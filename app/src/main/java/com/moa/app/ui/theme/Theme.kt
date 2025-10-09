@@ -1,4 +1,4 @@
-package com.wjdrjs.moa.ui.theme
+package com.moa.app.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

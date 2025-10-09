@@ -1,4 +1,4 @@
-package com.wjdrjs.moa
+package com.moa.app
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

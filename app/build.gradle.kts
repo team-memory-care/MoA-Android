@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.wjdrjs.moa"
+    namespace = "com.moa.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.wjdrjs.moa"
+        applicationId = "com.moa.app"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
