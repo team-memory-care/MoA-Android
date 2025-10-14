@@ -6,6 +6,3 @@ plugins {
 android {
     namespace = "com.moa.app.designsystem"
 }
-
-dependencies {
-}
