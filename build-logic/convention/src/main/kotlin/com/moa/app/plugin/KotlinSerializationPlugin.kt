@@ -6,7 +6,7 @@ import org.gradle.api.Project
 class KotlinSerializationPlugin : BasePlugin() {
     override fun apply(target: Project): Unit = with(target) {
         pluginManager.apply {
-            apply("kotlin.serialization.json")
+            apply("org.jetbrains.kotlin.plugin.serialization")
         }
 
         addLibraries("implementation", "kotlinx.serialization.json")
