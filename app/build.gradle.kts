@@ -35,7 +35,6 @@ dependencies {
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
 
-
     implementation(projects.core.designsystem)
     implementation(projects.domain)
     implementation(projects.data)
