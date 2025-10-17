@@ -1,4 +1,4 @@
-package com.moa.app.designsystem.font
+package com.moa.app.designsystem.foundation
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf

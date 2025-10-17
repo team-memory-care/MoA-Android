@@ -4,10 +4,10 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
-import com.moa.app.designsystem.color.LocalMoaColors
-import com.moa.app.designsystem.color.MoaColors
-import com.moa.app.designsystem.font.LocalMoaTypography
-import com.moa.app.designsystem.font.MoaTypography
+import com.moa.app.designsystem.foundation.LocalMoaColors
+import com.moa.app.designsystem.foundation.MoaColors
+import com.moa.app.designsystem.foundation.LocalMoaTypography
+import com.moa.app.designsystem.foundation.MoaTypography
 
 object MoaTheme {
     val colors: MoaColors
