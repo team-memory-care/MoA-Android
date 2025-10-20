@@ -78,7 +78,7 @@ fun MaTextField(
     ) { innerTextField ->
         Row(
             modifier = Modifier
-                .padding(vertical = 12.dp, horizontal = 20.dp),
+                .padding(vertical = 16.dp, horizontal = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
