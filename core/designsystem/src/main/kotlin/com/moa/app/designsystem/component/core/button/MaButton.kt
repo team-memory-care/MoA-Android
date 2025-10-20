@@ -83,6 +83,17 @@ object MaButtonDefaults {
         )
 
     @Composable
+    fun maBlackButtonColors(): MaButtonColors =
+        MaButtonColors(
+            defaultBackground = MoaTheme.colors.black,
+            pressedBackground = MoaTheme.colors.black,
+            disabledBackground = MoaTheme.colors.coolGray95,
+            defaultContentColor = MoaTheme.colors.white,
+            pressedContentColor = MoaTheme.colors.white,
+            disabledContentColor = MoaTheme.colors.white,
+        )
+
+    @Composable
     fun maSelectButtonColors(): MaSelectButtonColors =
         MaSelectButtonColors(
             selectedBackground = MoaTheme.colors.green50,
