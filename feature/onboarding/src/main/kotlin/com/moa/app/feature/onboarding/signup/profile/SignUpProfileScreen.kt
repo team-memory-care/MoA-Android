@@ -1,4 +1,4 @@
-package com.moa.app.feature.onboarding.signup
+package com.moa.app.feature.onboarding.signup.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.core.button.MaSelectButton
 import com.moa.app.designsystem.component.core.textfield.MaTextField
@@ -27,12 +28,20 @@ import com.moa.app.designsystem.component.product.topbar.MaTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
 
 @Composable
-fun SignUpProfileScreen() {
-    SignUpProfileScreenContent()
+fun SignUpProfileScreen(
+    viewModel: SignUpProfileViewModel = hiltViewModel()
+) {
+    SignUpProfileScreenContent(
+        onBackClick = viewModel::navigateToBack,
+        onNextClick = viewModel::navigateToNext
+    )
 }
 
 @Composable
-private fun SignUpProfileScreenContent() {
+private fun SignUpProfileScreenContent(
+    onBackClick: () -> Unit,
+    onNextClick: () -> Unit,
+) {
     var name by remember { mutableStateOf("") }
     var year by remember { mutableStateOf("") }
     var month by remember { mutableStateOf("") }
@@ -46,7 +55,7 @@ private fun SignUpProfileScreenContent() {
     ) {
         MaTopAppBar(
             title = "회원가입",
-            onBackClick = {}
+            onBackClick = onBackClick
         )
 
         Spacer(modifier = Modifier.height(28.dp))
@@ -185,7 +194,7 @@ private fun SignUpProfileScreenContent() {
             Spacer(modifier = Modifier.weight(1f))
 
             MaButton(
-                onClick = { },
+                onClick = onNextClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
@@ -204,5 +213,8 @@ private fun SignUpProfileScreenContent() {
 @Preview
 @Composable
 private fun Preview() {
-    SignUpProfileScreenContent()
+    SignUpProfileScreenContent(
+        onBackClick = {},
+        onNextClick = {}
+    )
 }

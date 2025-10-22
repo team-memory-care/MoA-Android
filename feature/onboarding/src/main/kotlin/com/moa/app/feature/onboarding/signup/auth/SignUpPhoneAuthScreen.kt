@@ -1,4 +1,4 @@
-package com.moa.app.feature.onboarding.signup
+package com.moa.app.feature.onboarding.signup.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

@@ -16,18 +16,25 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.core.button.MaButtonColors
 import com.moa.app.designsystem.theme.MoaTheme
 
 @Composable
-fun SignInScreen() {
-    SignInScreenContent()
+fun SignInScreen(
+    viewModel: SignInViewModel = hiltViewModel()
+) {
+    SignInScreenContent(
+        navigateToSignUp = viewModel::navigateToSignUp
+    )
 }
 
 @Composable
-private fun SignInScreenContent() {
+private fun SignInScreenContent(
+    navigateToSignUp: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,7 +51,7 @@ private fun SignInScreenContent() {
         )
 
         MaButton(
-            onClick = { },
+            onClick = navigateToSignUp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 4.dp),
@@ -82,5 +89,7 @@ private fun SignInScreenContent() {
 @Preview
 @Composable
 private fun Preview() {
-    SignInScreenContent()
+    SignInScreenContent(
+        navigateToSignUp = {}
+    )
 }
