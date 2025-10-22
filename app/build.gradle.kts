@@ -36,6 +36,7 @@ dependencies {
     androidTestImplementation(libs.compose.ui.test.junit4)
 
     implementation(projects.core.designsystem)
+    implementation(projects.core.navigation)
     implementation(projects.domain)
     implementation(projects.data)
     implementation(projects.feature.onboarding)

@@ -26,6 +26,7 @@ composeNavigation = "2.9.5"
 
 # Kotlin
 kotlin = "2.1.20"
+kotlinxCoroutines = "1.10.2"
 kotlinxSerializationJson = "1.9.0"
 
 # Kotlin Symbol Processing
@@ -78,6 +79,7 @@ compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-mani
 compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 
 ## Kotlin
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 ## Hilt
