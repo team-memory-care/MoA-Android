@@ -12,6 +12,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.moa.app.designsystem.theme.MoATheme
+import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.feature.onboarding.landing.AuthLandingScreen
 import com.moa.app.feature.onboarding.signin.SignInScreen
 import com.moa.app.feature.onboarding.signup.auth.SignUpPhoneAuthScreen
 import com.moa.app.feature.onboarding.signup.profile.SignUpProfileScreen
@@ -32,7 +34,9 @@ class MainActivity : ComponentActivity() {
             ObserveNavigationEvents(mainViewModel, navController)
 
             MoATheme {
-                Scaffold { innerPadding ->
+                Scaffold(
+                    containerColor = MoaTheme.colors.white,
+                ) { innerPadding ->
                     NavHost(
                         navController = navController,
                         startDestination = AppRoute.Splash,
@@ -40,6 +44,10 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable<AppRoute.Splash> {
                             SplashScreen()
+                        }
+
+                        composable<AppRoute.AuthLanding> {
+                            AuthLandingScreen()
                         }
 
                         composable<AppRoute.SignIn> {

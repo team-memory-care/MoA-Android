@@ -16,14 +16,14 @@ class SplashViewModel @Inject constructor(
 ) : ViewModel() {
 
     init {
-        navigateToSignIn()
+        navigateToAuthLanding()
     }
 
-    private fun navigateToSignIn() {
+    private fun navigateToAuthLanding() {
         viewModelScope.launch {
-            delay(2000L)
+            delay(1000L)
             navigator.navigate(
-                route = AppRoute.SignIn,
+                route = AppRoute.AuthLanding,
                 options = NavigationOptions(
                     popUpTo = AppRoute.Splash,
                     inclusive = true,
