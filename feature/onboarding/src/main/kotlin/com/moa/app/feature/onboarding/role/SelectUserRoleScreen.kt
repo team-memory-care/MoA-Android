@@ -93,7 +93,7 @@ private fun SelectUserRoleScreenContent() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.img_role_guradian),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.img_role_guardian),
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
