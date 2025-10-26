@@ -1,7 +1,6 @@
 package com.moa.app.feature.onboarding.splash
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +12,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.app.designsystem.R
-import com.moa.app.designsystem.theme.MoaTheme
 
 @Composable
 fun SplashScreen(
@@ -25,9 +23,7 @@ fun SplashScreen(
 @Composable
 private fun SplashScreenContent() {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MoaTheme.colors.white),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -38,7 +34,7 @@ private fun SplashScreenContent() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun Preview() {
     SplashScreenContent()

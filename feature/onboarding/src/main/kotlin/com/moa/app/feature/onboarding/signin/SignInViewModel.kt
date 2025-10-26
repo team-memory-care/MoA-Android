@@ -12,6 +12,6 @@ class SignInViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun navigateToSignUp() {
-        navigator.navigate(route = AppRoute.SignUpProfile)
+
     }
 }

@@ -1,7 +1,6 @@
 package com.moa.app.feature.onboarding.signin
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,7 +37,6 @@ private fun SignInScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MoaTheme.colors.white)
             .padding(horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -86,7 +84,7 @@ private fun SignInScreenContent(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun Preview() {
     SignInScreenContent(
