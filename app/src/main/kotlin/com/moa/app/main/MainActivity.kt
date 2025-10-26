@@ -6,15 +6,26 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.moa.app.designsystem.theme.MoATheme
+import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.feature.onboarding.landing.AuthLandingScreen
+import com.moa.app.feature.onboarding.role.SelectUserRoleScreen
 import com.moa.app.feature.onboarding.signin.SignInScreen
-import com.moa.app.feature.onboarding.signup.auth.SignUpPhoneAuthScreen
-import com.moa.app.feature.onboarding.signup.profile.SignUpProfileScreen
+import com.moa.app.feature.onboarding.signup.SignUpCompleteScreen
+import com.moa.app.feature.onboarding.signup.SignUpPhoneAuthScreen
+import com.moa.app.feature.onboarding.signup.SignUpProfileScreen
+import com.moa.app.feature.onboarding.signup.SignUpSharedViewModel
 import com.moa.app.feature.onboarding.splash.SplashScreen
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.ObserveNavigationEvents
@@ -32,30 +43,41 @@ class MainActivity : ComponentActivity() {
             ObserveNavigationEvents(mainViewModel, navController)
 
             MoATheme {
-                Scaffold { innerPadding ->
+                Scaffold(
+                    containerColor = MoaTheme.colors.white,
+                ) { innerPadding ->
                     NavHost(
                         navController = navController,
                         startDestination = AppRoute.Splash,
                         modifier = Modifier.padding(innerPadding),
                     ) {
-                        composable<AppRoute.Splash> {
-                            SplashScreen()
+                        composable<AppRoute.Splash> { SplashScreen() }
+                        composable<AppRoute.AuthLanding> { AuthLandingScreen() }
+                        composable<AppRoute.SignIn> { SignInScreen() }
+                        navigation<AppRoute.SignUp>(
+                            startDestination = AppRoute.SignUpProfile
+                        ) {
+                            composable<AppRoute.SignUpProfile> { backStackEntry ->
+                                val viewModel = backStackEntry.sharedViewModel<SignUpSharedViewModel>(navController)
+                                SignUpProfileScreen(viewModel)
+                            }
+                            composable<AppRoute.SignUpPhoneAuth> { backStackEntry ->
+                                val viewModel = backStackEntry.sharedViewModel<SignUpSharedViewModel>(navController)
+                                SignUpPhoneAuthScreen(viewModel)
+                            }
+                            composable<AppRoute.SignUpComplete> { SignUpCompleteScreen() }
                         }
-
-                        composable<AppRoute.SignIn> {
-                            SignInScreen()
-                        }
-
-                        composable<AppRoute.SignUpProfile> {
-                            SignUpProfileScreen()
-                        }
-
-                        composable<AppRoute.SignUpPhoneAuth> {
-                            SignUpPhoneAuthScreen()
-                        }
+                        composable<AppRoute.SelectUserRole> { SelectUserRoleScreen() }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+internal inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController): T {
+    val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
+    val parentEntry = remember(this) { navController.getBackStackEntry(navGraphRoute) }
+    return hiltViewModel(parentEntry)
 }

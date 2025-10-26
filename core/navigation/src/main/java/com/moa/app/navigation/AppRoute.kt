@@ -8,11 +8,23 @@ sealed interface AppRoute {
     data object Splash : AppRoute
 
     @Serializable
-    data object SignIn : AppRoute
+    data object AuthLanding : AppRoute
+
+    @Serializable
+    data object SignUp : AppRoute
 
     @Serializable
     data object SignUpProfile : AppRoute
 
     @Serializable
     data object SignUpPhoneAuth : AppRoute
+
+    @Serializable
+    data object SignUpComplete : AppRoute
+
+    @Serializable
+    data object SignIn : AppRoute
+
+    @Serializable
+    data object SelectUserRole : AppRoute
 }

@@ -1,4 +1,4 @@
-package com.moa.app.feature.onboarding.splash
+package com.moa.app.feature.onboarding.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,23 +11,23 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SplashViewModel @Inject constructor(
+class SignUpCompleteViewModel @Inject constructor(
     private val navigator: Navigator
 ) : ViewModel() {
 
     init {
-        navigateToAuthLanding()
+        navigateToSelectUserRole()
     }
 
-    private fun navigateToAuthLanding() {
+    private fun navigateToSelectUserRole() {
         viewModelScope.launch {
             delay(1000L)
             navigator.navigate(
-                route = AppRoute.AuthLanding,
+                route = AppRoute.SelectUserRole,
                 options = NavigationOptions(
-                    popUpTo = AppRoute.Splash,
-                    inclusive = true,
-                ),
+                    popUpTo = AppRoute.SignUpComplete,
+                    inclusive = true
+                )
             )
         }
     }

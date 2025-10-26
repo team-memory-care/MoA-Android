@@ -1,6 +1,5 @@
-package com.moa.app.feature.onboarding.signup.auth
+package com.moa.app.feature.onboarding.signup
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,46 +10,68 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.core.button.MaButtonDefaults
 import com.moa.app.designsystem.component.core.textfield.MaTextField
 import com.moa.app.designsystem.component.product.layout.FormField
 import com.moa.app.designsystem.component.product.topbar.MaTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.feature.onboarding.signup.state.SignUpPhoneAuthUiState
 
 @Composable
-fun SignUpPhoneAuthScreen() {
-    SignUpPhoneAuthScreenContent()
+fun SignUpPhoneAuthScreen(
+    viewModel: SignUpSharedViewModel,
+) {
+    val uiState by viewModel.signUpPhoneAuthUiState.collectAsStateWithLifecycle()
+
+    SignUpPhoneAuthScreenContent(
+        uiState = uiState,
+        onChangePhoneNumber = viewModel::updatePhoneNumber,
+        onAuthCodeRequestClick = viewModel::requestAuthCode,
+        onChangeAuthNumber = viewModel::updateAuthCode,
+        onAuthConfirmClick = viewModel::verifyAuthCode,
+        onBackClick = viewModel::navigateToBack,
+    )
 }
 
 @Composable
-private fun SignUpPhoneAuthScreenContent() {
-    var phoneNumber by remember { mutableStateOf("") }
-    var authNumber by remember { mutableStateOf("") }
+private fun SignUpPhoneAuthScreenContent(
+    uiState: SignUpPhoneAuthUiState,
+    onChangePhoneNumber: (String) -> Unit,
+    onAuthCodeRequestClick: () -> Unit,
+    onChangeAuthNumber: (String) -> Unit,
+    onAuthConfirmClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
+) {
+    val phoneNumberFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        phoneNumberFocusRequester.requestFocus()
+    }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MoaTheme.colors.white)
+        modifier = Modifier.fillMaxSize()
     ) {
         MaTopAppBar(
             title = "회원가입",
-            onBackClick = {}
+            onBackClick = onBackClick
         )
 
         Spacer(modifier = Modifier.height(28.dp))
 
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 20.dp)
         ) {
             Text(
                 text = "안전을 위해 전화번호를\n확인할게요",
@@ -61,13 +82,14 @@ private fun SignUpPhoneAuthScreenContent() {
             Spacer(modifier = Modifier.height(24.dp))
 
             FormField(
-                isError = true,
-                errorMessage = "어쩌구"
+                isError = uiState.isPhoneNumberError,
+                errorMessage = uiState.phoneNumberErrorMessage,
             ) {
                 MaTextField(
-                    value = phoneNumber,
-                    onValueChange = { newValue -> phoneNumber = newValue },
-                    isError = true,
+                    value = uiState.phoneNumber,
+                    onValueChange = onChangePhoneNumber,
+                    modifier = Modifier.focusRequester(phoneNumberFocusRequester),
+                    isError = uiState.isPhoneNumberError,
                     maxLines = 1,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     placeholder = {
@@ -79,8 +101,8 @@ private fun SignUpPhoneAuthScreenContent() {
                     },
                     trailingContent = {
                         MaButton(
-                            onClick = {},
-                            enabled = true,
+                            onClick = onAuthCodeRequestClick,
+                            enabled = !uiState.isAuthCodeRequested,
                             colors = MaButtonDefaults.maBlackButtonColors(),
                             shape = RoundedCornerShape(8.dp)
                         ) {
@@ -98,9 +120,9 @@ private fun SignUpPhoneAuthScreenContent() {
             Spacer(modifier = Modifier.height(20.dp))
 
             FormField(
-                isError = true,
-                errorMessage = "어쩌구",
-                modifier = Modifier.alpha(1f)
+                isError = uiState.isAuthCodeError,
+                errorMessage = uiState.authCodeErrorMessage,
+                modifier = Modifier.alpha(if (uiState.isAuthCodeRequested) 1f else 0f)
             ) {
                 Text(
                     text = "인증번호",
@@ -110,9 +132,9 @@ private fun SignUpPhoneAuthScreenContent() {
                 )
 
                 MaTextField(
-                    value = authNumber,
-                    onValueChange = { newValue -> authNumber = newValue },
-                    isError = true,
+                    value = uiState.authCode,
+                    onValueChange = onChangeAuthNumber,
+                    isError = uiState.isAuthCodeError,
                     maxLines = 1,
                     placeholder = {
                         Text(
@@ -127,14 +149,14 @@ private fun SignUpPhoneAuthScreenContent() {
             Spacer(modifier = Modifier.weight(1f))
 
             MaButton(
-                onClick = { },
+                onClick = onAuthConfirmClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
             ) {
                 Text(
-                    text = "다음",
-                    style = MoaTheme.typography.body1Medium,
+                    text = "인증 확인",
+                    style = MoaTheme.typography.body1Bold,
                     modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp)
                 )
             }
@@ -142,8 +164,15 @@ private fun SignUpPhoneAuthScreenContent() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    SignUpPhoneAuthScreenContent()
+    SignUpPhoneAuthScreenContent(
+        uiState = SignUpPhoneAuthUiState.init,
+        onChangePhoneNumber = {},
+        onAuthCodeRequestClick = {},
+        onChangeAuthNumber = {},
+        onAuthConfirmClick = {},
+        onBackClick = {},
+    )
 }

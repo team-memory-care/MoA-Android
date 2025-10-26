@@ -1,4 +1,4 @@
-package com.moa.app.feature.onboarding.signin
+package com.moa.app.feature.onboarding.landing
 
 import androidx.lifecycle.ViewModel
 import com.moa.app.navigation.AppRoute
@@ -7,11 +7,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SignInViewModel @Inject constructor(
+class AuthLandingViewModel @Inject constructor(
     private val navigator: Navigator,
 ) : ViewModel() {
 
-    fun navigateToSignUp() {
 
-    }
+    fun onSignUpClicked() = navigator.navigate(route = AppRoute.SignUp)
+
+    fun onSignInClicked() {}
 }

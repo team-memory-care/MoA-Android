@@ -1,4 +1,4 @@
-package com.moa.app.feature.onboarding.splash
+package com.moa.app.feature.onboarding.signup
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -14,14 +14,14 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.app.designsystem.R
 
 @Composable
-fun SplashScreen(
-    viewModel: SplashViewModel = hiltViewModel()
+fun SignUpCompleteScreen(
+    viewModel: SignUpCompleteViewModel = hiltViewModel()
 ) {
-    SplashScreenContent()
+    SignUpScreenContent()
 }
 
 @Composable
-private fun SplashScreenContent() {
+private fun SignUpScreenContent() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -37,5 +37,5 @@ private fun SplashScreenContent() {
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    SplashScreenContent()
+    SignUpScreenContent()
 }

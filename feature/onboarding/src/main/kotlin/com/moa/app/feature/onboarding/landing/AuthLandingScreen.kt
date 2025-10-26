@@ -1,4 +1,4 @@
-package com.moa.app.feature.onboarding.signin
+package com.moa.app.feature.onboarding.landing
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -22,17 +22,19 @@ import com.moa.app.designsystem.component.core.button.MaButtonColors
 import com.moa.app.designsystem.theme.MoaTheme
 
 @Composable
-fun SignInScreen(
-    viewModel: SignInViewModel = hiltViewModel()
+fun AuthLandingScreen(
+    viewModel: AuthLandingViewModel = hiltViewModel()
 ) {
-    SignInScreenContent(
-        navigateToSignUp = viewModel::navigateToSignUp
+    AuthLandingScreenContent(
+        onSignUpClick = viewModel::onSignUpClicked,
+        onSignInClick = viewModel::onSignInClicked,
     )
 }
 
 @Composable
-private fun SignInScreenContent(
-    navigateToSignUp: () -> Unit
+private fun AuthLandingScreenContent(
+    onSignUpClick: () -> Unit,
+    onSignInClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -49,7 +51,7 @@ private fun SignInScreenContent(
         )
 
         MaButton(
-            onClick = navigateToSignUp,
+            onClick = onSignUpClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 4.dp),
@@ -62,7 +64,7 @@ private fun SignInScreenContent(
         }
 
         MaButton(
-            onClick = { },
+            onClick = onSignInClick,
             colors = MaButtonColors(
                 defaultBackground = Color.Transparent,
                 pressedBackground = Color.Transparent,
@@ -87,7 +89,8 @@ private fun SignInScreenContent(
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    SignInScreenContent(
-        navigateToSignUp = {}
+    AuthLandingScreenContent(
+        onSignUpClick = {},
+        onSignInClick = {},
     )
 }
