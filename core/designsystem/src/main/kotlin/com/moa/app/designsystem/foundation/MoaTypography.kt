@@ -15,6 +15,9 @@ data class MoaTypography(
     val display1Bold: TextStyle,
     val display1Medium: TextStyle,
     val display1Regular: TextStyle,
+    val display2Bold: TextStyle,
+    val display2Medium: TextStyle,
+    val display2Regular: TextStyle,
     val headLine1Bold: TextStyle,
     val headLine1Medium: TextStyle,
     val headLine1Regular: TextStyle,
@@ -58,6 +61,14 @@ internal val PretendardLineHeightStyle = LineHeightStyle(
 )
 
 internal val display1 = TextStyle(
+    fontFamily = PretendardFont,
+    fontSize = 32.sp,
+    lineHeight = 46.sp,
+    letterSpacing = (-0.5).sp,
+    lineHeightStyle = PretendardLineHeightStyle,
+)
+
+internal val display2 = TextStyle(
     fontFamily = PretendardFont,
     fontSize = 28.sp,
     lineHeight = 36.sp,
@@ -133,6 +144,9 @@ internal val defaultMoaTypography = MoaTypography(
     display1Bold = display1.copy(fontWeight = FontWeight.Bold),
     display1Medium = display1.copy(fontWeight = FontWeight.Medium),
     display1Regular = display1.copy(fontWeight = FontWeight.Normal),
+    display2Bold = display2.copy(fontWeight = FontWeight.Bold),
+    display2Medium = display2.copy(fontWeight = FontWeight.Medium),
+    display2Regular = display2.copy(fontWeight = FontWeight.Normal),
     headLine1Bold = headLine1.copy(fontWeight = FontWeight.Bold),
     headLine1Medium = headLine1.copy(fontWeight = FontWeight.Medium),
     headLine1Regular = headLine1.copy(fontWeight = FontWeight.Normal),

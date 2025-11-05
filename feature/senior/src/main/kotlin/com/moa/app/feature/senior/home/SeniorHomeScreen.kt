@@ -26,6 +26,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.theme.MoaTheme
@@ -100,7 +101,7 @@ private fun SeniorHomeScreenContent() {
                     Text(
                         text = "안녕하세요,\n김순자님\n오늘 하루도 활기차게\n시작해볼까요?",
                         color = MoaTheme.colors.black,
-                        style = MoaTheme.typography.headLine1Bold,
+                        style = MoaTheme.typography.display1Bold,
                     )
                 }
 
