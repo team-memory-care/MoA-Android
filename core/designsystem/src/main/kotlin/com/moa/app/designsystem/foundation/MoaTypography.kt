@@ -63,7 +63,7 @@ internal val PretendardLineHeightStyle = LineHeightStyle(
 internal val display1 = TextStyle(
     fontFamily = PretendardFont,
     fontSize = 32.sp,
-    lineHeight = 40.sp,
+    lineHeight = 46.sp,
     letterSpacing = (-0.5).sp,
     lineHeightStyle = PretendardLineHeightStyle,
 )
