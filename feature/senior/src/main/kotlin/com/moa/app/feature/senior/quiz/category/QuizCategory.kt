@@ -1,4 +1,4 @@
-package com.moa.app.feature.senior.quiz
+package com.moa.app.feature.senior.quiz.category
 
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
