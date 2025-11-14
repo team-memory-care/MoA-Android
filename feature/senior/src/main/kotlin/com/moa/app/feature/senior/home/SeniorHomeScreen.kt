@@ -3,6 +3,7 @@ package com.moa.app.feature.senior.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,20 +29,26 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.theme.MoaTheme
 
 @Composable
 fun SeniorHomeScreen(
-    modifier: Modifier = Modifier,
+    viewModel: SeniorHomeViewModel = hiltViewModel(),
 ) {
-    SeniorHomeScreenContent()
+    SeniorHomeScreenContent(
+        onDailyQuizClick = viewModel::navigateToDailyQuiz,
+        onQuizClick = viewModel::navigateToQuizCategory,
+    )
 }
 
 @Composable
-private fun SeniorHomeScreenContent() {
+private fun SeniorHomeScreenContent(
+    onDailyQuizClick: () -> Unit,
+    onQuizClick: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -119,7 +128,7 @@ private fun SeniorHomeScreenContent() {
 
 
             MaButton(
-                onClick = {},
+                onClick = onDailyQuizClick,
                 shape = RoundedCornerShape(24.dp),
             ) {
                 Row(
@@ -156,7 +165,9 @@ private fun SeniorHomeScreenContent() {
                         .weight(1f)
                         .clip(RoundedCornerShape(24.dp))
                         .clickable(
-                            onClick = {},
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = ripple(),
+                            onClick = onQuizClick,
                             role = Role.Button,
                         )
                         .background(MoaTheme.colors.lightBlue500)
@@ -246,5 +257,8 @@ private fun SeniorHomeScreenContent() {
 @Preview
 @Composable
 private fun Preview() {
-    SeniorHomeScreenContent()
+    SeniorHomeScreenContent(
+        onDailyQuizClick = {},
+        onQuizClick = {}
+    )
 }

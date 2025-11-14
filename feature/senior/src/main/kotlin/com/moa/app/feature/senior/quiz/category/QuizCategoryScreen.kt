@@ -11,18 +11,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.senior.quiz.category.QuizCategory
 import com.moa.app.feature.senior.quiz.component.QuizCategoryCard
 
 @Composable
 fun QuizCategoryScreen(
+    viewModel: QuizCategoryViewModel = hiltViewModel()
 ) {
-    QuizCategoryScreenContent()
+    QuizCategoryScreenContent(
+        onQuizCategoryClick = viewModel::onCategoryClicked
+    )
 }
 
 @Composable
-private fun QuizCategoryScreenContent() {
+private fun QuizCategoryScreenContent(
+    onQuizCategoryClick: (QuizCategory) -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -60,7 +66,7 @@ private fun QuizCategoryScreenContent() {
                     backgroundImage = category.imageRes,
                     backgroundColor = category.backgroundColor,
                     modifier = Modifier.weight(1f),
-                    onClick = {}
+                    onClick = { onQuizCategoryClick(category) }
                 )
             }
         }
@@ -70,5 +76,7 @@ private fun QuizCategoryScreenContent() {
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    QuizCategoryScreenContent()
+    QuizCategoryScreenContent(
+        onQuizCategoryClick = {}
+    )
 }

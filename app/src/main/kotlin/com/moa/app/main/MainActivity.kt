@@ -27,6 +27,9 @@ import com.moa.app.feature.onboarding.signup.SignUpPhoneAuthScreen
 import com.moa.app.feature.onboarding.signup.SignUpProfileScreen
 import com.moa.app.feature.onboarding.signup.SignUpSharedViewModel
 import com.moa.app.feature.onboarding.splash.SplashScreen
+import com.moa.app.feature.senior.home.SeniorHomeScreen
+import com.moa.app.feature.senior.quiz.orientation.OrientationQuizScreen
+import com.moa.app.feature.senior.quiz.category.QuizCategoryScreen
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.ObserveNavigationEvents
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,6 +71,9 @@ class MainActivity : ComponentActivity() {
                             composable<AppRoute.SignUpComplete> { SignUpCompleteScreen() }
                         }
                         composable<AppRoute.SelectUserRole> { SelectUserRoleScreen() }
+                        composable<AppRoute.SeniorHome> { SeniorHomeScreen() }
+                        composable<AppRoute.QuizCategory> { QuizCategoryScreen() }
+                        composable<AppRoute.OrientationQuiz> { OrientationQuizScreen() }
                     }
                 }
             }
