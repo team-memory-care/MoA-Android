@@ -27,4 +27,13 @@ sealed interface AppRoute {
 
     @Serializable
     data object SelectUserRole : AppRoute
+
+    @Serializable
+    data object SeniorHome : AppRoute
+
+    @Serializable
+    data object QuizCategory : AppRoute
+
+    @Serializable
+    data object OrientationQuiz : AppRoute
 }
