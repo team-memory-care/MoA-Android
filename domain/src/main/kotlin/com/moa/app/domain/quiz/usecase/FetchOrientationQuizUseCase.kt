@@ -2,7 +2,6 @@ package com.moa.app.domain.quiz.usecase
 
 import com.moa.app.domain.quiz.model.Quiz
 import com.moa.app.domain.quiz.model.Quizzes
-import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import javax.inject.Inject
 

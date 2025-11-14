@@ -5,7 +5,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 class Quizzes(
-    private val items: ImmutableList<Quiz>
+    private val items: ImmutableList<Quiz>,
 ) {
     val size: Int
         get() = items.size
