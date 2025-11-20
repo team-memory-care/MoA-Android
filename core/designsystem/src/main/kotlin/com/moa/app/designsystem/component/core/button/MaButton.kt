@@ -72,14 +72,21 @@ object MaButtonDefaults {
         @Composable get() = RoundedCornerShape(12.dp)
 
     @Composable
-    fun maButtonColors(): MaButtonColors =
+    fun maButtonColors(
+        defaultBackground: Color = MoaTheme.colors.green500,
+        pressedBackground: Color = MoaTheme.colors.green600,
+        disabledBackground: Color = MoaTheme.colors.green100,
+        defaultContentColor: Color = MoaTheme.colors.white,
+        pressedContentColor: Color = MoaTheme.colors.white,
+        disabledContentColor: Color = MoaTheme.colors.white,
+    ): MaButtonColors =
         MaButtonColors(
-            defaultBackground = MoaTheme.colors.green500,
-            pressedBackground = MoaTheme.colors.green600,
-            disabledBackground = MoaTheme.colors.green100,
-            defaultContentColor = MoaTheme.colors.white,
-            pressedContentColor = MoaTheme.colors.white,
-            disabledContentColor = MoaTheme.colors.white,
+            defaultBackground = defaultBackground,
+            pressedBackground = pressedBackground,
+            disabledBackground = disabledBackground,
+            defaultContentColor = defaultContentColor,
+            pressedContentColor = pressedContentColor,
+            disabledContentColor = disabledContentColor,
         )
 
     @Composable
