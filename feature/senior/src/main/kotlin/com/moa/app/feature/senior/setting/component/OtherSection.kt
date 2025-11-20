@@ -50,7 +50,7 @@ fun OtherSection(
         )
 
         OptionItem(
-            icon = R.drawable.ic_shield,
+            icon = R.drawable.ic_logout,
             title = "로그아웃",
             onClick = {}
         )
