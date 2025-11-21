@@ -10,6 +10,7 @@ import retrofit2.Response
 
 internal class NetworkResultCall<T>(
     private val proxy: Call<BaseResponse<T>>,
+    private val responseHandler: ResponseHandler<T> = ResponseHandler(),
 ) : Call<NetworkResult<T>> {
 
     override fun enqueue(callback: Callback<NetworkResult<T>>) {
@@ -19,7 +20,7 @@ internal class NetworkResultCall<T>(
                     call: Call<BaseResponse<T>>,
                     response: Response<BaseResponse<T>>,
                 ) {
-                    val networkResult = handleApi(response)
+                    val networkResult = responseHandler.handle(response)
                     callback.onResponse(this@NetworkResultCall, Response.success(networkResult))
                 }
 
@@ -29,27 +30,6 @@ internal class NetworkResultCall<T>(
                 }
             },
         )
-    }
-
-    private fun handleApi(response: Response<BaseResponse<T>>): NetworkResult<T> {
-        val body = response.body()
-
-        return if (response.isSuccessful && body != null) {
-            if (body.success) {
-                val data = body.data
-
-                if (data != null) {
-                    NetworkResult.Success(data)
-                } else {
-                    @Suppress("UNCHECKED_CAST")
-                    NetworkResult.Success(Unit as T)
-                }
-            } else {
-                NetworkResult.Error(code = response.code(), message = body.message)
-            }
-        } else {
-            NetworkResult.Error(code = response.code(), message = response.message())
-        }
     }
 
     override fun clone(): Call<NetworkResult<T>> = NetworkResultCall(proxy.clone())
