@@ -32,7 +32,7 @@ internal class NetworkResultCall<T>(
         )
     }
 
-    override fun clone(): Call<NetworkResult<T>> = NetworkResultCall(proxy.clone())
+    override fun clone(): Call<NetworkResult<T>> = NetworkResultCall(proxy.clone(), responseHandler)
     override fun execute(): Response<NetworkResult<T>> =
         throw UnsupportedOperationException("NetworkResultCall doesn't support execute")
 
