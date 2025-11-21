@@ -14,6 +14,12 @@ class NetworkResultCallAdapter(
 
     @Suppress("UNCHECKED_CAST")
     override fun adapt(call: Call<BaseResponse<*>>): Call<NetworkResult<*>> {
-        return NetworkResultCall(call as Call<BaseResponse<Any>>) as Call<NetworkResult<*>>
+        val handler = if (successType == Unit::class.java) {
+            UnitResponseHandler() as ResponseHandler<Any>
+        } else {
+            ResponseHandler<Any>()
+        }
+
+        return NetworkResultCall(call as Call<BaseResponse<Any>>, handler) as Call<NetworkResult<*>>
     }
 }
