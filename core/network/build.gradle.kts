@@ -32,6 +32,17 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+
+            all {
+                it.useJUnitPlatform()
+            }
+        }
+    }
 }
 
 dependencies {
@@ -40,4 +51,12 @@ dependencies {
     implementation(libs.bundles.retrofit)
     implementation(platform(libs.okhttp.bom))
     implementation(libs.bundles.okhttp)
+
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.assertj.core)
+
+    testImplementation(libs.bundles.retrofit)
+    testImplementation(libs.bundles.okhttp)
 }
