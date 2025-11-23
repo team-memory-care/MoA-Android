@@ -58,5 +58,5 @@ class UserConnectionViewModel @Inject constructor(
         }
     }
 
-    fun navigateToBack() = navigator::navigateBack
+    fun navigateToBack() = navigator.navigateBack()
 }
