@@ -36,4 +36,7 @@ sealed interface AppRoute {
 
     @Serializable
     data object OrientationQuiz : AppRoute
+
+    @Serializable
+    data object UserConnection : AppRoute
 }
