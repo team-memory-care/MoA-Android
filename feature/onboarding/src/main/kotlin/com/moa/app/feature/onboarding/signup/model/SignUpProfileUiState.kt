@@ -1,4 +1,4 @@
-package com.moa.app.feature.onboarding.signup.state
+package com.moa.app.feature.onboarding.signup.model
 
 import com.moa.app.domain.auth.model.Gender
 

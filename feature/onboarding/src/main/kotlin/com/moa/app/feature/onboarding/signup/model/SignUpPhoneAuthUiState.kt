@@ -1,4 +1,4 @@
-package com.moa.app.feature.onboarding.signup.state
+package com.moa.app.feature.onboarding.signup.model
 
 data class SignUpPhoneAuthUiState(
     val phoneNumber: String,
