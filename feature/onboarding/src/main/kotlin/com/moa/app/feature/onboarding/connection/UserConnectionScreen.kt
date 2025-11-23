@@ -55,7 +55,7 @@ fun UserConnectionContent(
             verticalArrangement = Arrangement.spacedBy(28.dp)
         ) {
             Text(
-                text = uiState.getTitle,
+                text = uiState.setTitle,
                 color = MoaTheme.colors.black,
                 style = MoaTheme.typography.headLine2Bold,
             )
@@ -82,7 +82,7 @@ fun UserConnectionContent(
                 .padding(bottom = 12.dp),
         ) {
             Text(
-                text = "다음",
+                text = uiState.setButtonTitle,
                 style = MoaTheme.typography.body1Medium,
                 modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
             )
