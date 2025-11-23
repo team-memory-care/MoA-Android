@@ -221,7 +221,7 @@ private fun SignUpProfileScreenContent(
             ) {
                 MaSelectButton(
                     onClick = onSelectedFemale,
-                    selected = uiState.gender == "female",
+                    selected = uiState.isGenderFemale,
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(
@@ -233,7 +233,7 @@ private fun SignUpProfileScreenContent(
 
                 MaSelectButton(
                     onClick = onSelectedMale,
-                    selected = uiState.gender == "male",
+                    selected = uiState.isGenderMale,
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(

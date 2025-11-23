@@ -1,14 +1,23 @@
 package com.moa.app.feature.onboarding.signup.state
 
+import com.moa.app.domain.auth.model.Gender
+
 data class SignUpProfileUiState(
     val name: String,
     val year: String,
     val month: String,
     val day: String,
-    val gender: String,
+    val gender: Gender?,
 ) {
     val isNextEnabled: Boolean
-        get() = name.isNotEmpty() && year.isNotEmpty() && month.isNotEmpty() && day.isNotEmpty() && gender.isNotEmpty()
+        get() = name.isNotEmpty() && year.isNotEmpty() && month.isNotEmpty() && day.isNotEmpty() && gender != null
+
+    val isGenderMale: Boolean
+        get() = gender == Gender.MALE
+
+    val isGenderFemale: Boolean
+        get() = gender == Gender.FEMALE
+
 
     companion object {
         val init = SignUpProfileUiState(
@@ -16,7 +25,7 @@ data class SignUpProfileUiState(
             year = "",
             month = "",
             day = "",
-            gender = "",
+            gender = null,
         )
     }
 }

@@ -2,6 +2,7 @@ package com.moa.app.feature.onboarding.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.domain.auth.model.Gender
 import com.moa.app.feature.onboarding.signup.state.SignUpPhoneAuthUiState
 import com.moa.app.feature.onboarding.signup.state.SignUpProfileUiState
 import com.moa.app.navigation.AppRoute
@@ -43,11 +44,11 @@ class SignUpSharedViewModel @Inject constructor(
     }
 
     fun selectMaleGender() {
-        _signUpUserProfileUiState.update { it.copy(gender = "male") }
+        _signUpUserProfileUiState.update { it.copy(gender = Gender.MALE) }
     }
 
     fun selectFemaleGender() {
-        _signUpUserProfileUiState.update { it.copy(gender = "female") }
+        _signUpUserProfileUiState.update { it.copy(gender = Gender.FEMALE) }
     }
 
     // sign up phone auth event
