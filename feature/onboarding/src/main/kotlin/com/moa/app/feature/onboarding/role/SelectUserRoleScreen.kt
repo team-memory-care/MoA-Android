@@ -21,18 +21,26 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.core.button.MaSelectButton
 import com.moa.app.designsystem.theme.MoaTheme
 
 @Composable
-fun SelectUserRoleScreen() {
-    SelectUserRoleScreenContent()
+fun SelectUserRoleScreen(
+    viewModel: SelectUserRoleViewModel = hiltViewModel()
+) {
+
+    SelectUserRoleScreenContent(
+        onNextClick = viewModel::navigateToUserConnection
+    )
 }
 
 @Composable
-private fun SelectUserRoleScreenContent() {
+private fun SelectUserRoleScreenContent(
+    onNextClick: () -> Unit
+) {
     var selectedUserRole by remember { mutableStateOf("") }
 
     Column(
@@ -118,7 +126,7 @@ private fun SelectUserRoleScreenContent() {
         Spacer(Modifier.weight(1f))
 
         MaButton(
-            onClick = { },
+            onClick = onNextClick,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
@@ -133,5 +141,7 @@ private fun SelectUserRoleScreenContent() {
 @Preview
 @Composable
 private fun Preview() {
-    SelectUserRoleScreenContent()
+    SelectUserRoleScreenContent(
+        onNextClick = {}
+    )
 }

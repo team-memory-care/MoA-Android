@@ -19,6 +19,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.moa.app.designsystem.theme.MoATheme
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.feature.onboarding.connection.UserConnectionScreen
 import com.moa.app.feature.onboarding.landing.AuthLandingScreen
 import com.moa.app.feature.onboarding.role.SelectUserRoleScreen
 import com.moa.app.feature.onboarding.signin.SignInScreen
@@ -74,6 +75,7 @@ class MainActivity : ComponentActivity() {
                         composable<AppRoute.SeniorHome> { SeniorHomeScreen() }
                         composable<AppRoute.QuizCategory> { QuizCategoryScreen() }
                         composable<AppRoute.OrientationQuiz> { OrientationQuizScreen() }
+                        composable<AppRoute.UserConnection> { UserConnectionScreen() }
                     }
                 }
             }
