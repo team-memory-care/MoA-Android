@@ -25,10 +25,16 @@ internal fun ObserveNavigationEvents(
                         is NavigationEvent.NavigateBack -> navController.popBackStack()
                         is NavigationEvent.Navigate -> {
                             navController.navigate(event.route) {
-                                event.options.popUpTo?.let { popUpToRoute ->
-                                    popUpTo(popUpToRoute) {
-                                        inclusive = event.options.inclusive
-                                        saveState = event.options.saveState
+                                if (event.options.clearBackStack) {
+                                    popUpTo(navController.graph.id) {
+                                        inclusive = true
+                                    }
+                                } else {
+                                    event.options.popUpTo?.let { popUpToRoute ->
+                                        popUpTo(popUpToRoute) {
+                                            inclusive = event.options.inclusive
+                                            saveState = event.options.saveState
+                                        }
                                     }
                                 }
                                 launchSingleTop = event.options.launchSingleTop
