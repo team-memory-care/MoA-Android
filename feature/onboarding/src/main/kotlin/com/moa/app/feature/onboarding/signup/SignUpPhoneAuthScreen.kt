@@ -27,7 +27,7 @@ import com.moa.app.designsystem.component.core.textfield.MaTextField
 import com.moa.app.designsystem.component.product.layout.FormField
 import com.moa.app.designsystem.component.product.topbar.MaTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
-import com.moa.app.feature.onboarding.signup.state.SignUpPhoneAuthUiState
+import com.moa.app.feature.onboarding.signup.model.SignUpPhoneAuthUiState
 
 @Composable
 fun SignUpPhoneAuthScreen(
@@ -150,6 +150,7 @@ private fun SignUpPhoneAuthScreenContent(
 
             MaButton(
                 onClick = onAuthConfirmClick,
+                enabled = uiState.authCode.isNotEmpty(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),

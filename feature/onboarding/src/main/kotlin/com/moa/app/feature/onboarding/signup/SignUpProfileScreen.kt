@@ -29,7 +29,7 @@ import com.moa.app.designsystem.component.core.button.MaSelectButton
 import com.moa.app.designsystem.component.core.textfield.MaTextField
 import com.moa.app.designsystem.component.product.topbar.MaTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
-import com.moa.app.feature.onboarding.signup.state.SignUpProfileUiState
+import com.moa.app.feature.onboarding.signup.model.SignUpProfileUiState
 
 @Composable
 fun SignUpProfileScreen(
@@ -221,7 +221,7 @@ private fun SignUpProfileScreenContent(
             ) {
                 MaSelectButton(
                     onClick = onSelectedFemale,
-                    selected = uiState.gender == "female",
+                    selected = uiState.isGenderFemale,
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(
@@ -233,7 +233,7 @@ private fun SignUpProfileScreenContent(
 
                 MaSelectButton(
                     onClick = onSelectedMale,
-                    selected = uiState.gender == "male",
+                    selected = uiState.isGenderMale,
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(

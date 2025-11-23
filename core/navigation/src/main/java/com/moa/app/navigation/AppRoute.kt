@@ -38,5 +38,5 @@ sealed interface AppRoute {
     data object OrientationQuiz : AppRoute
 
     @Serializable
-    data object UserConnection : AppRoute
+    data class UserConnection(val userRole: String) : AppRoute
 }
