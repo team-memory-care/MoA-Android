@@ -150,6 +150,7 @@ private fun SignUpPhoneAuthScreenContent(
 
             MaButton(
                 onClick = onAuthConfirmClick,
+                enabled = uiState.authCode.isNotEmpty(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
