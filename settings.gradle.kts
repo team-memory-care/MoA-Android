@@ -32,6 +32,7 @@ rootProject.name = "MoA"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
+include(":core:datastore")
 include(":core:designsystem")
 include(":core:navigation")
 include(":core:network")
