@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.auth.model.Gender
+import com.moa.app.domain.auth.model.UserProfile
 import com.moa.app.domain.auth.usecase.PhoneAuthCodeUseCase
+import com.moa.app.domain.auth.usecase.SignUpUseCase
 import com.moa.app.feature.onboarding.signup.model.SignUpPhoneAuthUiState
 import com.moa.app.feature.onboarding.signup.model.SignUpProfileUiState
 import com.moa.app.feature.onboarding.signup.model.SignUpPhoneAuthSideEffect
@@ -25,6 +27,7 @@ import javax.inject.Inject
 class SignUpSharedViewModel @Inject constructor(
     private val navigator: Navigator,
     private val phoneAuthCodeUseCase: PhoneAuthCodeUseCase,
+    private val signUpUseCase: SignUpUseCase
 ) : ViewModel() {
 
     private val _signUpUserProfileUiState = MutableStateFlow(SignUpProfileUiState.init)
@@ -89,15 +92,27 @@ class SignUpSharedViewModel @Inject constructor(
         }
     }
 
-    // 인증 번호 확인 요청
-    fun verifyAuthCode() {
+    fun signUp() {
         viewModelScope.launch {
-            // TODO: 인증 코드 확인 api 호출
+            val gender = _signUpUserProfileUiState.value.gender ?: return@launch
+            signUpUseCase(
+                userProfile = UserProfile(
+                    name = _signUpUserProfileUiState.value.name,
+                    birthDate = _signUpUserProfileUiState.value.birthDate,
+                    gender = gender,
+                    phoneNumber = _signUpPhoneAuthUiState.value.phoneNumber,
+                    authCode = _signUpPhoneAuthUiState.value.authCode
+                )
+            ).fold(
+                onSuccess = { navigateToComplete() },
+                onFailure = { error ->
+                    _signUpPhoneAuthUiState.update {
+                        it.copy(isAuthCodeError = true, authCodeErrorMessage = error.message)
+                    }
+                }
+            )
         }
-        // TODO: 인증 성공 시 회원가입 완료 후 화면 이동
-        navigateToComplete()
     }
-
 
     fun navigateToBack() = navigator.navigateBack()
 

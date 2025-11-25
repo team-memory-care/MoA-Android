@@ -56,9 +56,9 @@ fun SignUpPhoneAuthScreen(
         uiState = uiState,
         authCodeFocusRequester = authCodeFocusRequester,
         onChangePhoneNumber = viewModel::updatePhoneNumber,
-        onVerificationCodeRequestClick = viewModel::requestPhoneAuthCode,
+        onAuthCodeRequestClick = viewModel::requestPhoneAuthCode,
         onChangeAuthNumber = viewModel::updateAuthCode,
-        onAuthConfirmClick = viewModel::verifyAuthCode,
+        onAuthConfirmClick = viewModel::signUp,
         onBackClick = viewModel::navigateToBack,
     )
 }
