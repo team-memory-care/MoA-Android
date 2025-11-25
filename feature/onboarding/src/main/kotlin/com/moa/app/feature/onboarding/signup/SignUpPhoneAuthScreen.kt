@@ -20,7 +20,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.core.button.MaButtonDefaults
 import com.moa.app.designsystem.component.core.textfield.MaTextField
@@ -28,17 +30,33 @@ import com.moa.app.designsystem.component.product.layout.FormField
 import com.moa.app.designsystem.component.product.topbar.MaTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.onboarding.signup.model.SignUpPhoneAuthUiState
+import com.moa.app.feature.onboarding.signup.model.SignUpPhoneAuthSideEffect
 
 @Composable
 fun SignUpPhoneAuthScreen(
     viewModel: SignUpSharedViewModel,
 ) {
     val uiState by viewModel.signUpPhoneAuthUiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val authCodeFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        viewModel.signUpPhoneAuthSideEffect
+            .flowWithLifecycle(lifecycleOwner.lifecycle)
+            .collect { sideEffect ->
+                when (sideEffect) {
+                    is SignUpPhoneAuthSideEffect.FocusOnAuthCodeField -> {
+                        authCodeFocusRequester.requestFocus()
+                    }
+                }
+            }
+    }
 
     SignUpPhoneAuthScreenContent(
         uiState = uiState,
+        authCodeFocusRequester = authCodeFocusRequester,
         onChangePhoneNumber = viewModel::updatePhoneNumber,
-        onAuthCodeRequestClick = viewModel::requestAuthCode,
+        onVerificationCodeRequestClick = viewModel::requestPhoneAuthCode,
         onChangeAuthNumber = viewModel::updateAuthCode,
         onAuthConfirmClick = viewModel::verifyAuthCode,
         onBackClick = viewModel::navigateToBack,
@@ -48,6 +66,7 @@ fun SignUpPhoneAuthScreen(
 @Composable
 private fun SignUpPhoneAuthScreenContent(
     uiState: SignUpPhoneAuthUiState,
+    authCodeFocusRequester: FocusRequester,
     onChangePhoneNumber: (String) -> Unit,
     onAuthCodeRequestClick: () -> Unit,
     onChangeAuthNumber: (String) -> Unit,
@@ -90,7 +109,7 @@ private fun SignUpPhoneAuthScreenContent(
                     onValueChange = onChangePhoneNumber,
                     modifier = Modifier.focusRequester(phoneNumberFocusRequester),
                     isError = uiState.isPhoneNumberError,
-                    maxLines = 1,
+                    singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     placeholder = {
                         Text(
@@ -134,8 +153,10 @@ private fun SignUpPhoneAuthScreenContent(
                 MaTextField(
                     value = uiState.authCode,
                     onValueChange = onChangeAuthNumber,
+                    modifier = Modifier.focusRequester(authCodeFocusRequester),
                     isError = uiState.isAuthCodeError,
-                    maxLines = 1,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     placeholder = {
                         Text(
                             text = "4자리 인증번호를 입력해주세요.",
@@ -170,6 +191,7 @@ private fun SignUpPhoneAuthScreenContent(
 private fun Preview() {
     SignUpPhoneAuthScreenContent(
         uiState = SignUpPhoneAuthUiState.init,
+        authCodeFocusRequester = remember { FocusRequester() },
         onChangePhoneNumber = {},
         onAuthCodeRequestClick = {},
         onChangeAuthNumber = {},
