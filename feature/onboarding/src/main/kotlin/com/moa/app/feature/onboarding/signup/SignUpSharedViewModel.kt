@@ -84,7 +84,7 @@ class SignUpSharedViewModel @Inject constructor(
                 },
                 onFailure = { error ->
                     _signUpPhoneAuthUiState.update {
-                        it.copy(isAuthCodeError = true, authCodeErrorMessage = error.message)
+                        it.copy(isPhoneNumberError = true, phoneNumberErrorMessage = error.message)
                     }
                     Log.e("SignUpSharedViewModel", "requestAuthCode: $error")
                 }

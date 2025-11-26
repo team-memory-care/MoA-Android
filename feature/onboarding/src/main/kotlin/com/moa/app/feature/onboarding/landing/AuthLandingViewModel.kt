@@ -11,8 +11,7 @@ class AuthLandingViewModel @Inject constructor(
     private val navigator: Navigator,
 ) : ViewModel() {
 
-
     fun onSignUpClicked() = navigator.navigate(route = AppRoute.SignUp)
 
-    fun onSignInClicked() {}
+    fun onSignInClicked() = navigator.navigate(route = AppRoute.SignIn)
 }
