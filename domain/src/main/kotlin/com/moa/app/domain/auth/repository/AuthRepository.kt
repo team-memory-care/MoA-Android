@@ -6,4 +6,5 @@ interface AuthRepository {
     suspend fun requestPhoneAuthCode(phoneNumber: String): Result<Unit>
     suspend fun signUp(userProfile: UserProfile): Result<Unit>
     suspend fun setParentRole(): Result<String>
+    suspend fun reissueToken(): Result<String>
 }

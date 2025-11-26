@@ -5,6 +5,7 @@ import com.moa.app.data.auth.model.request.PhoneAuthCodeRequest
 import com.moa.app.data.auth.model.request.toDto
 import com.moa.app.domain.auth.model.UserProfile
 import com.moa.app.domain.auth.repository.AuthRepository
+import com.moa.app.network.auth.ReissueTokenRequest
 import com.moa.app.network.auth.TokenManager
 import javax.inject.Inject
 
@@ -34,4 +35,18 @@ class AuthRepositoryImpl @Inject constructor(
             }
     }
 
+    override suspend fun reissueToken(): Result<String> {
+        val refreshToken = tokenManager.getRefreshToken()
+            ?: return Result.failure(Exception("Refresh token not found"))
+        val request = ReissueTokenRequest(refreshToken)
+
+        return authDataSource.reissueToken(request)
+            .mapCatching { tokenResponse ->
+                tokenManager.saveTokens(
+                    accessToken = tokenResponse.accessToken,
+                    refreshToken = tokenResponse.refreshToken
+                )
+                tokenResponse.role
+            }
+    }
 }
