@@ -29,7 +29,7 @@ import com.moa.app.feature.onboarding.signup.SignUpProfileScreen
 import com.moa.app.feature.onboarding.signup.SignUpSharedViewModel
 import com.moa.app.feature.onboarding.splash.SplashScreen
 import com.moa.app.feature.senior.home.SeniorHomeScreen
-import com.moa.app.feature.senior.quiz.orientation.OrientationQuizScreen
+import com.moa.app.feature.senior.quiz.persistence.PersistenceQuizScreen
 import com.moa.app.feature.senior.quiz.category.QuizCategoryScreen
 import com.moa.app.feature.senior.setting.SeniorSettingScreen
 import com.moa.app.navigation.AppRoute
@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
                         composable<AppRoute.SelectUserRole> { SelectUserRoleScreen() }
                         composable<AppRoute.SeniorHome> { SeniorHomeScreen() }
                         composable<AppRoute.QuizCategory> { QuizCategoryScreen() }
-                        composable<AppRoute.OrientationQuiz> { OrientationQuizScreen() }
+                        composable<AppRoute.PersistenceQuiz> { PersistenceQuizScreen() }
                         composable<AppRoute.UserConnection> { UserConnectionScreen() }
                         composable<AppRoute.SeniorSetting> { SeniorSettingScreen() }
                     }

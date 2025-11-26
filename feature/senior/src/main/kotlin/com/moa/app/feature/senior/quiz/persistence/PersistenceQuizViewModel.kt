@@ -1,10 +1,9 @@
-package com.moa.app.feature.senior.quiz.orientation
+package com.moa.app.feature.senior.quiz.persistence
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moa.app.domain.quiz.model.Quiz
-import com.moa.app.domain.quiz.model.Quizzes
+import com.moa.app.domain.quiz.model.PersistenceQuiz
 import com.moa.app.domain.quiz.usecase.CheckAnswerUseCase
 import com.moa.app.domain.quiz.usecase.FetchOrientationQuizUseCase
 import com.moa.app.feature.senior.quiz.component.ResultDialogState
@@ -13,7 +12,7 @@ import com.moa.app.navigation.NavigationOptions
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,16 +22,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OrientationQuizViewModel @Inject constructor(
+class PersistenceQuizViewModel @Inject constructor(
     private val navigator: Navigator,
     private val fetchOrientationQuizUseCase: FetchOrientationQuizUseCase,
     private val checkAnswerUseCase: CheckAnswerUseCase,
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<OrientationQuizUiState> = MutableStateFlow(OrientationQuizUiState.Loading)
-    val uiState: StateFlow<OrientationQuizUiState> = _uiState.asStateFlow()
+    private val _uiState: MutableStateFlow<PersistenceQuizUiState> = MutableStateFlow(PersistenceQuizUiState.Loading)
+    val uiState: StateFlow<PersistenceQuizUiState> = _uiState.asStateFlow()
 
-    private var quizzes: Quizzes = Quizzes.from(persistentListOf())
+    private var quizzes: List<PersistenceQuiz> = emptyList()
 
     init {
         loadQuizzes()
@@ -42,20 +41,20 @@ class OrientationQuizViewModel @Inject constructor(
         viewModelScope.launch {
             delay(2000L)
             val quizzes = fetchOrientationQuizUseCase()
-            this@OrientationQuizViewModel.quizzes = quizzes
-            val quizzesUiModel = quizzes.map { it.toUiModel() }
+            this@PersistenceQuizViewModel.quizzes = quizzes
+            val quizzesUiModel = quizzes.map { it.toUiModel() }.toImmutableList()
 
             if (quizzesUiModel.isNotEmpty()) {
-                _uiState.update { OrientationQuizUiState.Success(quizzes = quizzesUiModel) }
+                _uiState.update { PersistenceQuizUiState.Success(quizzes = quizzesUiModel) }
             } else {
-                _uiState.update { OrientationQuizUiState.Error(message = "퀴즈가 존재하지 않습니다") }
+                _uiState.update { PersistenceQuizUiState.Error(message = "퀴즈가 존재하지 않습니다") }
             }
         }
     }
 
     fun selectAnswer(selectedAnswerIndex: Int) {
         _uiState.update { currentState ->
-            if (currentState is OrientationQuizUiState.Success && !currentState.isCheckingAnswer) {
+            if (currentState is PersistenceQuizUiState.Success && !currentState.isCheckingAnswer) {
                 currentState.copy(selectedAnswerIndex = selectedAnswerIndex)
             } else {
                 currentState
@@ -65,8 +64,8 @@ class OrientationQuizViewModel @Inject constructor(
 
     fun checkAnswer() {
         _uiState.update { currentState ->
-            if (currentState !is OrientationQuizUiState.Success || currentState.isCheckingAnswer) return@update currentState
-            val currentDomainQuestion = this.quizzes.getQuizAt(currentState.currentQuestionIndex) ?: return@update currentState
+            if (currentState !is PersistenceQuizUiState.Success || currentState.isCheckingAnswer) return@update currentState
+            val currentDomainQuestion = this.quizzes.getOrNull(currentState.currentQuestionIndex) ?: return@update currentState
             val isCorrect = checkAnswerUseCase(
                 quiz = currentDomainQuestion,
                 selectedIndex = currentState.selectedAnswerIndex,
@@ -75,7 +74,7 @@ class OrientationQuizViewModel @Inject constructor(
             val newDialogState = if (isCorrect) {
                 ResultDialogState.Correct
             } else {
-                val correctAnswer = currentDomainQuestion.getCorrectAnswer()
+                val correctAnswer = currentDomainQuestion.answer
                 ResultDialogState.Incorrect(correctAnswer)
             }
 
@@ -94,7 +93,7 @@ class OrientationQuizViewModel @Inject constructor(
         var shouldNavigate = false
 
         _uiState.update { currentState ->
-            if (currentState !is OrientationQuizUiState.Success) return@update currentState
+            if (currentState !is PersistenceQuizUiState.Success) return@update currentState
 
             val nextIndex = currentState.currentQuestionIndex + 1
 
@@ -116,7 +115,7 @@ class OrientationQuizViewModel @Inject constructor(
             navigator.navigate(
                 route = AppRoute.SeniorHome,
                 options = NavigationOptions(
-                    popUpTo = AppRoute.OrientationQuiz,
+                    popUpTo = AppRoute.PersistenceQuiz,
                     inclusive = true,
                     launchSingleTop = true
                 )
@@ -124,21 +123,21 @@ class OrientationQuizViewModel @Inject constructor(
         }
     }
 
-    companion object {
+    companion object Companion {
         private const val DIALOG_DURATION_MS = 2000L
     }
 }
 
 @Immutable
-sealed interface OrientationQuizUiState {
-    data object Loading : OrientationQuizUiState
-    data class Error(val message: String) : OrientationQuizUiState
+sealed interface PersistenceQuizUiState {
+    data object Loading : PersistenceQuizUiState
+    data class Error(val message: String) : PersistenceQuizUiState
     data class Success(
         val quizzes: ImmutableList<QuizUiModel>,
         val currentQuestionIndex: Int = 0,
         val selectedAnswerIndex: Int? = null,
         val resultDialogState: ResultDialogState = ResultDialogState.Hidden,
-    ) : OrientationQuizUiState {
+    ) : PersistenceQuizUiState {
         val currentStep: Int
             get() = currentQuestionIndex + 1
 
@@ -158,8 +157,8 @@ data class QuizUiModel(
     val options: ImmutableList<String>,
 )
 
-fun Quiz.toUiModel() =
+fun PersistenceQuiz.toUiModel() =
     QuizUiModel(
-        question = this.question,
-        options = this.options,
+        question = this.questionFormat,
+        options = this.answerOptions,
     )

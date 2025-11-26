@@ -1,16 +1,13 @@
-package com.moa.app.feature.senior.quiz.orientation
+package com.moa.app.feature.senior.quiz.persistence
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,8 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -40,21 +35,19 @@ import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.senior.R
 import com.moa.app.feature.senior.quiz.component.QuizLoadContent
 import com.moa.app.feature.senior.quiz.component.QuizResultDialog
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.immutableListOf
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-fun OrientationQuizScreen(
-    viewModel: OrientationQuizViewModel = hiltViewModel(),
+fun PersistenceQuizScreen(
+    viewModel: PersistenceQuizViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     when (val state = uiState) {
-        is OrientationQuizUiState.Loading -> QuizLoadContent()
-        is OrientationQuizUiState.Error -> {}
-        is OrientationQuizUiState.Success -> {
-            OrientationQuizContent(
+        is PersistenceQuizUiState.Loading -> QuizLoadContent()
+        is PersistenceQuizUiState.Error -> {}
+        is PersistenceQuizUiState.Success -> {
+            PersistenceQuizContent(
                 uiState = state,
                 onBackClick = {},
                 onOptionSelected = viewModel::selectAnswer,
@@ -67,8 +60,8 @@ fun OrientationQuizScreen(
 }
 
 @Composable
-private fun OrientationQuizContent(
-    uiState: OrientationQuizUiState.Success,
+private fun PersistenceQuizContent(
+    uiState: PersistenceQuizUiState.Success,
     onOptionSelected: (Int) -> Unit,
     onContinueClick: () -> Unit,
     onBackClick: () -> Unit,
@@ -176,8 +169,8 @@ private fun OrientationQuizContent(
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    OrientationQuizContent(
-        uiState = OrientationQuizUiState.Success(
+    PersistenceQuizContent(
+        uiState = PersistenceQuizUiState.Success(
             quizzes = persistentListOf(
                 QuizUiModel("오늘은 몇 년도인가요?", persistentListOf("2025년", "2022년", "2020년")),
                 QuizUiModel("오늘은 몇 년도인가요?", persistentListOf("2025년", "2022년", "2020년")),

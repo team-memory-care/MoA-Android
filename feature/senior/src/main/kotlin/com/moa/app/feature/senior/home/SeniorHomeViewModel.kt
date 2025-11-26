@@ -17,7 +17,7 @@ class SeniorHomeViewModel @Inject constructor(
     }
 
     fun navigateToDailyQuiz() {
-        navigator.navigate(AppRoute.OrientationQuiz)
+        navigator.navigate(AppRoute.PersistenceQuiz)
     }
 
     fun navigateToSetting() {

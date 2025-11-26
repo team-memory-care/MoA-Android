@@ -14,15 +14,15 @@ class QuizCategoryViewModel @Inject constructor(
 
     fun onCategoryClicked(quizCategory: QuizCategory) {
         when (quizCategory) {
-            QuizCategory.ORIENTATION -> navigateToOrientation()
+            QuizCategory.ORIENTATION -> navigateToPersistence()
             else -> {}
         }
 
     }
 
-    private fun navigateToOrientation() {
+    private fun navigateToPersistence() {
         navigator.navigate(
-            route = AppRoute.OrientationQuiz,
+            route = AppRoute.PersistenceQuiz,
             options = NavigationOptions(
                 launchSingleTop = true
             )
