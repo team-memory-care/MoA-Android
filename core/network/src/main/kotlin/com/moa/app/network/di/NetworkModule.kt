@@ -2,11 +2,14 @@ package com.moa.app.network.di
 
 import com.moa.app.network.BuildConfig
 import com.moa.app.network.adapter.NetworkResultCallAdapterFactory
+import com.moa.app.network.auth.AuthInterceptor
+import com.moa.app.network.auth.TokenManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -51,9 +54,16 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideAuthInterceptor(tokenManager: TokenManager): Interceptor =
+        AuthInterceptor(tokenManager)
+
+    @Provides
+    @Singleton
     fun provideOkHttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: AuthInterceptor
     ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(authInterceptor)
         .addInterceptor(httpLoggingInterceptor)
         .connectTimeout(10L, TimeUnit.SECONDS)
         .writeTimeout(30L, TimeUnit.SECONDS)
