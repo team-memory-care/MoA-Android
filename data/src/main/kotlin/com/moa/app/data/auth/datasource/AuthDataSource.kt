@@ -10,6 +10,8 @@ import com.moa.app.network.auth.TokenResponse
 interface AuthDataSource {
     suspend fun requestPhoneAuthCode(request: PhoneAuthCodeRequest): Result<Unit>
     suspend fun signUp(request: SignUpUserRequest): Result<AuthTokenResponse>
+    suspend fun requestSignInAuthCode(phoneNumber: String): Result<Unit>
+    suspend fun signIn(phoneNumber: String, authCode: String): Result<TokenResponse>
     suspend fun setParentRole(): Result<ParentRoleResponse>
     suspend fun reissueToken(request: ReissueTokenRequest): Result<TokenResponse>
 }

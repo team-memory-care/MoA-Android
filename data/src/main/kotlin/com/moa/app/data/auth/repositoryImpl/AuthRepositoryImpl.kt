@@ -28,6 +28,21 @@ class AuthRepositoryImpl @Inject constructor(
             }
     }
 
+    override suspend fun requestSignInAuthCode(phoneNumber: String): Result<Unit> {
+        return authDataSource.requestSignInAuthCode(phoneNumber)
+    }
+
+    override suspend fun signIn(phoneNumber: String, authCode: String): Result<String> {
+        return authDataSource.signIn(phoneNumber, authCode)
+            .mapCatching { tokenResponse ->
+                tokenManager.saveTokens(
+                    accessToken = tokenResponse.accessToken,
+                    refreshToken = tokenResponse.refreshToken,
+                )
+                tokenResponse.role
+            }
+    }
+
     override suspend fun setParentRole(): Result<String> {
         return authDataSource.setParentRole()
             .mapCatching { parentRoleResponse ->

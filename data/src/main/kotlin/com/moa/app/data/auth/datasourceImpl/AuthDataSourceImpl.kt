@@ -24,6 +24,14 @@ class AuthDataSourceImpl @Inject constructor(
         return authService.signUp(request).toResult { it }
     }
 
+    override suspend fun requestSignInAuthCode(phoneNumber: String): Result<Unit> {
+        return authService.requestSignInAuthCode(phoneNumber).toResult()
+    }
+
+    override suspend fun signIn(phoneNumber: String, authCode: String): Result<TokenResponse> {
+        return authService.signIn(phoneNumber, authCode).toResult { it }
+    }
+
     override suspend fun setParentRole(): Result<ParentRoleResponse> {
         return authService.setParentRole().toResult { it }
     }

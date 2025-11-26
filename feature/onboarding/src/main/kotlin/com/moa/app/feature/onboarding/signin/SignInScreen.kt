@@ -1,85 +1,185 @@
 package com.moa.app.feature.onboarding.signin
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.moa.app.designsystem.R
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.moa.app.designsystem.component.core.button.MaButton
-import com.moa.app.designsystem.component.core.button.MaButtonColors
+import com.moa.app.designsystem.component.core.button.MaButtonDefaults
+import com.moa.app.designsystem.component.core.textfield.MaTextField
+import com.moa.app.designsystem.component.product.layout.FormField
+import com.moa.app.designsystem.component.product.topbar.MaTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.feature.onboarding.signin.model.SignInSideEffect
+import com.moa.app.feature.onboarding.signin.model.SignInUiState
 
 @Composable
 fun SignInScreen(
     viewModel: SignInViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val authCodeFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect
+            .flowWithLifecycle(lifecycleOwner.lifecycle)
+            .collect { sideEffect ->
+                when (sideEffect) {
+                    is SignInSideEffect.FocusOnAuthCodeField -> {
+                        authCodeFocusRequester.requestFocus()
+                    }
+                }
+            }
+    }
+
     SignInScreenContent(
-        navigateToSignUp = viewModel::navigateToSignUp
+        uiState = uiState,
+        authCodeFocusRequester = authCodeFocusRequester,
+        onChangePhoneNumber = viewModel::updatePhoneNumber,
+        onAuthCodeRequestClick = viewModel::requestAuthCode,
+        onChangeAuthNumber = viewModel::updateAuthCode,
+        onAuthConfirmClick = viewModel::signIn,
+        onBackClick = viewModel::navigateToBack,
     )
 }
 
 @Composable
 private fun SignInScreenContent(
-    navigateToSignUp: () -> Unit
+    uiState: SignInUiState,
+    authCodeFocusRequester: FocusRequester,
+    onChangePhoneNumber: (String) -> Unit,
+    onAuthCodeRequestClick: () -> Unit,
+    onChangeAuthNumber: (String) -> Unit,
+    onAuthConfirmClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
 ) {
+    val phoneNumberFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        phoneNumberFocusRequester.requestFocus()
+    }
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
     ) {
+        MaTopAppBar(title = "로그인", onBackClick = onBackClick)
 
-        Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.img_moa_logo),
-            contentDescription = null,
-            modifier = Modifier.weight(1f),
-        )
+        Spacer(modifier = Modifier.height(28.dp))
 
-        MaButton(
-            onClick = navigateToSignUp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp),
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp)
         ) {
             Text(
-                text = "처음이에요",
-                style = MoaTheme.typography.body1Bold,
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
+                text = "안전을 위해 전화번호를\n확인할게요",
+                color = MoaTheme.colors.black,
+                style = MoaTheme.typography.headLine2Bold,
             )
-        }
 
-        MaButton(
-            onClick = { },
-            colors = MaButtonColors(
-                defaultBackground = Color.Transparent,
-                pressedBackground = Color.Transparent,
-                disabledBackground = Color.Transparent,
-                defaultContentColor = MoaTheme.colors.coolGray60,
-                pressedContentColor = MoaTheme.colors.coolGray60,
-                disabledContentColor = MoaTheme.colors.coolGray60,
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-        ) {
-            Text(
-                text = "이미 계정이 있어요",
-                style = MoaTheme.typography.body2Medium,
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
-            )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            FormField(
+                isError = uiState.isPhoneNumberError,
+                errorMessage = uiState.phoneNumberErrorMessage,
+            ) {
+                MaTextField(
+                    value = uiState.phoneNumber,
+                    onValueChange = onChangePhoneNumber,
+                    modifier = Modifier.focusRequester(phoneNumberFocusRequester),
+                    isError = uiState.isPhoneNumberError,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    placeholder = {
+                        Text(
+                            text = "예) 010-1234-5678",
+                            color = MoaTheme.colors.coolGray60,
+                            style = MoaTheme.typography.body1Medium,
+                        )
+                    },
+                    trailingContent = {
+                        MaButton(
+                            onClick = onAuthCodeRequestClick,
+                            enabled = !uiState.isAuthCodeRequested,
+                            colors = MaButtonDefaults.maBlackButtonColors(),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = "인증",
+                                style = MoaTheme.typography.body2Bold,
+                                color = MoaTheme.colors.white,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            FormField(
+                isError = uiState.isAuthCodeError,
+                errorMessage = uiState.authCodeErrorMessage,
+                modifier = Modifier.alpha(if (uiState.isAuthCodeRequested) 1f else 0f)
+            ) {
+                Text(
+                    text = "인증번호",
+                    color = MoaTheme.colors.black,
+                    style = MoaTheme.typography.title2Bold,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                MaTextField(
+                    value = uiState.authCode,
+                    onValueChange = onChangeAuthNumber,
+                    modifier = Modifier.focusRequester(authCodeFocusRequester),
+                    isError = uiState.isAuthCodeError,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    placeholder = {
+                        Text(
+                            text = "4자리 인증번호를 입력해주세요.",
+                            color = MoaTheme.colors.coolGray60,
+                            style = MoaTheme.typography.body1Medium,
+                        )
+                    },
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            MaButton(
+                onClick = onAuthConfirmClick,
+                enabled = uiState.authCode.isNotEmpty(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+            ) {
+                Text(
+                    text = "인증 확인",
+                    style = MoaTheme.typography.body1Bold,
+                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp)
+                )
+            }
         }
     }
 }
@@ -88,6 +188,12 @@ private fun SignInScreenContent(
 @Composable
 private fun Preview() {
     SignInScreenContent(
-        navigateToSignUp = {}
+        uiState = SignInUiState.init,
+        authCodeFocusRequester = remember { FocusRequester() },
+        onChangePhoneNumber = {},
+        onAuthCodeRequestClick = {},
+        onChangeAuthNumber = {},
+        onAuthConfirmClick = {},
+        onBackClick = {},
     )
 }
