@@ -26,4 +26,12 @@ class AuthRepositoryImpl @Inject constructor(
                 )
             }
     }
+
+    override suspend fun setParentRole(): Result<String> {
+        return authDataSource.setParentRole()
+            .mapCatching { parentRoleResponse ->
+                parentRoleResponse.parentCode
+            }
+    }
+
 }

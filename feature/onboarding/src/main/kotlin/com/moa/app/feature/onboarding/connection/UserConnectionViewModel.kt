@@ -1,9 +1,12 @@
 package com.moa.app.feature.onboarding.connection
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.moa.app.domain.auth.model.UserRole
+import com.moa.app.domain.auth.usecase.SetParentRoleUseCase
 import com.moa.app.feature.onboarding.connection.model.UserConnectionUiState
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.NavigationOptions
@@ -14,11 +17,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class UserConnectionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val navigator: Navigator
+    private val navigator: Navigator,
+    private val setParentRoleUseCase: SetParentRoleUseCase
 ) : ViewModel() {
 
     private val userRole = savedStateHandle.toRoute<AppRoute.UserConnection>().userRole
@@ -33,6 +38,23 @@ class UserConnectionViewModel @Inject constructor(
     private fun setUserRole(role: String) {
         val userRole = UserRole.fromString(role)
         _uiState.update { it.copy(userRole = userRole) }
+
+        if (userRole == UserRole.PARENT) {
+            setParentRole()
+        }
+    }
+
+    private fun setParentRole() {
+        viewModelScope.launch {
+            setParentRoleUseCase().fold(
+                onSuccess = { userCode ->
+                    _uiState.update { it.copy(userCode = userCode) }
+                },
+                onFailure = {
+                    Log.d("UserConnectionViewModel", "setParentRole: $it")
+                },
+            )
+        }
     }
 
     fun updateUserCode(code: String) {

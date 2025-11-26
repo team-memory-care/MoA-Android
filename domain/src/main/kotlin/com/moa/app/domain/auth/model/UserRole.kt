@@ -9,6 +9,8 @@ package com.moa.app.domain.auth.model
 enum class UserRole {
     PARENT,
     CHILD,
+    PENDING,
+    ADMIN,
     ;
 
     companion object {
@@ -16,6 +18,8 @@ enum class UserRole {
             return when (userRole) {
                 "PARENT" -> PARENT
                 "CHILD" -> CHILD
+                "PENDING" -> PENDING
+                "ADMIN" -> ADMIN
                 else -> throw IllegalArgumentException("Invalid UserRole: $userRole")
             }
         }
