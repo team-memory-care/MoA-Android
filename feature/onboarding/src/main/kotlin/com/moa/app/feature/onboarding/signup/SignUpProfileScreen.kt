@@ -30,6 +30,8 @@ import com.moa.app.designsystem.component.core.textfield.MaTextField
 import com.moa.app.designsystem.component.product.topbar.MaTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.onboarding.signup.model.SignUpProfileUiState
+import com.moa.app.domain.auth.model.Gender
+import com.moa.app.feature.onboarding.signup.model.displayText
 
 @Composable
 fun SignUpProfileScreen(
@@ -225,7 +227,7 @@ private fun SignUpProfileScreenContent(
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(
-                        text = "여자",
+                        text = Gender.FEMALE.displayText,
                         style = MoaTheme.typography.body1Medium,
                         modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
                     )
@@ -237,7 +239,7 @@ private fun SignUpProfileScreenContent(
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(
-                        text = "남자",
+                        text = Gender.MALE.displayText,
                         style = MoaTheme.typography.body1Medium,
                         modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
                     )

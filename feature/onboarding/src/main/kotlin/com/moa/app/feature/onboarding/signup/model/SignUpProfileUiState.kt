@@ -18,6 +18,8 @@ data class SignUpProfileUiState(
     val isGenderFemale: Boolean
         get() = gender == Gender.FEMALE
 
+    val birthDate: String
+        get() = "$year$month$day"
 
     companion object {
         val init = SignUpProfileUiState(
@@ -29,3 +31,9 @@ data class SignUpProfileUiState(
         )
     }
 }
+
+val Gender.displayText: String
+    get() = when (this) {
+        Gender.MALE -> "남성"
+        Gender.FEMALE -> "여성"
+    }

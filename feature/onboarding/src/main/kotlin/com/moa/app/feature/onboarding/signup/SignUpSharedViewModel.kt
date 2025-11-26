@@ -1,15 +1,23 @@
 package com.moa.app.feature.onboarding.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.auth.model.Gender
+import com.moa.app.domain.auth.model.UserProfile
+import com.moa.app.domain.auth.usecase.PhoneAuthCodeUseCase
+import com.moa.app.domain.auth.usecase.SignUpUseCase
 import com.moa.app.feature.onboarding.signup.model.SignUpPhoneAuthUiState
 import com.moa.app.feature.onboarding.signup.model.SignUpProfileUiState
+import com.moa.app.feature.onboarding.signup.model.SignUpPhoneAuthSideEffect
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.NavigationOptions
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,6 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpSharedViewModel @Inject constructor(
     private val navigator: Navigator,
+    private val phoneAuthCodeUseCase: PhoneAuthCodeUseCase,
+    private val signUpUseCase: SignUpUseCase
 ) : ViewModel() {
 
     private val _signUpUserProfileUiState = MutableStateFlow(SignUpProfileUiState.init)
@@ -25,6 +35,9 @@ class SignUpSharedViewModel @Inject constructor(
 
     private val _signUpPhoneAuthUiState = MutableStateFlow(SignUpPhoneAuthUiState.init)
     val signUpPhoneAuthUiState = _signUpPhoneAuthUiState.asStateFlow()
+
+    private val _signUpPhoneAuthSideEffect: MutableSharedFlow<SignUpPhoneAuthSideEffect> = MutableSharedFlow()
+    val signUpPhoneAuthSideEffect: SharedFlow<SignUpPhoneAuthSideEffect> = _signUpPhoneAuthSideEffect.asSharedFlow()
 
     // sign up profile event
     fun updateName(name: String) {
@@ -60,23 +73,46 @@ class SignUpSharedViewModel @Inject constructor(
         _signUpPhoneAuthUiState.update { it.copy(authCode = authCode) }
     }
 
-    fun requestAuthCode() {
+    fun requestPhoneAuthCode() {
         viewModelScope.launch {
-            // TODO: 인증 코드 요청 api 호출
+            phoneAuthCodeUseCase(
+                phoneNumber = _signUpPhoneAuthUiState.value.phoneNumber
+            ).fold(
+                onSuccess = {
+                    _signUpPhoneAuthUiState.update { it.copy(isAuthCodeRequested = true) }
+                    _signUpPhoneAuthSideEffect.emit(SignUpPhoneAuthSideEffect.FocusOnAuthCodeField)
+                },
+                onFailure = { error ->
+                    _signUpPhoneAuthUiState.update {
+                        it.copy(isPhoneNumberError = true, phoneNumberErrorMessage = error.message)
+                    }
+                    Log.e("SignUpSharedViewModel", "requestAuthCode: $error")
+                }
+            )
         }
-        // TODO: api 요청 성공 실패 분기처리 하기
-        _signUpPhoneAuthUiState.update { it.copy(isAuthCodeRequested = true) }
     }
 
-    // 인증 번호 확인 요청
-    fun verifyAuthCode() {
+    fun signUp() {
         viewModelScope.launch {
-            // TODO: 인증 코드 확인 api 호출
+            val gender = _signUpUserProfileUiState.value.gender ?: return@launch
+            signUpUseCase(
+                userProfile = UserProfile(
+                    name = _signUpUserProfileUiState.value.name,
+                    birthDate = _signUpUserProfileUiState.value.birthDate,
+                    gender = gender,
+                    phoneNumber = _signUpPhoneAuthUiState.value.phoneNumber,
+                    authCode = _signUpPhoneAuthUiState.value.authCode
+                )
+            ).fold(
+                onSuccess = { navigateToComplete() },
+                onFailure = { error ->
+                    _signUpPhoneAuthUiState.update {
+                        it.copy(isAuthCodeError = true, authCodeErrorMessage = error.message)
+                    }
+                }
+            )
         }
-        // TODO: 인증 성공 시 회원가입 완료 후 화면 이동
-        navigateToComplete()
     }
-
 
     fun navigateToBack() = navigator.navigateBack()
 
