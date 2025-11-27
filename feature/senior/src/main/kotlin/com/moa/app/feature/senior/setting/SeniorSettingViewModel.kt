@@ -86,7 +86,7 @@ class SeniorSettingViewModel @Inject constructor(
                 },
                 onFailure = {
                     Log.e("withdrawal", "withdrawal: $it")
-                    hideLogoutDialog()
+                    hideWithdrawalDialog()
                 },
             )
         }

@@ -72,5 +72,6 @@ class AuthRepositoryImpl @Inject constructor(
             ?: return Result.failure(Exception("Refresh token not found"))
 
         return authDataSource.logOut(accessToken, refreshToken)
+            .onSuccess { tokenManager.clearTokens() }
     }
 }
