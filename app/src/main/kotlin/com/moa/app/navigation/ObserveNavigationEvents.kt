@@ -2,6 +2,7 @@ package com.moa.app.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -13,8 +14,9 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun ObserveNavigationEvents(
     viewModel: MainViewModel,
-    navController: NavController
+    navController: NavController,
 ) {
+    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner, navController) {
@@ -23,6 +25,7 @@ internal fun ObserveNavigationEvents(
                 viewModel.navigationEvents.collect { event ->
                     when (event) {
                         is NavigationEvent.NavigateBack -> navController.popBackStack()
+                        is NavigationEvent.OpenUrl -> openUrlInBrowser(context, event.url)
                         is NavigationEvent.Navigate -> {
                             navController.navigate(event.route) {
                                 if (event.options.clearBackStack) {

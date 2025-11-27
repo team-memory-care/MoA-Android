@@ -11,4 +11,5 @@ interface Navigator {
     )
 
     fun navigateBack()
+    fun openUrl(url: String)
 }

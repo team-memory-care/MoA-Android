@@ -7,4 +7,5 @@ sealed interface NavigationEvent {
     ) : NavigationEvent
 
     data object NavigateBack : NavigationEvent
+    data class OpenUrl(val url: String) : NavigationEvent
 }
