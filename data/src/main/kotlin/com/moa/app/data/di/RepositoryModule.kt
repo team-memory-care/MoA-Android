@@ -1,7 +1,9 @@
 package com.moa.app.data.di
 
 import com.moa.app.data.auth.repositoryImpl.AuthRepositoryImpl
+import com.moa.app.data.user.repositoryImpl.UserRepositoryImpl
 import com.moa.app.domain.auth.repository.AuthRepository
+import com.moa.app.domain.user.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,5 +17,9 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
 
 }

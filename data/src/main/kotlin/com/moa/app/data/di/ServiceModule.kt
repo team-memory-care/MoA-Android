@@ -1,6 +1,7 @@
 package com.moa.app.data.di
 
 import com.moa.app.data.auth.service.AuthService
+import com.moa.app.data.user.service.UserService
 import com.moa.app.network.auth.TokenService
 import dagger.Module
 import dagger.Provides
@@ -22,4 +23,9 @@ object ServiceModule {
     @Singleton
     fun provideReissueTokenService(retrofit: Retrofit): TokenService =
         retrofit.create(TokenService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideUserService(retrofit: Retrofit): UserService =
+        retrofit.create(UserService::class.java)
 }

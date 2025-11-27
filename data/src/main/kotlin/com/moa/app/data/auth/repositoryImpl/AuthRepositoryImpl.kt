@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val authDataSource: AuthDataSource,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
 ) : AuthRepository {
     override suspend fun requestPhoneAuthCode(phoneNumber: String): Result<Unit> {
         val request = PhoneAuthCodeRequest(phoneNumber = phoneNumber)
@@ -23,7 +23,7 @@ class AuthRepositoryImpl @Inject constructor(
             .mapCatching { authTokenResponse ->
                 tokenManager.saveTokens(
                     accessToken = authTokenResponse.accessToken,
-                    refreshToken = authTokenResponse.refreshToken
+                    refreshToken = authTokenResponse.refreshToken,
                 )
             }
     }
@@ -59,9 +59,19 @@ class AuthRepositoryImpl @Inject constructor(
             .mapCatching { tokenResponse ->
                 tokenManager.saveTokens(
                     accessToken = tokenResponse.accessToken,
-                    refreshToken = tokenResponse.refreshToken
+                    refreshToken = tokenResponse.refreshToken,
                 )
                 tokenResponse.role
             }
+    }
+
+    override suspend fun logOut(): Result<Unit> {
+        val accessToken = tokenManager.getAccessToken()
+            ?: return Result.failure(Exception("Access token not found"))
+        val refreshToken = tokenManager.getRefreshToken()
+            ?: return Result.failure(Exception("Refresh token not found"))
+
+        return authDataSource.logOut(accessToken, refreshToken)
+            .onSuccess { tokenManager.clearTokens() }
     }
 }

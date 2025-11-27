@@ -25,6 +25,10 @@ import com.moa.app.designsystem.theme.MoaTheme
 
 @Composable
 fun OtherSection(
+    onCustomerCenterClick: () -> Unit,
+    onPolicyClick: () -> Unit,
+    onLogOutClick: () -> Unit,
+    onWithdrawalClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -34,35 +38,38 @@ fun OtherSection(
             text = "기타",
             color = MoaTheme.colors.black,
             style = MoaTheme.typography.body1Bold,
-            modifier = Modifier.padding(vertical = 10.dp)
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .padding(start = 20.dp)
         )
 
         OptionItem(
             icon = R.drawable.ic_headphones,
             title = "고객센터",
-            onClick = {}
+            onClick = onCustomerCenterClick
         )
 
         OptionItem(
             icon = R.drawable.ic_shield,
             title = "약관 및 정책",
-            onClick = {}
+            onClick = onPolicyClick
         )
 
         OptionItem(
             icon = R.drawable.ic_logout,
             title = "로그아웃",
-            onClick = {}
+            onClick = onLogOutClick
         )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(
-                    onClick = {},
+                    onClick = onWithdrawalClick,
                     indication = ripple(),
                     interactionSource = remember { MutableInteractionSource() },
-                ),
+                )
+                .padding(start = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
@@ -87,5 +94,10 @@ fun OtherSection(
 @Preview
 @Composable
 private fun Preview() {
-    OtherSection()
+    OtherSection(
+        onCustomerCenterClick = {},
+        onPolicyClick = {},
+        onLogOutClick = {},
+        onWithdrawalClick = {}
+    )
 }

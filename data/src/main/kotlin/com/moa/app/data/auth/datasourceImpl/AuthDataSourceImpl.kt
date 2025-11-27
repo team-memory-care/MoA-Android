@@ -1,6 +1,7 @@
 package com.moa.app.data.auth.datasourceImpl
 
 import com.moa.app.data.auth.datasource.AuthDataSource
+import com.moa.app.data.auth.model.request.AuthTokenRequest
 import com.moa.app.data.auth.model.request.PhoneAuthCodeRequest
 import com.moa.app.data.auth.model.request.SignUpUserRequest
 import com.moa.app.data.auth.model.response.AuthTokenResponse
@@ -38,5 +39,10 @@ class AuthDataSourceImpl @Inject constructor(
 
     override suspend fun reissueToken(request: ReissueTokenRequest): Result<TokenResponse> {
         return tokenService.reissueToken(request).toResult { it }
+    }
+
+    override suspend fun logOut(accessToken: String, refreshToken: String): Result<Unit> {
+        val request = AuthTokenRequest(accessToken, refreshToken)
+        return authService.logOut(request).toResult()
     }
 }
