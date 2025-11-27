@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,7 +59,7 @@ class SeniorSettingViewModel @Inject constructor(
                     }
                 },
                 onFailure = {
-                    Log.e("fetchUserProfile", "fetchUserProfile: $it")
+                    Timber.tag("fetchUserProfile").e("fetchUserProfile: $it")
                 },
             )
         }
@@ -71,7 +72,7 @@ class SeniorSettingViewModel @Inject constructor(
                     navigateToClear()
                 },
                 onFailure = {
-                    Log.e("logOut", "logOut: $it")
+                    Timber.tag("logOut").e("logOut: $it")
                     hideLogoutDialog()
                 },
             )
@@ -85,7 +86,7 @@ class SeniorSettingViewModel @Inject constructor(
                     navigateToClear()
                 },
                 onFailure = {
-                    Log.e("withdrawal", "withdrawal: $it")
+                    Timber.tag("withdrawal").e("withdrawal: $it")
                     hideWithdrawalDialog()
                 },
             )
@@ -105,7 +106,7 @@ class SeniorSettingViewModel @Inject constructor(
                 popUpTo = AppRoute.SeniorSetting,
                 inclusive = true,
                 clearBackStack = true,
-            )
+            ),
         )
     }
 

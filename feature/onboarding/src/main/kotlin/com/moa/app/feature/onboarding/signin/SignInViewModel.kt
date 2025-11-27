@@ -20,13 +20,14 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     private val navigator: Navigator,
     private val phoneAuthCodeUseCase: PhoneAuthCodeUseCase,
-    private val signInUseCase: SignInUseCase
+    private val signInUseCase: SignInUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SignInUiState> = MutableStateFlow(SignInUiState.init)
@@ -58,8 +59,8 @@ class SignInViewModel @Inject constructor(
                                 phoneNumberErrorMessage = "인증번호 요청에 실패했습니다.",
                             )
                         }
-                        Log.e("SignInViewModel", "requestAuthCode: $error")
-                    }
+                        Timber.tag("SignInViewModel").e("requestAuthCode: $error")
+                    },
                 )
         }
     }
@@ -79,8 +80,8 @@ class SignInViewModel @Inject constructor(
                             authCodeErrorMessage = "인증번호가 일치하지 않아요.\n다시 확인해주세요.",
                         )
                     }
-                    Log.e("SignInViewModel", "signIn: $t")
-                }
+                    Timber.tag("SignInViewModel").e("signIn: $t")
+                },
             )
         }
     }
@@ -88,7 +89,7 @@ class SignInViewModel @Inject constructor(
     private fun handleNavigationForRole(userRole: UserRole) {
         when (userRole) {
             UserRole.PARENT -> navigateToRoute(AppRoute.SeniorHome)
-            UserRole.CHILD -> TODO("Not yet implemented")
+            UserRole.CHILD -> {}
             UserRole.PENDING -> navigateToRoute(AppRoute.SelectUserRole)
             else -> {}
         }
@@ -99,8 +100,8 @@ class SignInViewModel @Inject constructor(
             route = route,
             options = NavigationOptions(
                 popUpTo = AppRoute.SignIn,
-                inclusive = true
-            )
+                inclusive = true,
+            ),
         )
     }
 

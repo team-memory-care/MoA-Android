@@ -1,6 +1,5 @@
 package com.moa.app.feature.senior.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.user.usecase.FetchUserProfileUseCase
@@ -16,12 +15,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class SeniorHomeViewModel @Inject constructor(
     private val navigator: Navigator,
-    private val fetchUserProfileUseCase: FetchUserProfileUseCase
+    private val fetchUserProfileUseCase: FetchUserProfileUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SeniorHomeUiState> = MutableStateFlow(SeniorHomeUiState.INIT)
@@ -42,7 +42,7 @@ class SeniorHomeViewModel @Inject constructor(
                     _uiState.update { it.copy(userName = userProfile.name) }
                 },
                 onFailure = {
-                    Log.e("fetchUserProfile", "fetchUserProfile: $it")
+                    Timber.tag("fetchUserProfile").e("fetchUserProfile: $it")
                 },
             )
         }

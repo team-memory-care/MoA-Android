@@ -1,6 +1,5 @@
 package com.moa.app.feature.senior.quiz.persistence
 
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,13 +12,13 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,7 +51,7 @@ class PersistenceQuizViewModel @Inject constructor(
                     _uiState.update {
                         PersistenceQuizUiState.Error(message = "퀴즈가 존재하지 않습니다.")
                     }
-                    Log.e("PersistenceQuizViewModel", "loadQuizzes: $t")
+                    Timber.tag("PersistenceQuizViewModel").e("loadQuizzes: $t")
                 },
             )
         }
@@ -162,7 +161,7 @@ sealed interface PersistenceQuizUiState {
         val selectedAnswerIndex: Int? = null,
         val showResultDialog: Boolean = false,
         val dialogResult: DialogResult? = null,
-        val exitDialog: Boolean = false
+        val exitDialog: Boolean = false,
     ) : PersistenceQuizUiState {
         val currentStep: Int
             get() = currentQuestionIndex + 1
