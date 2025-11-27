@@ -14,7 +14,8 @@ enum class QuizCategory {
     LINGUISTIC,
     MEMORY,
     ATTENTION,
-    SPACETIME
+    SPACETIME,
+
     ;
 
     companion object {
