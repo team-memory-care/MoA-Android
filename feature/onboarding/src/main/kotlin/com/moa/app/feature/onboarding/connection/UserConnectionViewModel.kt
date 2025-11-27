@@ -1,6 +1,5 @@
 package com.moa.app.feature.onboarding.connection
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @HiltViewModel
 class UserConnectionViewModel @Inject constructor(
@@ -51,7 +51,7 @@ class UserConnectionViewModel @Inject constructor(
                     _uiState.update { it.copy(userCode = userCode) }
                 },
                 onFailure = {
-                    Log.d("UserConnectionViewModel", "setParentRole: $it")
+                    Timber.tag("UserConnectionViewModel").e("setParentRole: $it")
                 },
             )
         }

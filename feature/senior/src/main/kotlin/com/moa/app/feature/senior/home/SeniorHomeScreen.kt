@@ -1,5 +1,6 @@
 package com.moa.app.feature.senior.home
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,36 +20,64 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.feature.senior.home.model.SeniorHomeUiState
+import com.moa.app.feature.senior.quiz.category.model.QuizCategorySideEffect
 
 @Composable
 fun SeniorHomeScreen(
     viewModel: SeniorHomeViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect
+            .flowWithLifecycle(lifecycleOwner.lifecycle)
+            .collect { sideEffect ->
+                when (sideEffect) {
+                    is SeniorHomeSideEffect.ShowToast -> {
+                        Toast.makeText(context, sideEffect.message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+    }
+
     SeniorHomeScreenContent(
+        uiState = uiState,
         onDailyQuizClick = viewModel::navigateToDailyQuiz,
         onQuizClick = viewModel::navigateToQuizCategory,
+        onReportClick = viewModel::navigateToReport,
         onSettingClick = viewModel::navigateToSetting,
     )
 }
 
 @Composable
 private fun SeniorHomeScreenContent(
+    uiState: SeniorHomeUiState,
     onDailyQuizClick: () -> Unit,
     onQuizClick: () -> Unit,
+    onReportClick: () -> Unit,
     onSettingClick: () -> Unit,
 ) {
     Column(
@@ -110,7 +139,7 @@ private fun SeniorHomeScreenContent(
                     )
 
                     Text(
-                        text = "안녕하세요,\n김순자님\n오늘 하루도 활기차게\n시작해볼까요?",
+                        text = "안녕하세요,\n${uiState.userName}님\n오늘 하루도 활기차게\n시작해볼까요?",
                         color = MoaTheme.colors.black,
                         style = MoaTheme.typography.display1Bold,
                     )
@@ -145,7 +174,7 @@ private fun SeniorHomeScreenContent(
                     )
 
                     Image(
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_chevron_left),
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
                         contentDescription = null,
                         colorFilter = tint(MoaTheme.colors.white),
                     )
@@ -213,7 +242,7 @@ private fun SeniorHomeScreenContent(
                         .weight(1f)
                         .clip(RoundedCornerShape(24.dp))
                         .clickable(
-                            onClick = {},
+                            onClick = onReportClick,
                             role = Role.Button,
                         )
                         .background(MoaTheme.colors.orange500)
@@ -260,8 +289,10 @@ private fun SeniorHomeScreenContent(
 @Composable
 private fun Preview() {
     SeniorHomeScreenContent(
+        uiState = SeniorHomeUiState.INIT,
         onDailyQuizClick = {},
         onQuizClick = {},
+        onReportClick = {},
         onSettingClick = {},
     )
 }

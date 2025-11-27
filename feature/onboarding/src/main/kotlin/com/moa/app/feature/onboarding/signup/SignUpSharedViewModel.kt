@@ -1,15 +1,14 @@
 package com.moa.app.feature.onboarding.signup
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.auth.model.Gender
 import com.moa.app.domain.auth.model.UserProfile
 import com.moa.app.domain.auth.usecase.PhoneAuthCodeUseCase
 import com.moa.app.domain.auth.usecase.SignUpUseCase
+import com.moa.app.feature.onboarding.signup.model.SignUpPhoneAuthSideEffect
 import com.moa.app.feature.onboarding.signup.model.SignUpPhoneAuthUiState
 import com.moa.app.feature.onboarding.signup.model.SignUpProfileUiState
-import com.moa.app.feature.onboarding.signup.model.SignUpPhoneAuthSideEffect
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.NavigationOptions
 import com.moa.app.navigation.Navigator
@@ -21,13 +20,14 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class SignUpSharedViewModel @Inject constructor(
     private val navigator: Navigator,
     private val phoneAuthCodeUseCase: PhoneAuthCodeUseCase,
-    private val signUpUseCase: SignUpUseCase
+    private val signUpUseCase: SignUpUseCase,
 ) : ViewModel() {
 
     private val _signUpUserProfileUiState = MutableStateFlow(SignUpProfileUiState.init)
@@ -76,7 +76,7 @@ class SignUpSharedViewModel @Inject constructor(
     fun requestPhoneAuthCode() {
         viewModelScope.launch {
             phoneAuthCodeUseCase(
-                phoneNumber = _signUpPhoneAuthUiState.value.phoneNumber
+                phoneNumber = _signUpPhoneAuthUiState.value.phoneNumber,
             ).fold(
                 onSuccess = {
                     _signUpPhoneAuthUiState.update { it.copy(isAuthCodeRequested = true) }
@@ -86,8 +86,8 @@ class SignUpSharedViewModel @Inject constructor(
                     _signUpPhoneAuthUiState.update {
                         it.copy(isPhoneNumberError = true, phoneNumberErrorMessage = error.message)
                     }
-                    Log.e("SignUpSharedViewModel", "requestAuthCode: $error")
-                }
+                    Timber.tag("SignUpSharedViewModel").e("requestAuthCode: $error")
+                },
             )
         }
     }
@@ -101,15 +101,15 @@ class SignUpSharedViewModel @Inject constructor(
                     birthDate = _signUpUserProfileUiState.value.birthDate,
                     gender = gender,
                     phoneNumber = _signUpPhoneAuthUiState.value.phoneNumber,
-                    authCode = _signUpPhoneAuthUiState.value.authCode
-                )
+                    authCode = _signUpPhoneAuthUiState.value.authCode,
+                ),
             ).fold(
                 onSuccess = { navigateToComplete() },
                 onFailure = { error ->
                     _signUpPhoneAuthUiState.update {
                         it.copy(isAuthCodeError = true, authCodeErrorMessage = error.message)
                     }
-                }
+                },
             )
         }
     }
@@ -123,8 +123,8 @@ class SignUpSharedViewModel @Inject constructor(
             route = AppRoute.SignUpComplete,
             options = NavigationOptions(
                 popUpTo = AppRoute.SignUp,
-                inclusive = true
-            )
+                inclusive = true,
+            ),
         )
     }
 }

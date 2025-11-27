@@ -1,7 +1,6 @@
 package com.moa.app.datastore.di
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
@@ -14,6 +13,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import timber.log.Timber
 import javax.inject.Singleton
 
 @Module
@@ -36,11 +36,8 @@ object DataStoreModule {
                 context.dataStoreFile("auth_token_data.enc")
             },
             corruptionHandler = ReplaceFileCorruptionHandler { exception ->
-                Log.e(
-                    "TokenDataStore",
-                    "Token data corrupted, replacing with empty data",
-                    exception,
-                )
+                Timber.tag("TokenDataStore")
+                    .e(exception, "Token data corrupted, replacing with empty data")
 
                 TokenData.INIT
             },

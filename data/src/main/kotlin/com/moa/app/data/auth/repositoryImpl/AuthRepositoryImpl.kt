@@ -66,12 +66,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logOut(): Result<Unit> {
-        val accessToken = tokenManager.getAccessToken()
-            ?: return Result.failure(Exception("Access token not found"))
-        val refreshToken = tokenManager.getRefreshToken()
-            ?: return Result.failure(Exception("Refresh token not found"))
-
-        return authDataSource.logOut(accessToken, refreshToken)
+        return authDataSource.logOut()
             .onSuccess { tokenManager.clearTokens() }
     }
 }

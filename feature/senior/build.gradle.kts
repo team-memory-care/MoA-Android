@@ -13,6 +13,8 @@ dependencies {
     implementation(projects.core.navigation)
     implementation(projects.domain)
 
+    implementation(libs.timber)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.kotlinx.collections.immutable)

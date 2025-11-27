@@ -14,6 +14,8 @@ abstract class AndroidBasePlugin : BasePlugin() {
             defaultConfig {
                 minSdk = libs.findVersion("minSdk").get().requiredVersion.toInt()
                 targetSdk = libs.findVersion("targetSdk").get().requiredVersion.toInt()
+                versionCode = libs.findVersion("versionCode").get().requiredVersion.toInt()
+                versionName = libs.findVersion("versionName").get().requiredVersion
             }
 
             compileOptions {
