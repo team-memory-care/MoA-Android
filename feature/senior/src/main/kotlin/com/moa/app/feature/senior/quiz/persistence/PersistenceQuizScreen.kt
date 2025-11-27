@@ -1,16 +1,14 @@
-package com.moa.app.feature.senior.quiz.orientation
+package com.moa.app.feature.senior.quiz.persistence
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,52 +21,70 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.core.button.MaQuizButton
 import com.moa.app.designsystem.component.core.button.QuizButtonState
+import com.moa.app.designsystem.component.product.dialog.MaAlertDialog
 import com.moa.app.designsystem.component.product.topbar.MaStepProgressTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.domain.quiz.model.PersistenceQuiz
+import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.feature.senior.R
 import com.moa.app.feature.senior.quiz.component.QuizLoadContent
 import com.moa.app.feature.senior.quiz.component.QuizResultDialog
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.immutableListOf
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-fun OrientationQuizScreen(
-    viewModel: OrientationQuizViewModel = hiltViewModel(),
+fun PersistenceQuizScreen(
+    viewModel: PersistenceQuizViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    BackHandler(enabled = true, onBack = viewModel::onBackClick)
 
-    when (val state = uiState) {
-        is OrientationQuizUiState.Loading -> QuizLoadContent()
-        is OrientationQuizUiState.Error -> {}
-        is OrientationQuizUiState.Success -> {
-            OrientationQuizContent(
-                uiState = state,
-                onBackClick = {},
+    when (val uiState = uiState) {
+        is PersistenceQuizUiState.Loading -> QuizLoadContent()
+        is PersistenceQuizUiState.Error -> {}
+        is PersistenceQuizUiState.Success -> {
+            PersistenceQuizContent(
+                uiState = uiState,
+                onBackClick = viewModel::onBackClick,
                 onOptionSelected = viewModel::selectAnswer,
                 onContinueClick = viewModel::checkAnswer,
             )
 
-            QuizResultDialog(dialogState = state.resultDialogState)
+            if (uiState.showResultDialog && uiState.dialogResult != null) {
+                QuizResultDialog(
+                    isCorrect = uiState.dialogResult.isCorrect,
+                    correctAnswer = uiState.dialogResult.correctAnswer,
+                )
+            }
+
+            if (uiState.exitDialog) {
+                MaAlertDialog(
+                    title = "퀴즈를 그만두시나요?",
+                    content = "그만두면 지금까지\n푼 퀴즈는 저장되지 않아요.",
+                    confirmButtonText = "계속 풀기",
+                    dismissButtonText = "그만두기",
+                    onConfirm = viewModel::onHideExitDialog,
+                    onDismiss = viewModel::exitQuiz,
+                    onDialogDismissRequest = viewModel::onHideExitDialog,
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun OrientationQuizContent(
-    uiState: OrientationQuizUiState.Success,
+private fun PersistenceQuizContent(
+    uiState: PersistenceQuizUiState.Success,
     onOptionSelected: (Int) -> Unit,
     onContinueClick: () -> Unit,
     onBackClick: () -> Unit,
@@ -102,7 +118,7 @@ private fun OrientationQuizContent(
         ) { targetIndex ->
             key(targetIndex) {
                 val question = uiState.quizzes[targetIndex]
-                val quizText = question.question
+                val quizText = question.questionContent
 
                 Column(
                     modifier = Modifier.padding(horizontal = 20.dp),
@@ -130,9 +146,7 @@ private fun OrientationQuizContent(
                         modifier = Modifier.align(alignment = Alignment.End)
                     )
 
-                    val options = question.options
-
-                    options.forEachIndexed { index, option ->
+                    question.answerOptions.forEachIndexed { index, option ->
                         val buttonState = when (uiState.selectedAnswerIndex) {
                             null -> QuizButtonState.DEFAULT
                             index -> QuizButtonState.SELECTED
@@ -176,15 +190,42 @@ private fun OrientationQuizContent(
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    OrientationQuizContent(
-        uiState = OrientationQuizUiState.Success(
+    PersistenceQuizContent(
+        uiState = PersistenceQuizUiState.Success(
             quizzes = persistentListOf(
-                QuizUiModel("오늘은 몇 년도인가요?", persistentListOf("2025년", "2022년", "2020년")),
-                QuizUiModel("오늘은 몇 년도인가요?", persistentListOf("2025년", "2022년", "2020년")),
-                QuizUiModel("오늘은 몇 년도인가요?", persistentListOf("2025년", "2022년", "2020년")),
-                QuizUiModel("오늘은 몇 년도인가요?", persistentListOf("2025년", "2022년", "2020년")),
-                QuizUiModel("지금은 무슨 계절인가요?", persistentListOf("여름", "가을", "겨울")),
-            ),
+                PersistenceQuiz(
+                    id = 1,
+                    type = QuizCategory.PERSISTENCE,
+                    questionFormat = "오늘은 몇 년도인가요?",
+                    questionContent = "",
+                    answer = "2025년",
+                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
+                ),
+                PersistenceQuiz(
+                    id = 1,
+                    type = QuizCategory.PERSISTENCE,
+                    questionFormat = "오늘은 몇 년도인가요?",
+                    questionContent = "",
+                    answer = "2025년",
+                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
+                ),
+                PersistenceQuiz(
+                    id = 1,
+                    type = QuizCategory.PERSISTENCE,
+                    questionFormat = "오늘은 몇 년도인가요?",
+                    questionContent = "",
+                    answer = "2025년",
+                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
+                ),
+                PersistenceQuiz(
+                    id = 1,
+                    type = QuizCategory.PERSISTENCE,
+                    questionFormat = "오늘은 몇 년도인가요?",
+                    questionContent = "",
+                    answer = "2025년",
+                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
+                ),
+            )
         ),
         onOptionSelected = {},
         onContinueClick = {},

@@ -35,7 +35,7 @@ sealed interface AppRoute {
     data object QuizCategory : AppRoute
 
     @Serializable
-    data object OrientationQuiz : AppRoute
+    data object PersistenceQuiz : AppRoute
 
     @Serializable
     data class UserConnection(val userRole: String) : AppRoute

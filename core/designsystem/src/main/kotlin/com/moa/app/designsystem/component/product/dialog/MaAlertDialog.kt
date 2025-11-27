@@ -33,11 +33,12 @@ fun MaAlertDialog(
     dismissButtonText: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    onDialogDismissRequest: (() -> Unit)? = null,
     properties: DialogProperties = DialogProperties(),
 ) {
     BasicAlertDialog(
         modifier = modifier,
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDialogDismissRequest ?: onDismiss,
         properties = properties,
     ) {
         Column(

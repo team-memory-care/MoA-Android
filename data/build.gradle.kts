@@ -12,6 +12,7 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.domain)
 
+    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
     implementation(platform(libs.retrofit.bom))
     implementation(libs.bundles.retrofit)
