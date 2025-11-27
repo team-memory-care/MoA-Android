@@ -1,7 +1,9 @@
 package com.moa.app.feature.senior.setting
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.domain.user.usecase.FetchUserProfileUseCase
 import com.moa.app.feature.senior.setting.model.SeniorSettingUiState
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,10 +17,15 @@ import javax.inject.Inject
 @HiltViewModel
 class SeniorSettingViewModel @Inject constructor(
     private val navigator: Navigator,
+    private val fetchUserProfileUseCase: FetchUserProfileUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SeniorSettingUiState> = MutableStateFlow(SeniorSettingUiState.INIT)
     val uiState: StateFlow<SeniorSettingUiState> = _uiState.asStateFlow()
+
+    init {
+        fetchUserProfile()
+    }
 
     fun showLogoutDialog() {
         _uiState.update { it.copy(showLogoutDialog = true) }
@@ -36,9 +43,18 @@ class SeniorSettingViewModel @Inject constructor(
         _uiState.update { it.copy(showWithdrawalDialog = false) }
     }
 
-    fun fetchUserProfile() {
+    private fun fetchUserProfile() {
         viewModelScope.launch {
-
+            fetchUserProfileUseCase().fold(
+                onSuccess = { userProfile ->
+                    _uiState.update {
+                        it.copy(userName = userProfile.name, userCode = userProfile.authCode)
+                    }
+                },
+                onFailure = {
+                    Log.e("fetchUserProfile", "fetchUserProfile: $it")
+                },
+            )
         }
     }
 

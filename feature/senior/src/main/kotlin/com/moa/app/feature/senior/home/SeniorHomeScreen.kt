@@ -41,6 +41,7 @@ fun SeniorHomeScreen(
     SeniorHomeScreenContent(
         onDailyQuizClick = viewModel::navigateToDailyQuiz,
         onQuizClick = viewModel::navigateToQuizCategory,
+        onSettingClick = viewModel::navigateToSetting,
     )
 }
 
@@ -48,6 +49,7 @@ fun SeniorHomeScreen(
 private fun SeniorHomeScreenContent(
     onDailyQuizClick: () -> Unit,
     onQuizClick: () -> Unit,
+    onSettingClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -74,7 +76,7 @@ private fun SeniorHomeScreenContent(
                 contentDescription = null,
                 modifier = Modifier
                     .clickable(
-                        onClick = {},
+                        onClick = onSettingClick,
                         role = Role.Button,
                         interactionSource = null,
                         indication = null
@@ -259,6 +261,7 @@ private fun SeniorHomeScreenContent(
 private fun Preview() {
     SeniorHomeScreenContent(
         onDailyQuizClick = {},
-        onQuizClick = {}
+        onQuizClick = {},
+        onSettingClick = {},
     )
 }
