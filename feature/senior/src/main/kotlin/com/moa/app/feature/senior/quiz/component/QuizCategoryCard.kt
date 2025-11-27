@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.theme.MoaTheme
 
@@ -31,6 +32,7 @@ fun QuizCategoryCard(
     description: String,
     backgroundImage: Int,
     backgroundColor: Color,
+    isEnabled: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -40,6 +42,7 @@ fun QuizCategoryCard(
             .clip(RoundedCornerShape(12.dp))
             .background(backgroundColor)
             .clickable(
+                enabled = isEnabled,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(),
                 onClick = onClick,
@@ -50,8 +53,19 @@ fun QuizCategoryCard(
             painter = painterResource(backgroundImage),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            alpha = if (isEnabled) 1f else 0.5f,
+            modifier = Modifier
+                .fillMaxSize()
+                .zIndex(1f)
         )
+
+        if (!isEnabled) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MoaTheme.colors.coolGray80)
+            )
+        }
 
         Text(
             text = title,
@@ -81,6 +95,7 @@ private fun Preview() {
         description = "Description",
         backgroundImage = R.drawable.img_quiz_list_1,
         backgroundColor = MoaTheme.colors.blue400,
+        isEnabled = true,
         modifier = Modifier.fillMaxWidth(),
         onClick = {}
     )
