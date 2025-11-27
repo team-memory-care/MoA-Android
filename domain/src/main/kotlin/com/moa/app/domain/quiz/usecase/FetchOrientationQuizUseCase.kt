@@ -6,7 +6,7 @@ import com.moa.app.domain.quiz.repository.QuizRepository
 import javax.inject.Inject
 
 class FetchOrientationQuizUseCase @Inject constructor(
-    private val quizRepository: QuizRepository
+    private val quizRepository: QuizRepository,
 ) {
     suspend operator fun invoke(category: QuizCategory): Result<List<PersistenceQuiz>> {
         return quizRepository.fetchPersistenceQuizzes(category)
