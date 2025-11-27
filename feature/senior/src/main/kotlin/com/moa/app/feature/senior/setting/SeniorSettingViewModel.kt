@@ -3,8 +3,11 @@ package com.moa.app.feature.senior.setting
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.domain.auth.usecase.LogOutUseCase
 import com.moa.app.domain.user.usecase.FetchUserProfileUseCase
 import com.moa.app.feature.senior.setting.model.SeniorSettingUiState
+import com.moa.app.navigation.AppRoute
+import com.moa.app.navigation.NavigationOptions
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +21,7 @@ import javax.inject.Inject
 class SeniorSettingViewModel @Inject constructor(
     private val navigator: Navigator,
     private val fetchUserProfileUseCase: FetchUserProfileUseCase,
+    private val logOutUseCase: LogOutUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SeniorSettingUiState> = MutableStateFlow(SeniorSettingUiState.INIT)
@@ -59,7 +63,18 @@ class SeniorSettingViewModel @Inject constructor(
     }
 
     fun logOut() {
-        hideLogoutDialog()
+        viewModelScope.launch {
+            logOutUseCase().fold(
+                onSuccess = {
+                    hideLogoutDialog()
+                    navigateToClear()
+                },
+                onFailure = {
+                    Log.e("logOut", "logOut: $it")
+                    hideLogoutDialog()
+                },
+            )
+        }
     }
 
     fun withdrawal() {
@@ -71,6 +86,17 @@ class SeniorSettingViewModel @Inject constructor(
     fun openCustomerCenterUrl() = navigator.openUrl(CUSTOMER_CENTER_URL)
 
     fun navigateToBack() = navigator.navigateBack()
+
+    private fun navigateToClear() {
+        navigator.navigate(
+            route = AppRoute.AuthLanding,
+            options = NavigationOptions(
+                popUpTo = AppRoute.SeniorSetting,
+                inclusive = true,
+                clearBackStack = true,
+            )
+        )
+    }
 
     companion object {
         private const val POLICY_URL = "https://woongaaaa.notion.site/Legal-2b41a839ca3c80bcb357fd347f9535f3"

@@ -14,4 +14,5 @@ interface AuthDataSource {
     suspend fun signIn(phoneNumber: String, authCode: String): Result<TokenResponse>
     suspend fun setParentRole(): Result<ParentRoleResponse>
     suspend fun reissueToken(request: ReissueTokenRequest): Result<TokenResponse>
+    suspend fun logOut(accessToken: String, refreshToken: String): Result<Unit>
 }
