@@ -39,4 +39,7 @@ sealed interface AppRoute {
 
     @Serializable
     data class UserConnection(val userRole: String) : AppRoute
+
+    @Serializable
+    data object SeniorSetting
 }

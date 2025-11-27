@@ -36,7 +36,8 @@ fun OptionItem(
                 onClick = onClick,
                 indication = ripple(),
                 interactionSource = remember { MutableInteractionSource() },
-            ),
+            )
+            .padding(start = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
