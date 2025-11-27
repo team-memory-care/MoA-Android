@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.PersistenceQuiz
 import com.moa.app.domain.quiz.usecase.CheckAnswerUseCase
+import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.usecase.FetchOrientationQuizUseCase
 import com.moa.app.feature.senior.quiz.component.ResultDialogState
 import com.moa.app.navigation.AppRoute
@@ -31,8 +32,6 @@ class PersistenceQuizViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<PersistenceQuizUiState> = MutableStateFlow(PersistenceQuizUiState.Loading)
     val uiState: StateFlow<PersistenceQuizUiState> = _uiState.asStateFlow()
 
-    private var quizzes: List<PersistenceQuiz> = emptyList()
-
     init {
         loadQuizzes()
     }
@@ -40,15 +39,15 @@ class PersistenceQuizViewModel @Inject constructor(
     private fun loadQuizzes() {
         viewModelScope.launch {
             delay(2000L)
-            val quizzes = fetchOrientationQuizUseCase()
-            this@PersistenceQuizViewModel.quizzes = quizzes
-            val quizzesUiModel = quizzes.map { it.toUiModel() }.toImmutableList()
-
-            if (quizzesUiModel.isNotEmpty()) {
-                _uiState.update { PersistenceQuizUiState.Success(quizzes = quizzesUiModel) }
-            } else {
-                _uiState.update { PersistenceQuizUiState.Error(message = "퀴즈가 존재하지 않습니다") }
-            }
+            fetchOrientationQuizUseCase(QuizCategory.PERSISTENCE).fold(
+                onSuccess = { quizzes ->
+                    _uiState.update { PersistenceQuizUiState.Success(quizzes = quizzes.toImmutableList()) }
+                },
+                onFailure = { t ->
+                    _uiState.update { PersistenceQuizUiState.Error(message = "퀴즈가 존재하지 않습니다.") }
+                    Log.e("PersistenceQuizViewModel", "loadQuizzes: $t")
+                },
+            )
         }
     }
 
@@ -133,7 +132,7 @@ sealed interface PersistenceQuizUiState {
     data object Loading : PersistenceQuizUiState
     data class Error(val message: String) : PersistenceQuizUiState
     data class Success(
-        val quizzes: ImmutableList<QuizUiModel>,
+        val quizzes: ImmutableList<PersistenceQuiz>,
         val currentQuestionIndex: Int = 0,
         val selectedAnswerIndex: Int? = null,
         val resultDialogState: ResultDialogState = ResultDialogState.Hidden,
@@ -152,13 +151,3 @@ sealed interface PersistenceQuizUiState {
     }
 }
 
-data class QuizUiModel(
-    val question: String,
-    val options: ImmutableList<String>,
-)
-
-fun PersistenceQuiz.toUiModel() =
-    QuizUiModel(
-        question = this.questionFormat,
-        options = this.answerOptions,
-    )

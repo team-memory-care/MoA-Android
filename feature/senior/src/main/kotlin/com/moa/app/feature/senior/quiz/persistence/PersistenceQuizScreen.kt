@@ -32,6 +32,8 @@ import com.moa.app.designsystem.component.core.button.MaQuizButton
 import com.moa.app.designsystem.component.core.button.QuizButtonState
 import com.moa.app.designsystem.component.product.topbar.MaStepProgressTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.domain.quiz.model.PersistenceQuiz
+import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.feature.senior.R
 import com.moa.app.feature.senior.quiz.component.QuizLoadContent
 import com.moa.app.feature.senior.quiz.component.QuizResultDialog
@@ -43,13 +45,13 @@ fun PersistenceQuizScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    when (val state = uiState) {
+    when (val uiState = uiState) {
         is PersistenceQuizUiState.Loading -> QuizLoadContent()
         is PersistenceQuizUiState.Error -> {}
         is PersistenceQuizUiState.Success -> {
             PersistenceQuizContent(
-                uiState = state,
                 onBackClick = {},
+                uiState = uiState,
                 onOptionSelected = viewModel::selectAnswer,
                 onContinueClick = viewModel::checkAnswer,
             )
@@ -95,7 +97,7 @@ private fun PersistenceQuizContent(
         ) { targetIndex ->
             key(targetIndex) {
                 val question = uiState.quizzes[targetIndex]
-                val quizText = question.question
+                val quizText = question.questionContent
 
                 Column(
                     modifier = Modifier.padding(horizontal = 20.dp),
@@ -123,9 +125,7 @@ private fun PersistenceQuizContent(
                         modifier = Modifier.align(alignment = Alignment.End)
                     )
 
-                    val options = question.options
-
-                    options.forEachIndexed { index, option ->
+                    question.answerOptions.forEachIndexed { index, option ->
                         val buttonState = when (uiState.selectedAnswerIndex) {
                             null -> QuizButtonState.DEFAULT
                             index -> QuizButtonState.SELECTED
@@ -172,12 +172,39 @@ private fun Preview() {
     PersistenceQuizContent(
         uiState = PersistenceQuizUiState.Success(
             quizzes = persistentListOf(
-                QuizUiModel("오늘은 몇 년도인가요?", persistentListOf("2025년", "2022년", "2020년")),
-                QuizUiModel("오늘은 몇 년도인가요?", persistentListOf("2025년", "2022년", "2020년")),
-                QuizUiModel("오늘은 몇 년도인가요?", persistentListOf("2025년", "2022년", "2020년")),
-                QuizUiModel("오늘은 몇 년도인가요?", persistentListOf("2025년", "2022년", "2020년")),
-                QuizUiModel("지금은 무슨 계절인가요?", persistentListOf("여름", "가을", "겨울")),
-            ),
+                PersistenceQuiz(
+                    id = 1,
+                    type = QuizCategory.PERSISTENCE,
+                    questionFormat = "오늘은 몇 년도인가요?",
+                    questionContent = "",
+                    answer = "2025년",
+                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
+                ),
+                PersistenceQuiz(
+                    id = 1,
+                    type = QuizCategory.PERSISTENCE,
+                    questionFormat = "오늘은 몇 년도인가요?",
+                    questionContent = "",
+                    answer = "2025년",
+                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
+                ),
+                PersistenceQuiz(
+                    id = 1,
+                    type = QuizCategory.PERSISTENCE,
+                    questionFormat = "오늘은 몇 년도인가요?",
+                    questionContent = "",
+                    answer = "2025년",
+                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
+                ),
+                PersistenceQuiz(
+                    id = 1,
+                    type = QuizCategory.PERSISTENCE,
+                    questionFormat = "오늘은 몇 년도인가요?",
+                    questionContent = "",
+                    answer = "2025년",
+                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
+                ),
+            )
         ),
         onOptionSelected = {},
         onContinueClick = {},
