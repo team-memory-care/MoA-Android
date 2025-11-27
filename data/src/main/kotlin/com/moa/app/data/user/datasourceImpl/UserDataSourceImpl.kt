@@ -14,4 +14,8 @@ class UserDataSourceImpl @Inject constructor(
         return userService.fetchUserProfile().toResult { it }
     }
 
+    override suspend fun withdrawal(): Result<Unit> {
+        return userService.withdrawal().toResult()
+    }
+
 }

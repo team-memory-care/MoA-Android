@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.auth.usecase.LogOutUseCase
+import com.moa.app.domain.auth.usecase.WithdrawalUseCase
 import com.moa.app.domain.user.usecase.FetchUserProfileUseCase
 import com.moa.app.feature.senior.setting.model.SeniorSettingUiState
 import com.moa.app.navigation.AppRoute
@@ -22,6 +23,7 @@ class SeniorSettingViewModel @Inject constructor(
     private val navigator: Navigator,
     private val fetchUserProfileUseCase: FetchUserProfileUseCase,
     private val logOutUseCase: LogOutUseCase,
+    private val withdrawalUseCase: WithdrawalUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SeniorSettingUiState> = MutableStateFlow(SeniorSettingUiState.INIT)
@@ -66,7 +68,6 @@ class SeniorSettingViewModel @Inject constructor(
         viewModelScope.launch {
             logOutUseCase().fold(
                 onSuccess = {
-                    hideLogoutDialog()
                     navigateToClear()
                 },
                 onFailure = {
@@ -78,7 +79,17 @@ class SeniorSettingViewModel @Inject constructor(
     }
 
     fun withdrawal() {
-        hideWithdrawalDialog()
+        viewModelScope.launch {
+            withdrawalUseCase().fold(
+                onSuccess = {
+                    navigateToClear()
+                },
+                onFailure = {
+                    Log.e("withdrawal", "withdrawal: $it")
+                    hideLogoutDialog()
+                },
+            )
+        }
     }
 
     fun openPolicyUrl() = navigator.openUrl(POLICY_URL)
