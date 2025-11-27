@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.moa.android.application)
     alias(libs.plugins.moa.android.hilt)
@@ -10,13 +12,37 @@ android {
         applicationId = "com.moa.app"
     }
 
+    val localProperties = Properties().apply {
+        val propFile = rootProject.file("local.properties")
+        if (propFile.exists()) {
+            propFile.inputStream().use(::load)
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file(
+                System.getenv("RELEASE_STORE_FILE")
+                    ?: localProperties["release.keystore.path"] as? String
+                    ?: "release.jks"
+            )
+            storePassword = System.getenv("RELEASE_STORE_PASSWORD")
+                ?: localProperties["release.keystore.password"] as? String
+            keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+                ?: localProperties["release.key.alias"] as? String
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+                ?: localProperties["release.key.password"] as? String
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
