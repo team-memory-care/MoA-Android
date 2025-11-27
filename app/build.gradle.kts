@@ -24,7 +24,7 @@ android {
             storeFile = file(
                 System.getenv("RELEASE_STORE_FILE")
                     ?: localProperties["release.keystore.path"] as? String
-                    ?: "release.jks"
+                    ?: "release.jks",
             )
             storePassword = System.getenv("RELEASE_STORE_PASSWORD")
                 ?: localProperties["release.keystore.password"] as? String
