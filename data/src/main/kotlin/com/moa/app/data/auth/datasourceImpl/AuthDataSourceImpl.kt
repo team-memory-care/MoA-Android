@@ -41,8 +41,7 @@ class AuthDataSourceImpl @Inject constructor(
         return tokenService.reissueToken(request).toResult { it }
     }
 
-    override suspend fun logOut(accessToken: String, refreshToken: String): Result<Unit> {
-        val request = AuthTokenRequest(accessToken, refreshToken)
-        return authService.logOut(request).toResult()
+    override suspend fun logOut(): Result<Unit> {
+        return authService.logOut().toResult()
     }
 }

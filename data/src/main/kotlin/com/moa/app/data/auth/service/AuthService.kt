@@ -40,8 +40,7 @@ interface AuthService {
     @POST("/api/v1/users/role/parent")
     suspend fun setParentRole(): NetworkResult<ParentRoleResponse>
 
-    @NoAuth
     @POST("/api/v1/auth/logout")
-    suspend fun logOut(@Body request: AuthTokenRequest): NetworkResult<Unit>
+    suspend fun logOut(): NetworkResult<Unit>
 
 }
