@@ -1,15 +1,12 @@
 package com.moa.app.feature.senior.quiz.persistence
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.PersistenceQuiz
-import com.moa.app.domain.quiz.usecase.CheckAnswerUseCase
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.usecase.FetchOrientationQuizUseCase
-import com.moa.app.feature.senior.quiz.component.ResultDialogState
-import com.moa.app.navigation.AppRoute
-import com.moa.app.navigation.NavigationOptions
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -26,7 +23,6 @@ import javax.inject.Inject
 class PersistenceQuizViewModel @Inject constructor(
     private val navigator: Navigator,
     private val fetchOrientationQuizUseCase: FetchOrientationQuizUseCase,
-    private val checkAnswerUseCase: CheckAnswerUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PersistenceQuizUiState> = MutableStateFlow(PersistenceQuizUiState.Loading)
@@ -52,33 +48,28 @@ class PersistenceQuizViewModel @Inject constructor(
     }
 
     fun selectAnswer(selectedAnswerIndex: Int) {
-        _uiState.update { currentState ->
-            if (currentState is PersistenceQuizUiState.Success && !currentState.isCheckingAnswer) {
-                currentState.copy(selectedAnswerIndex = selectedAnswerIndex)
+        _uiState.update {
+            if (it is PersistenceQuizUiState.Success && !it.showResultDialog) {
+                it.copy(selectedAnswerIndex = selectedAnswerIndex)
             } else {
-                currentState
+                it
             }
         }
     }
 
     fun checkAnswer() {
-        _uiState.update { currentState ->
-            if (currentState !is PersistenceQuizUiState.Success || currentState.isCheckingAnswer) return@update currentState
-            val currentDomainQuestion = this.quizzes.getOrNull(currentState.currentQuestionIndex) ?: return@update currentState
-            val isCorrect = checkAnswerUseCase(
-                quiz = currentDomainQuestion,
-                selectedIndex = currentState.selectedAnswerIndex,
-            )
+        _uiState.update {
+            if (it !is PersistenceQuizUiState.Success || it.showResultDialog) return@update it
+            val selectedAnswerIndex = it.selectedAnswerIndex ?: return@update it
+            val currentQuiz = it.quizzes.getOrNull(it.currentQuestionIndex) ?: return@update it
+            val isCorrect = currentQuiz.getCurrentAnswerIndex(selectedAnswerIndex)
 
-            val newDialogState = if (isCorrect) {
-                ResultDialogState.Correct
-            } else {
-                val correctAnswer = currentDomainQuestion.answer
-                ResultDialogState.Incorrect(correctAnswer)
-            }
-
-            currentState.copy(
-                resultDialogState = newDialogState,
+            it.copy(
+                showResultDialog = true,
+                dialogResult = DialogResult(
+                    isCorrect = isCorrect,
+                    correctAnswer = if (isCorrect) "" else currentQuiz.answer,
+                ),
             )
         }
 
@@ -89,41 +80,64 @@ class PersistenceQuizViewModel @Inject constructor(
     }
 
     private fun goToNextQuestion() {
-        var shouldNavigate = false
+        val currentState = _uiState.value as? PersistenceQuizUiState.Success ?: return
+        val nextQuestionIndex = currentState.currentQuestionIndex + 1
+        val isLastQuestion = nextQuestionIndex >= currentState.quizzes.size
 
-        _uiState.update { currentState ->
-            if (currentState !is PersistenceQuizUiState.Success) return@update currentState
-
-            val nextIndex = currentState.currentQuestionIndex + 1
-
-            if (nextIndex < this.quizzes.size) {
-                currentState.copy(
-                    currentQuestionIndex = nextIndex,
-                    selectedAnswerIndex = null,
-                    resultDialogState = ResultDialogState.Hidden,
-                )
-            } else {
-                shouldNavigate = true
-                currentState.copy(
-                    resultDialogState = ResultDialogState.Hidden,
-                )
+        if (isLastQuestion) {
+            _uiState.update {
+                if (it is PersistenceQuizUiState.Success) {
+                    it.copy(showResultDialog = false, dialogResult = null)
+                } else {
+                    it
+                }
             }
-        }
 
-        if (shouldNavigate) {
-            navigator.navigate(
-                route = AppRoute.SeniorHome,
-                options = NavigationOptions(
-                    popUpTo = AppRoute.PersistenceQuiz,
-                    inclusive = true,
-                    launchSingleTop = true
-                )
-            )
+            viewModelScope.launch {
+                delay(DIALOG_DISMISS_ANIMATION_MS)
+                exitQuiz()
+            }
+        } else {
+            _uiState.update {
+                if (it is PersistenceQuizUiState.Success) {
+                    it.copy(
+                        currentQuestionIndex = nextQuestionIndex,
+                        selectedAnswerIndex = null,
+                        showResultDialog = false,
+                        dialogResult = null,
+                    )
+                } else {
+                    it
+                }
+            }
         }
     }
 
-    companion object Companion {
+    fun onBackClick() {
+        _uiState.update {
+            if (it is PersistenceQuizUiState.Success && !it.exitDialog) {
+                it.copy(exitDialog = true)
+            } else {
+                it
+            }
+        }
+    }
+
+    fun onHideExitDialog() {
+        _uiState.update {
+            if (it is PersistenceQuizUiState.Success && it.exitDialog) {
+                it.copy(exitDialog = false)
+            } else {
+                it
+            }
+        }
+    }
+
+    fun exitQuiz() = navigator.navigateBack()
+
+    companion object {
         private const val DIALOG_DURATION_MS = 2000L
+        private const val DIALOG_DISMISS_ANIMATION_MS = 200L
     }
 }
 
@@ -135,7 +149,9 @@ sealed interface PersistenceQuizUiState {
         val quizzes: ImmutableList<PersistenceQuiz>,
         val currentQuestionIndex: Int = 0,
         val selectedAnswerIndex: Int? = null,
-        val resultDialogState: ResultDialogState = ResultDialogState.Hidden,
+        val showResultDialog: Boolean = false,
+        val dialogResult: DialogResult? = null,
+        val exitDialog: Boolean = false
     ) : PersistenceQuizUiState {
         val currentStep: Int
             get() = currentQuestionIndex + 1
@@ -143,11 +159,9 @@ sealed interface PersistenceQuizUiState {
         val totalSteps: Int
             get() = quizzes.size
 
-        val isCheckingAnswer: Boolean
-            get() = resultDialogState != ResultDialogState.Hidden
-
         val isContinueButtonEnabled: Boolean
-            get() = selectedAnswerIndex != null && !isCheckingAnswer
+            get() = selectedAnswerIndex != null && !showResultDialog
     }
 }
 
+data class DialogResult(val isCorrect: Boolean, val correctAnswer: String)

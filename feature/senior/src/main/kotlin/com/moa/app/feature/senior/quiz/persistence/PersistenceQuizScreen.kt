@@ -1,5 +1,6 @@
 package com.moa.app.feature.senior.quiz.persistence
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.SizeTransform
@@ -25,11 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.core.button.MaQuizButton
 import com.moa.app.designsystem.component.core.button.QuizButtonState
+import com.moa.app.designsystem.component.product.dialog.MaAlertDialog
 import com.moa.app.designsystem.component.product.topbar.MaStepProgressTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.domain.quiz.model.PersistenceQuiz
@@ -44,19 +47,37 @@ fun PersistenceQuizScreen(
     viewModel: PersistenceQuizViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    BackHandler(enabled = true, onBack = viewModel::onBackClick)
 
     when (val uiState = uiState) {
         is PersistenceQuizUiState.Loading -> QuizLoadContent()
         is PersistenceQuizUiState.Error -> {}
         is PersistenceQuizUiState.Success -> {
             PersistenceQuizContent(
-                onBackClick = {},
                 uiState = uiState,
+                onBackClick = viewModel::onBackClick,
                 onOptionSelected = viewModel::selectAnswer,
                 onContinueClick = viewModel::checkAnswer,
             )
 
-            QuizResultDialog(dialogState = state.resultDialogState)
+            if (uiState.showResultDialog && uiState.dialogResult != null) {
+                QuizResultDialog(
+                    isCorrect = uiState.dialogResult.isCorrect,
+                    correctAnswer = uiState.dialogResult.correctAnswer,
+                )
+            }
+
+            if (uiState.exitDialog) {
+                MaAlertDialog(
+                    title = "퀴즈를 그만두시나요?",
+                    content = "그만두면 지금까지\n푼 퀴즈는 저장되지 않아요.",
+                    confirmButtonText = "계속 풀기",
+                    dismissButtonText = "그만두기",
+                    onConfirm = viewModel::onHideExitDialog,
+                    onDismiss = viewModel::exitQuiz,
+                    onDialogDismissRequest = viewModel::onHideExitDialog,
+                )
+            }
         }
     }
 }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,9 +19,11 @@ import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.senior.R
 
 @Composable
-fun QuizResultDialog(dialogState: ResultDialogState) {
-    if (dialogState == ResultDialogState.Hidden) return
-
+fun QuizResultDialog(
+    isCorrect: Boolean,
+    correctAnswer: String,
+    modifier: Modifier = Modifier,
+) {
     Dialog(
         onDismissRequest = {},
         properties = DialogProperties(
@@ -30,10 +31,11 @@ fun QuizResultDialog(dialogState: ResultDialogState) {
             dismissOnClickOutside = false,
         ),
     ) {
-        val isCorrect = dialogState is ResultDialogState.Correct
-        val correctAnswer = (dialogState as? ResultDialogState.Incorrect)?.correctAnswer ?: ""
-
-        QuizResultCard(isCorrect, correctAnswer)
+        QuizResultCard(
+            isCorrect = isCorrect,
+            correctAnswer = correctAnswer,
+            modifier = modifier
+        )
     }
 }
 
@@ -77,13 +79,6 @@ private fun QuizResultCard(
             style = MoaTheme.typography.title2Semibold
         )
     }
-}
-
-@Immutable
-sealed interface ResultDialogState {
-    data object Hidden : ResultDialogState
-    data object Correct : ResultDialogState
-    data class Incorrect(val correctAnswer: String) : ResultDialogState
 }
 
 @Preview(name = "정답")
