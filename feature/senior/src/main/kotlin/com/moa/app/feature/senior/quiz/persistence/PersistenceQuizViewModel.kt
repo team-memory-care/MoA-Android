@@ -6,11 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.PersistenceQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
-import com.moa.app.domain.quiz.usecase.FetchOrientationQuizUseCase
+import com.moa.app.domain.quiz.usecase.FetchPersistenceQuizUseCase
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PersistenceQuizViewModel @Inject constructor(
     private val navigator: Navigator,
-    private val fetchOrientationQuizUseCase: FetchOrientationQuizUseCase,
+    private val fetchPersistenceQuizUseCase: FetchPersistenceQuizUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PersistenceQuizUiState> = MutableStateFlow(PersistenceQuizUiState.Loading)
@@ -34,13 +37,21 @@ class PersistenceQuizViewModel @Inject constructor(
 
     private fun loadQuizzes() {
         viewModelScope.launch {
-            delay(2000L)
-            fetchOrientationQuizUseCase(QuizCategory.PERSISTENCE).fold(
+            val minLoadingTime = async { delay(2000L) }
+            val quizzesDeferred = async {
+                fetchPersistenceQuizUseCase(QuizCategory.PERSISTENCE)
+            }
+            awaitAll(minLoadingTime, quizzesDeferred)
+            quizzesDeferred.await().fold(
                 onSuccess = { quizzes ->
-                    _uiState.update { PersistenceQuizUiState.Success(quizzes = quizzes.toImmutableList()) }
+                    _uiState.update {
+                        PersistenceQuizUiState.Success(quizzes = quizzes.toImmutableList())
+                    }
                 },
                 onFailure = { t ->
-                    _uiState.update { PersistenceQuizUiState.Error(message = "퀴즈가 존재하지 않습니다.") }
+                    _uiState.update {
+                        PersistenceQuizUiState.Error(message = "퀴즈가 존재하지 않습니다.")
+                    }
                     Log.e("PersistenceQuizViewModel", "loadQuizzes: $t")
                 },
             )
