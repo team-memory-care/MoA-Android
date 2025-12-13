@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.PersistenceQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
-import com.moa.app.domain.quiz.usecase.FetchPersistenceQuizUseCase
+import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PersistenceQuizViewModel @Inject constructor(
     private val navigator: Navigator,
-    private val fetchPersistenceQuizUseCase: FetchPersistenceQuizUseCase,
+    private val fetchQuizUseCase: FetchQuizUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PersistenceQuizUiState> = MutableStateFlow(PersistenceQuizUiState.Loading)
@@ -38,13 +38,14 @@ class PersistenceQuizViewModel @Inject constructor(
         viewModelScope.launch {
             val minLoadingTime = async { delay(2000L) }
             val quizzesDeferred = async {
-                fetchPersistenceQuizUseCase(QuizCategory.PERSISTENCE)
+                fetchQuizUseCase(QuizCategory.PERSISTENCE)
             }
             awaitAll(minLoadingTime, quizzesDeferred)
             quizzesDeferred.await().fold(
                 onSuccess = { quizzes ->
+                    val persistenceQuizzes = quizzes.filterIsInstance<PersistenceQuiz>()
                     _uiState.update {
-                        PersistenceQuizUiState.Success(quizzes = quizzes.toImmutableList())
+                        PersistenceQuizUiState.Success(quizzes = persistenceQuizzes.toImmutableList())
                     }
                 },
                 onFailure = { t ->
@@ -72,7 +73,7 @@ class PersistenceQuizViewModel @Inject constructor(
             if (it !is PersistenceQuizUiState.Success || it.showResultDialog) return@update it
             val selectedAnswerIndex = it.selectedAnswerIndex ?: return@update it
             val currentQuiz = it.quizzes.getOrNull(it.currentQuestionIndex) ?: return@update it
-            val isCorrect = currentQuiz.getCurrentAnswerIndex(selectedAnswerIndex)
+            val isCorrect = currentQuiz.isAnswerCorrect(selectedAnswerIndex)
 
             it.copy(
                 showResultDialog = true,

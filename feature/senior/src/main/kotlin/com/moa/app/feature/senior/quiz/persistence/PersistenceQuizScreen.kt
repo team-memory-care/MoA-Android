@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.designsystem.component.core.button.MaButton
@@ -50,7 +49,7 @@ fun PersistenceQuizScreen(
     BackHandler(enabled = true, onBack = viewModel::onBackClick)
 
     when (val uiState = uiState) {
-        is PersistenceQuizUiState.Loading -> QuizLoadContent()
+        is PersistenceQuizUiState.Loading -> QuizLoadContent(QuizCategory.PERSISTENCE)
         is PersistenceQuizUiState.Error -> {}
         is PersistenceQuizUiState.Success -> {
             PersistenceQuizContent(
