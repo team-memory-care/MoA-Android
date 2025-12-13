@@ -5,6 +5,7 @@ import com.moa.app.data.quiz.model.response.toDomain
 import com.moa.app.domain.quiz.model.PersistenceQuiz
 import com.moa.app.domain.quiz.model.Quiz
 import com.moa.app.domain.quiz.model.QuizCategory
+import com.moa.app.domain.quiz.model.QuizResult
 import com.moa.app.domain.quiz.repository.QuizRepository
 import javax.inject.Inject
 
@@ -17,5 +18,9 @@ class QuizRepositoryImpl @Inject constructor(
             .mapCatching { responses ->
                 responses.map { it.toDomain() }
             }
+    }
+
+    override suspend fun submitQuizResult(quizResult: QuizResult): Result<Unit> {
+        return quizDataSource.submitQuizResult(quizResult)
     }
 }
