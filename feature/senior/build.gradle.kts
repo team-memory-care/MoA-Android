@@ -14,6 +14,7 @@ dependencies {
     implementation(projects.domain)
 
     implementation(libs.timber)
+    implementation(libs.bundles.coil)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

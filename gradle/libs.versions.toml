@@ -46,6 +46,9 @@ retrofit = "3.0.0"
 # Logging
 timber = "5.0.1"
 
+# coil
+coil = "3.3.0"
+
 # Test
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -105,6 +108,10 @@ okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref 
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
 
+## coil
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+
 ## Logging
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
@@ -139,6 +146,7 @@ compose = [
 compose-debug = ["compose-ui-tooling", "compose-ui-test-manifest"]
 okhttp = ["okhttp", "okhttp-logging-interceptor"]
 retrofit = ["retrofit", "retrofit-kotlin-serialization-converter"]
+coil = ["coil-compose", "coil-network"]
 
 
 [plugins]
