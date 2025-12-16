@@ -9,7 +9,7 @@ android {
     namespace = "com.moa.app"
 
     defaultConfig {
-        applicationId = "com.moa.app"
+        applicationId = "com.biggun.moa"
     }
 
     val localProperties = Properties().apply {
@@ -40,7 +40,7 @@ android {
             applicationIdSuffix = ".debug"
         }
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
