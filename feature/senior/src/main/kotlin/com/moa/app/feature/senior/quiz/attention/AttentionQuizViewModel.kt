@@ -84,7 +84,11 @@ class AttentionQuizViewModel @Inject constructor(
                 correctAnswer = if (isCorrect) "" else currentQuiz.answer,
             )
 
-            state.copy(showResultDialog = true, quizResult = quizResult)
+            state.copy(
+                showResultDialog = true,
+                quizResult = quizResult,
+                correctCount = if (isCorrect) state.correctCount + 1 else state.correctCount,
+            )
         }
 
         viewModelScope.launch {
