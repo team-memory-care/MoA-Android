@@ -24,14 +24,23 @@ class QuizCategoryViewModel @Inject constructor(
     private val navigator: Navigator,
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<QuizCategoryUiState> = MutableStateFlow(QuizCategoryUiState.INIT)
+    private val _uiState = MutableStateFlow(QuizCategoryUiState.INIT)
     val uiState: StateFlow<QuizCategoryUiState> = _uiState.asStateFlow()
 
     private val _sideEffect: MutableSharedFlow<QuizCategorySideEffect> = MutableSharedFlow()
     val sideEffect: SharedFlow<QuizCategorySideEffect> = _sideEffect.asSharedFlow()
 
     init {
-        _uiState.update { it.copy(enabledCategories = setOf(QuizCategory.PERSISTENCE)) }
+        _uiState.update {
+            it.copy(
+                enabledCategories = setOf(
+                    QuizCategory.PERSISTENCE,
+                    QuizCategory.LINGUISTIC,
+                    QuizCategory.ATTENTION,
+                    QuizCategory.SPACETIME
+                ),
+            )
+        }
     }
 
 
@@ -46,6 +55,9 @@ class QuizCategoryViewModel @Inject constructor(
         viewModelScope.launch {
             when (quizCategory) {
                 QuizCategory.PERSISTENCE -> navigateToQuiz(AppRoute.PersistenceQuiz)
+                QuizCategory.LINGUISTIC -> navigateToQuiz(AppRoute.LinguisticQuiz)
+                QuizCategory.ATTENTION -> navigateToQuiz(AppRoute.AttentionQuiz)
+                QuizCategory.SPACETIME -> navigateToQuiz(AppRoute.SpaceTimeQuiz)
                 else -> {
                     _sideEffect.emit(QuizCategorySideEffect.ShowToast("${quizCategory.name} 퀴즈는 아직 준비중이에요"))
                 }

@@ -73,7 +73,7 @@ private fun QuizCategoryScreenContent(
         MaTopAppBar(title = "퀴즈 선택", onBackClick = onBackClick)
 
         Text(
-            text = "퀴즈는 MMSE 기반으로 만들어졌어요",
+            text = "표준 인지평가 방식을 참고해 구성되었어요",
             color = MoaTheme.colors.black,
             style = MoaTheme.typography.body1Regular,
             textAlign = TextAlign.Center,
