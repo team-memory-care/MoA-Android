@@ -57,6 +57,7 @@ class QuizCategoryViewModel @Inject constructor(
                 QuizCategory.PERSISTENCE -> navigateToQuiz(AppRoute.PersistenceQuiz)
                 QuizCategory.LINGUISTIC -> navigateToQuiz(AppRoute.LinguisticQuiz)
                 QuizCategory.ATTENTION -> navigateToQuiz(AppRoute.AttentionQuiz)
+                QuizCategory.SPACETIME -> navigateToQuiz(AppRoute.SpaceTimeQuiz)
                 else -> {
                     _sideEffect.emit(QuizCategorySideEffect.ShowToast("${quizCategory.name} 퀴즈는 아직 준비중이에요"))
                 }

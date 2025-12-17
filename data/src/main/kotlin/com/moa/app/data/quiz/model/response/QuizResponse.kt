@@ -21,5 +21,6 @@ fun QuizResponse.toDomain(): Quiz {
         is PersistenceQuizResponse -> this.toDomain()
         is LinguisticQuizResponse -> this.toDomain()
         is AttentionQuizResponse -> this.toDomain()
+        is SpaceTimeQuizResponse -> this.toDomain()
     }
 }
