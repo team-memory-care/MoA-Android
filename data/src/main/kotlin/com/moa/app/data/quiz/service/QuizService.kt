@@ -1,6 +1,6 @@
 package com.moa.app.data.quiz.service
 
-import com.moa.app.data.quiz.model.request.QuizResultRequest
+import com.moa.app.data.quiz.model.request.QuizScoreRequest
 import com.moa.app.data.quiz.model.response.QuizResponse
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.network.model.NetworkResult
@@ -15,5 +15,5 @@ interface QuizService {
     suspend fun fetchQuizzes(@Query("type") type: QuizCategory): NetworkResult<List<QuizResponse>>
 
     @POST("/api/v1/quiz/result")
-    suspend fun submitQuizResult(@Body request: QuizResultRequest): NetworkResult<Unit>
+    suspend fun uploadQuizScore(@Body request: QuizScoreRequest): NetworkResult<Unit>
 }

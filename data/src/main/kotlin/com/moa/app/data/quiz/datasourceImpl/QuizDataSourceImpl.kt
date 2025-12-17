@@ -5,7 +5,7 @@ import com.moa.app.data.quiz.model.request.toDto
 import com.moa.app.data.quiz.model.response.QuizResponse
 import com.moa.app.data.quiz.service.QuizService
 import com.moa.app.domain.quiz.model.QuizCategory
-import com.moa.app.domain.quiz.model.QuizResult
+import com.moa.app.domain.quiz.model.QuizScore
 import com.moa.app.network.extension.toResult
 import javax.inject.Inject
 
@@ -17,8 +17,8 @@ class QuizDataSourceImpl @Inject constructor(
         return quizService.fetchQuizzes((type)).toResult { it }
     }
 
-    override suspend fun submitQuizResult(quizResult: QuizResult): Result<Unit> {
-        return quizService.submitQuizResult(quizResult.toDto()).toResult()
+    override suspend fun uploadQuizScore(quizScore: QuizScore): Result<Unit> {
+        return quizService.uploadQuizScore(quizScore.toDto()).toResult()
     }
 
 }
