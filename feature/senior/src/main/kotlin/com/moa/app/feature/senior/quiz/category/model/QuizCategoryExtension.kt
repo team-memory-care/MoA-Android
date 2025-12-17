@@ -47,7 +47,7 @@ val QuizCategory.iconRes: Int
 
 val QuizCategory.loadDescription: String
     get() = when (this) {
-        QuizCategory.PERSISTENCE -> "지남력은\n시관과 장소를 확인해요"
+        QuizCategory.PERSISTENCE -> "지남력은\n시간과 장소를 확인해요"
         QuizCategory.LINGUISTIC -> "언어능력은\n말하기와 이해를 살펴봐요"
         QuizCategory.MEMORY -> "기억력은\n단어와 그림을 기억해요"
         QuizCategory.ATTENTION -> "주의력/계산은\n집중과 계산을 해봐요"

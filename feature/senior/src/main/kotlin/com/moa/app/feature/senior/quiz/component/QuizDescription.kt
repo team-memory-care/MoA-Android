@@ -34,7 +34,7 @@ fun CenterQuizDescription(
         Image(
             painter = painterResource(R.drawable.img_quiz_character_center),
             contentDescription = null,
-            modifier = modifier.clickable(
+            modifier = Modifier.clickable(
                 onClick = onImageClick,
                 role = Role.Button,
                 interactionSource = remember { MutableInteractionSource() },

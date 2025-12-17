@@ -11,6 +11,7 @@ data class PersistenceQuiz(
     val answerOptions: ImmutableList<String>,
 ) : Quiz {
     fun isAnswerCorrect(selectedAnswerIndex: Int): Boolean {
+        if (selectedAnswerIndex !in answerOptions.indices) return false
         return answer == answerOptions[selectedAnswerIndex]
     }
 }
