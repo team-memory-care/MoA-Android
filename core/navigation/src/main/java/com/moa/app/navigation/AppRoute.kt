@@ -41,6 +41,9 @@ sealed interface AppRoute {
     data object LinguisticQuiz : AppRoute
 
     @Serializable
+    data object AttentionQuiz : AppRoute
+
+    @Serializable
     data class UserConnection(val userRole: String) : AppRoute
 
     @Serializable
