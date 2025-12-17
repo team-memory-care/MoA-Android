@@ -1,8 +1,10 @@
 package com.moa.app.domain.quiz.repository
 
-import com.moa.app.domain.quiz.model.PersistenceQuiz
+import com.moa.app.domain.quiz.model.Quiz
 import com.moa.app.domain.quiz.model.QuizCategory
+import com.moa.app.domain.quiz.model.QuizScore
 
 interface QuizRepository {
-    suspend fun fetchPersistenceQuizzes(category: QuizCategory): Result<List<PersistenceQuiz>>
+    suspend fun fetchQuizzes(category: QuizCategory): Result<List<Quiz>>
+    suspend fun uploadQuizScore(quizScore: QuizScore): Result<Unit>
 }

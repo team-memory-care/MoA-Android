@@ -60,12 +60,11 @@ fun MaStepProgressTopAppBar(
                 color = MoaTheme.colors.black,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
-            StepIndicator(
-                totalSteps = totalSteps,
-                currentStep = currentStep,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 4.dp)
+
+            Text(
+                text = "$currentStep/$totalSteps",
+                color = MoaTheme.colors.black,
+                style = MoaTheme.typography.headLine2Bold,
             )
         }
     }

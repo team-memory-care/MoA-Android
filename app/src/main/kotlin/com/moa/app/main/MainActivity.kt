@@ -31,6 +31,7 @@ import com.moa.app.feature.onboarding.splash.SplashScreen
 import com.moa.app.feature.senior.home.SeniorHomeScreen
 import com.moa.app.feature.senior.quiz.persistence.PersistenceQuizScreen
 import com.moa.app.feature.senior.quiz.category.QuizCategoryScreen
+import com.moa.app.feature.senior.quiz.linguistic.LinguisticQuizScreen
 import com.moa.app.feature.senior.setting.SeniorSettingScreen
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.ObserveNavigationEvents
@@ -76,6 +77,7 @@ class MainActivity : ComponentActivity() {
                         composable<AppRoute.SeniorHome> { SeniorHomeScreen() }
                         composable<AppRoute.QuizCategory> { QuizCategoryScreen() }
                         composable<AppRoute.PersistenceQuiz> { PersistenceQuizScreen() }
+                        composable<AppRoute.LinguisticQuiz> { LinguisticQuizScreen() }
                         composable<AppRoute.UserConnection> { UserConnectionScreen() }
                         composable<AppRoute.SeniorSetting> { SeniorSettingScreen() }
                     }
