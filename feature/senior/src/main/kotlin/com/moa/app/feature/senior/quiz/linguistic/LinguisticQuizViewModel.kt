@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.LinguisticQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
+import com.moa.app.domain.quiz.model.QuizScore
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.linguistic.model.LinguisticQuizUiState
@@ -109,7 +110,7 @@ class LinguisticQuizViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val result = QuizResult(
+            val result = QuizScore(
                 totalNumber = totalCount,
                 correctNumber = correctCount,
                 type = QuizCategory.LINGUISTIC,
