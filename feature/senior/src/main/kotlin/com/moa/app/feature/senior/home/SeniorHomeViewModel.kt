@@ -57,9 +57,7 @@ class SeniorHomeViewModel @Inject constructor(
     }
 
     fun navigateToReport() {
-        viewModelScope.launch {
-            _sideEffect.emit(SeniorHomeSideEffect.ShowToast("리포트는 아직 준비중인 기능이에요"))
-        }
+        navigator.navigate(AppRoute.Report)
     }
 
 
