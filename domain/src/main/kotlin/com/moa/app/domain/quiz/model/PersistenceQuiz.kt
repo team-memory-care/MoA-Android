@@ -7,7 +7,7 @@ data class PersistenceQuiz(
     override val type: QuizCategory,
     override val questionFormat: String,
     override val questionContent: String,
-    override val answer: String,
+    val answer: String,
     val answerOptions: ImmutableList<String>,
 ) : Quiz {
     fun isAnswerCorrect(selectedAnswerIndex: Int): Boolean {

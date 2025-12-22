@@ -13,7 +13,7 @@ data class SpaceTimeQuizResponse(
     override val questionId: Long,
     override val questionFormat: String,
     override val questionContent: String,
-    override val answer: String,
+    @SerialName("answer") val answer: String,
     @SerialName("questionImageUrl") val questionImageUrl: String,
     @SerialName("imageOptionsUrl") val imageOptionsUrl: List<String>
 ) : QuizResponse()
