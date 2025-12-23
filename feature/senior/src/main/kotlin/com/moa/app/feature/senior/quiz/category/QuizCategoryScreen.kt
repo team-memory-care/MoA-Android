@@ -89,6 +89,7 @@ private fun QuizCategoryScreenContent(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             QuizCategory.entries.forEach { category ->
+                if (category == QuizCategory.ALL) return@forEach
                 val isEnabled = uiState.enabledCategories.contains(category)
 
                 QuizCategoryCard(

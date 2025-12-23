@@ -15,19 +15,7 @@ enum class QuizCategory {
     MEMORY,
     ATTENTION,
     SPACETIME,
+    ALL,
 
     ;
-
-    companion object {
-        fun fromString(value: String): QuizCategory {
-            return when (value) {
-                "PERSISTENCE" -> PERSISTENCE
-                "LINGUISTIC" -> LINGUISTIC
-                "MEMORY" -> MEMORY
-                "ATTENTION" -> ATTENTION
-                "SPACETIME" -> SPACETIME
-                else -> throw IllegalArgumentException("Invalid QuizCategory value: $value")
-            }
-        }
-    }
 }
