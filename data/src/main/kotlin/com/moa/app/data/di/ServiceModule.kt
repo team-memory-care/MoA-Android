@@ -3,6 +3,7 @@ package com.moa.app.data.di
 import com.moa.app.data.auth.service.AuthService
 import com.moa.app.data.user.service.UserService
 import com.moa.app.data.quiz.service.QuizService
+import com.moa.app.data.report.service.ReportService
 import com.moa.app.network.auth.TokenService
 import dagger.Module
 import dagger.Provides
@@ -34,4 +35,9 @@ object ServiceModule {
     @Singleton
     fun provideQuizService(retrofit: Retrofit): QuizService =
         retrofit.create(QuizService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideReportService(retrofit: Retrofit): ReportService =
+        retrofit.create(ReportService::class.java)
 }
