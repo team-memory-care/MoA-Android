@@ -10,12 +10,12 @@ package com.moa.app.domain.quiz.model
  * SPACETIME: 시공간
  */
 enum class QuizCategory {
+    ALL,
     PERSISTENCE,
     LINGUISTIC,
     MEMORY,
     ATTENTION,
     SPACETIME,
-    ALL,
 
     ;
 }

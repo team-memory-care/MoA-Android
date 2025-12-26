@@ -3,6 +3,7 @@ package com.moa.app.data.report.model.response
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.report.model.DailyQuizScore
 import com.moa.app.domain.report.model.DailyReport
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -28,8 +29,8 @@ data class DailyAdvicesDto(
 fun DailyReportResponse.toDomain(): DailyReport {
     return DailyReport(
         date = date,
-        dailyQuizScore = dailyQuizScore.map { it.toDomain() },
-        advices = advices.advices
+        dailyQuizScore = dailyQuizScore.map { it.toDomain() }.toImmutableList(),
+        advices = advices.advices.toImmutableList()
     )
 }
 
