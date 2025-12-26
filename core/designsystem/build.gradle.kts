@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.moa.app.designsystem"
 }
+
+dependencies {
+    implementation(libs.kotlinx.collections.immutable)
+}
