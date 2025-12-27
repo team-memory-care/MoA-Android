@@ -1,5 +1,7 @@
 package com.moa.app.domain.quiz.model
 
+import kotlinx.serialization.Serializable
+
 /**
  * MMSE 기반 퀴즈 카테고리
  *
@@ -9,7 +11,9 @@ package com.moa.app.domain.quiz.model
  * ATTENTION: 주의력
  * SPACETIME: 시공간
  */
+@Serializable
 enum class QuizCategory {
+    ALL,
     PERSISTENCE,
     LINGUISTIC,
     MEMORY,
@@ -17,17 +21,4 @@ enum class QuizCategory {
     SPACETIME,
 
     ;
-
-    companion object {
-        fun fromString(value: String): QuizCategory {
-            return when (value) {
-                "PERSISTENCE" -> PERSISTENCE
-                "LINGUISTIC" -> LINGUISTIC
-                "MEMORY" -> MEMORY
-                "ATTENTION" -> ATTENTION
-                "SPACETIME" -> SPACETIME
-                else -> throw IllegalArgumentException("Invalid QuizCategory value: $value")
-            }
-        }
-    }
 }

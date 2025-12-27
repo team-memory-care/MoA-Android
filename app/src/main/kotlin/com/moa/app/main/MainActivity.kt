@@ -28,6 +28,7 @@ import com.moa.app.feature.onboarding.signup.SignUpPhoneAuthScreen
 import com.moa.app.feature.onboarding.signup.SignUpProfileScreen
 import com.moa.app.feature.onboarding.signup.SignUpSharedViewModel
 import com.moa.app.feature.onboarding.splash.SplashScreen
+import com.moa.app.feature.report.ReportScreen
 import com.moa.app.feature.senior.home.SeniorHomeScreen
 import com.moa.app.feature.senior.quiz.attention.AttentionQuizScreen
 import com.moa.app.feature.senior.quiz.persistence.PersistenceQuizScreen
@@ -84,6 +85,7 @@ class MainActivity : ComponentActivity() {
                         composable<AppRoute.SpaceTimeQuiz> { SpaceTimeQuizScreen() }
                         composable<AppRoute.UserConnection> { UserConnectionScreen() }
                         composable<AppRoute.SeniorSetting> { SeniorSettingScreen() }
+                        composable<AppRoute.Report> { ReportScreen() }
                     }
                 }
             }

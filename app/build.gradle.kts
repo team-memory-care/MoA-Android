@@ -77,5 +77,6 @@ dependencies {
     implementation(projects.data)
     implementation(projects.feature.onboarding)
     implementation(projects.feature.senior)
+    implementation(projects.feature.report)
     implementation(projects.feature.guardian)
 }

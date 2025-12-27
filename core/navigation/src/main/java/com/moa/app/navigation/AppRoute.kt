@@ -51,4 +51,7 @@ sealed interface AppRoute {
 
     @Serializable
     data object SeniorSetting : AppRoute
+
+    @Serializable
+    data object Report : AppRoute
 }

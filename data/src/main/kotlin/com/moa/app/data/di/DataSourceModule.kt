@@ -6,6 +6,8 @@ import com.moa.app.data.user.datasource.UserDataSource
 import com.moa.app.data.user.datasourceImpl.UserDataSourceImpl
 import com.moa.app.data.quiz.datasource.QuizDataSource
 import com.moa.app.data.quiz.datasourceImpl.QuizDataSourceImpl
+import com.moa.app.data.report.datasource.ReportDataSource
+import com.moa.app.data.report.datasourceImpl.ReportDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,5 +29,9 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindQuizDataSource(impl: QuizDataSourceImpl): QuizDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindReportDataSource(impl: ReportDataSourceImpl): ReportDataSource
 
 }
