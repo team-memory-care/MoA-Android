@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.moa.app.designsystem.theme.MoaTheme
 
 @Composable
-fun MaLinerProgressIndicator(
+fun MaLinearProgressIndicator(
     correct: Int,
     total: Int,
     modifier: Modifier = Modifier,
@@ -55,8 +55,8 @@ fun MaLinerProgressIndicator(
 
 @Preview
 @Composable
-private fun PreviewMaLinerProgressIndicator() {
-    MaLinerProgressIndicator(
+private fun PreviewMaLinearProgressIndicator() {
+    MaLinearProgressIndicator(
         correct = 5,
         total = 10,
         modifier = Modifier.fillMaxWidth()

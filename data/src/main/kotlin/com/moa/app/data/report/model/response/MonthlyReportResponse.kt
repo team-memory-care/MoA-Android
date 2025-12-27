@@ -1,7 +1,7 @@
 package com.moa.app.data.report.model.response
 
 import com.moa.app.domain.quiz.model.QuizCategory
-import com.moa.app.domain.report.model.MonthRepostScore
+import com.moa.app.domain.report.model.MonthReportScore
 import com.moa.app.domain.report.model.MonthlyReport
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -12,12 +12,12 @@ data class MonthlyReportResponse(
     @SerialName("completeRate") val completeRate: Int,
     @SerialName("correctRate") val correctRate: Int,
     @SerialName("diagnosis") val diagnosis: String,
-    @SerialName("score") val score: Map<QuizCategory, MonthRepostScoreDto>,
+    @SerialName("score") val score: Map<QuizCategory, MonthReportScoreDto>,
     @SerialName("longTermStrategy") val longTermStrategy: String
 )
 
 @Serializable
-data class MonthRepostScoreDto(
+data class MonthReportScoreDto(
     @SerialName("weekIndex") val weekIndex: Int,
     @SerialName("score") val score: Long,
     @SerialName("lastMonthScore") val lastMonthScore: Long,
@@ -34,8 +34,8 @@ fun MonthlyReportResponse.toDomain(): MonthlyReport {
     )
 }
 
-fun MonthRepostScoreDto.toDomain(): MonthRepostScore {
-    return MonthRepostScore(
+fun MonthReportScoreDto.toDomain(): MonthReportScore {
+    return MonthReportScore(
         weekIndex = this.weekIndex,
         score = this.score,
         lastMonthScore = this.lastMonthScore

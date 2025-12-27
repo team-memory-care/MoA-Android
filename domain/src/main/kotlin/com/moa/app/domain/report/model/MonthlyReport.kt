@@ -7,11 +7,11 @@ data class MonthlyReport(
     val completeRate: Int,
     val correctRate: Int,
     val diagnosis: String,
-    val score: Map<QuizCategory, MonthRepostScore>,
+    val score: Map<QuizCategory, MonthReportScore>,
     val longTermStrategy: String,
 )
 
-data class MonthRepostScore(
+data class MonthReportScore(
     val weekIndex: Int,
     val score: Long,
     val lastMonthScore: Long,

@@ -1,5 +1,7 @@
 package com.moa.app.domain.quiz.model
 
+import kotlinx.serialization.Serializable
+
 /**
  * MMSE 기반 퀴즈 카테고리
  *
@@ -9,6 +11,7 @@ package com.moa.app.domain.quiz.model
  * ATTENTION: 주의력
  * SPACETIME: 시공간
  */
+@Serializable
 enum class QuizCategory {
     ALL,
     PERSISTENCE,

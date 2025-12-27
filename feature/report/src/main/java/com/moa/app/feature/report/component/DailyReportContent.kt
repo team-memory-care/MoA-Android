@@ -25,7 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.moa.app.designsystem.component.core.indicator.MaLinerProgressIndicator
+import com.moa.app.designsystem.component.core.indicator.MaLinearProgressIndicator
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.feature.report.extension.scoreBackgroundColor
@@ -87,7 +87,7 @@ fun DailyReportContent(
                 }
             }
 
-            MaLinerProgressIndicator(
+            MaLinearProgressIndicator(
                 correct = quizAll?.correctNumber ?: 0,
                 total = quizAll?.totalNumber ?: 1,
                 modifier = Modifier.fillMaxWidth(),
@@ -111,7 +111,11 @@ fun DailyReportContent(
                 items = categoryScores,
                 key = { it.type.name },
             ) { scoreItem ->
-                ReportQuizScoreCard(dailyQuizScore = scoreItem)
+                ReportQuizScoreCard(
+                    quizCategory = scoreItem.type,
+                    correctNumber = scoreItem.correctNumber,
+                    totalNumber = scoreItem.totalNumber,
+                )
             }
         }
 
@@ -146,13 +150,15 @@ fun DailyReportContent(
 
 @Composable
 private fun ReportQuizScoreCard(
-    dailyQuizScore: DailyQuizScoreUiModel,
+    quizCategory: QuizCategory,
+    correctNumber: Int,
+    totalNumber: Int,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(dailyQuizScore.type.scoreBackgroundColor)
+            .background(quizCategory.scoreBackgroundColor)
             .width(214.dp),
         verticalArrangement = Arrangement.spacedBy(36.dp),
     ) {
@@ -165,19 +171,19 @@ private fun ReportQuizScoreCard(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = dailyQuizScore.type.scoreTitle,
+                text = quizCategory.scoreTitle,
                 color = MoaTheme.colors.white,
                 style = MoaTheme.typography.title2Semibold,
             )
 
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = "${dailyQuizScore.correctNumber}점/",
+                    text = "${correctNumber}점/",
                     color = MoaTheme.colors.white,
                     style = MoaTheme.typography.headLine2Bold,
                 )
                 Text(
-                    text = "${dailyQuizScore.totalNumber}점",
+                    text = "${totalNumber}점",
                     color = MoaTheme.colors.white,
                     style = MoaTheme.typography.body1Medium,
                 )
@@ -185,7 +191,7 @@ private fun ReportQuizScoreCard(
         }
 
         Image(
-            painter = painterResource(id = dailyQuizScore.type.scoreIconRes),
+            painter = painterResource(id = quizCategory.scoreIconRes),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
