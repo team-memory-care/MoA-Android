@@ -121,6 +121,7 @@ class LinguisticQuizViewModel @Inject constructor(
                 .onFailure { t ->
                     Timber.e(t, "Failed to submit quiz result")
                     _uiState.update { it.copy(isLoading = false, errorMessage = "결과 전송 실패") }
+                    exitQuiz()
                 }
         }
     }

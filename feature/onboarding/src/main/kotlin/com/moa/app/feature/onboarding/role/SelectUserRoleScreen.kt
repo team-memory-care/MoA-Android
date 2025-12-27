@@ -124,37 +124,37 @@ private fun SelectUserRoleScreenContent(
 
             Spacer(Modifier.height(10.dp))
 
-            MaSelectButton(
-                onClick = { onGuardianRoleClick(UserRole.CHILD) },
-                selected = uiState.isUserRoleGuardian,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.img_role_guardian),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .size(126.dp, 112.dp)
-                    )
-
-                    Spacer(Modifier.height(18.dp))
-
-                    Text(
-                        text = "저는 가족이나 보호자에요",
-                        style = MoaTheme.typography.title2Semibold,
-                        modifier = Modifier.padding(bottom = 2.dp)
-                    )
-
-                    Text(
-                        text = "상대방의 리포트를 확인하고 싶어요",
-                        style = MoaTheme.typography.body1Medium,
-                    )
-                }
-            }
+//            MaSelectButton(
+//                onClick = { onGuardianRoleClick(UserRole.CHILD) },
+//                selected = uiState.isUserRoleGuardian,
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Column(
+//                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    Image(
+//                        imageVector = ImageVector.vectorResource(id = R.drawable.img_role_guardian),
+//                        contentDescription = null,
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .size(126.dp, 112.dp)
+//                    )
+//
+//                    Spacer(Modifier.height(18.dp))
+//
+//                    Text(
+//                        text = "저는 가족이나 보호자에요",
+//                        style = MoaTheme.typography.title2Semibold,
+//                        modifier = Modifier.padding(bottom = 2.dp)
+//                    )
+//
+//                    Text(
+//                        text = "상대방의 리포트를 확인하고 싶어요",
+//                        style = MoaTheme.typography.body1Medium,
+//                    )
+//                }
+//            }
         }
 
         MaButton(
