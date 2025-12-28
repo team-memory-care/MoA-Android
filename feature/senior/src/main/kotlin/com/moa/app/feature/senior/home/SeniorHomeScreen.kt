@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaButton
+import com.moa.app.designsystem.component.product.topbar.MaHomeTopBar
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.senior.home.model.SeniorHomeUiState
 import com.moa.app.feature.senior.quiz.category.model.QuizCategorySideEffect
@@ -85,34 +86,7 @@ private fun SeniorHomeScreenContent(
             .fillMaxSize()
             .background(MoaTheme.colors.white),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(start = 20.dp, end = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Image(
-                imageVector = ImageVector.vectorResource(R.drawable.img_moa_logo),
-                contentDescription = null,
-                colorFilter = tint(MoaTheme.colors.coolGray60),
-                modifier = Modifier.size(60.dp, 24.dp)
-            )
-
-            Image(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_setting),
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable(
-                        onClick = onSettingClick,
-                        role = Role.Button,
-                        interactionSource = null,
-                        indication = null
-                    )
-                    .padding(12.dp)
-            )
-        }
+        MaHomeTopBar(onSettingClick = onSettingClick)
 
         Column(
             modifier = Modifier.padding(horizontal = 20.dp),
