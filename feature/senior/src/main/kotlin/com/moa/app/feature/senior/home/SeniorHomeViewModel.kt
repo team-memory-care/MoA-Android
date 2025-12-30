@@ -53,7 +53,7 @@ class SeniorHomeViewModel @Inject constructor(
     }
 
     fun navigateToDailyQuiz() {
-        navigator.navigate(AppRoute.PersistenceQuiz)
+        navigator.navigate(AppRoute.LinguisticQuiz)
     }
 
     fun navigateToReport() {

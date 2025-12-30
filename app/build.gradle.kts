@@ -1,3 +1,4 @@
+import java.util.Base64
 import java.util.Properties
 
 plugins {
@@ -9,7 +10,7 @@ android {
     namespace = "com.moa.app"
 
     defaultConfig {
-        applicationId = "com.moa.app"
+        applicationId = "com.biggun.moa"
     }
 
     val localProperties = Properties().apply {
@@ -24,14 +25,19 @@ android {
             storeFile = file(
                 System.getenv("RELEASE_STORE_FILE")
                     ?: localProperties["release.keystore.path"] as? String
-                    ?: "release.jks",
+                    ?: "${rootProject.projectDir}/app/keystore/release.jks",
             )
-            storePassword = System.getenv("RELEASE_STORE_PASSWORD")
-                ?: localProperties["release.keystore.password"] as? String
+
+            storePassword = System.getenv("RELEASE_STORE_PASSWORD_BASE64")?.let {
+                String(Base64.getDecoder().decode(it))
+            } ?: localProperties["release.keystore.password"] as? String
+
             keyAlias = System.getenv("RELEASE_KEY_ALIAS")
                 ?: localProperties["release.key.alias"] as? String
-            keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
-                ?: localProperties["release.key.password"] as? String
+
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD_BASE64")?.let {
+                String(Base64.getDecoder().decode(it))
+            } ?: localProperties["release.key.password"] as? String
         }
     }
 
@@ -40,7 +46,7 @@ android {
             applicationIdSuffix = ".debug"
         }
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
