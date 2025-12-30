@@ -9,6 +9,7 @@ jobs:
     build-release:
         name: Build Release AAB
         runs-on: ubuntu-latest
+
         steps:
             -   name: Check out repository
                 uses: actions/checkout@v4
@@ -23,19 +24,28 @@ jobs:
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
+            -   name: Create keystore directory
+                run: mkdir -p app/keystore
+
             -   name: Decode Release Keystore
                 env:
                     RELEASE_STORE_BASE_64: ${{ secrets.RELEASE_STORE_BASE_64 }}
                 run: |
-                    printf "%s" "$RELEASE_STORE_BASE_64" | base64 --decode > release.jks
+                    printf "%s" "$RELEASE_STORE_BASE_64" | base64 --decode > app/keystore/release.jks
+
+            -   name: Verify Keystore File
+                run: |
+                    echo "Keystore file info:"
+                    ls -lh app/keystore/release.jks
+                    file app/keystore/release.jks
 
             -   name: Build Release AAB
                 env:
-                    RELEASE_STORE_FILE: ${{ github.workspace }}/release.jks
+                    RELEASE_STORE_FILE: ${{ github.workspace }}/app/keystore/release.jks
                     RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
                     RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
                     RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-                run: ./gradlew bundleRelease
+                run: ./gradlew bundleRelease --stacktrace
 
             -   name: Upload Release AAB
                 uses: actions/upload-artifact@v4
