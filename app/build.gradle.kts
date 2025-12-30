@@ -1,59 +1,88 @@
+import java.util.Base64
+import java.util.Properties
+
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.moa.android.application)
+    alias(libs.plugins.moa.android.hilt)
 }
 
 android {
-    namespace = "com.wjdrjs.moa"
-    compileSdk = 36
+    namespace = "com.moa.app"
 
     defaultConfig {
-        applicationId = "com.wjdrjs.moa"
-        minSdk = 28
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        applicationId = "com.biggun.moa"
+    }
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    val localProperties = Properties().apply {
+        val propFile = rootProject.file("local.properties")
+        if (propFile.exists()) {
+            propFile.inputStream().use(::load)
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file(
+                System.getenv("RELEASE_STORE_FILE")
+                    ?: localProperties["release.keystore.path"] as? String
+                    ?: "${rootProject.projectDir}/app/keystore/release.jks",
+            )
+
+            storePassword = System.getenv("RELEASE_STORE_PASSWORD_BASE64")?.let {
+                String(Base64.getDecoder().decode(it))
+            } ?: localProperties["release.keystore.password"] as? String
+
+            keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+                ?: localProperties["release.key.alias"] as? String
+
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD_BASE64")?.let {
+                String(Base64.getDecoder().decode(it))
+            } ?: localProperties["release.key.password"] as? String
+        }
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+
     buildFeatures {
-        compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(libs.androidx.browser)
+
+    implementation(libs.timber)
+
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+
+    implementation(projects.core.datastore)
+    implementation(projects.core.designsystem)
+    implementation(projects.core.navigation)
+    implementation(projects.core.network)
+    implementation(projects.domain)
+    implementation(projects.data)
+    implementation(projects.feature.onboarding)
+    implementation(projects.feature.senior)
+    implementation(projects.feature.report)
+    implementation(projects.feature.guardian)
 }

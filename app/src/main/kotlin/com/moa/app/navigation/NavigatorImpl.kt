@@ -1,0 +1,43 @@
+package com.moa.app.navigation
+
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.onFailure
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
+import timber.log.Timber
+import javax.inject.Inject
+
+class NavigatorImpl @Inject constructor() : Navigator {
+
+    private val _events = Channel<NavigationEvent>(capacity = Channel.CONFLATED)
+    override val events: Flow<NavigationEvent> = _events.receiveAsFlow()
+
+    override fun navigate(route: AppRoute, options: NavigationOptions) {
+        _events.trySend(
+            NavigationEvent.Navigate(route = route, options = options),
+        ).onFailure {
+            Timber.tag(TAG).e(it, "Failed to send navigation event")
+        }
+    }
+
+    override fun navigateBack() {
+        _events.trySend(NavigationEvent.NavigateBack)
+            .onFailure {
+                Timber.tag(TAG).e(it, "Failed to send navigation event")
+            }
+    }
+
+    override fun openUrl(url: String) {
+        if (url.startsWith(HTTP_PREFIX) || url.startsWith(HTTPS_PREFIX)) {
+            _events.trySend(NavigationEvent.OpenUrl(url))
+        } else {
+            Timber.tag(TAG).w("Invalid URL format: $url")
+        }
+    }
+
+    companion object {
+        private const val TAG = "NavigatorImpl"
+        private const val HTTP_PREFIX = "http://"
+        private const val HTTPS_PREFIX = "https://"
+    }
+}

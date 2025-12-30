@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MoA" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Base.Theme.MoA" parent="Theme.AppCompat.Light.NoActionBar" />
+
+    <style name="Theme.MoA" parent="Base.Theme.MoA">
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 </resources>
