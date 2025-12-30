@@ -24,6 +24,7 @@ android {
         create("release") {
             storeFile = file(
                 System.getenv("RELEASE_STORE_FILE")
+                    ?: localProperties["release.keystore.path"] as? String
                     ?: "${rootProject.projectDir}/app/keystore/release.jks",
             )
 
