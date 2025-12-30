@@ -9,7 +9,6 @@ jobs:
     build-release:
         name: Build Release AAB
         runs-on: ubuntu-latest
-
         steps:
             -   name: Check out repository
                 uses: actions/checkout@v4
@@ -33,19 +32,21 @@ jobs:
                 run: |
                     printf "%s" "$RELEASE_STORE_BASE_64" | base64 --decode > app/keystore/release.jks
 
-            -   name: Verify Keystore File
+            -   name: Create Gradle Properties
+                env:
+                    STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+                    KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+                    KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
                 run: |
-                    echo "Keystore file info:"
-                    ls -lh app/keystore/release.jks
-                    file app/keystore/release.jks
+                    cat > gradle.properties << 'EOF'
+                    RELEASE_STORE_FILE=${{ github.workspace }}/app/keystore/release.jks
+                    EOF
+                    echo "RELEASE_STORE_PASSWORD=${STORE_PASSWORD}" >> gradle.properties
+                    echo "RELEASE_KEY_ALIAS=${KEY_ALIAS}" >> gradle.properties
+                    echo "RELEASE_KEY_PASSWORD=${KEY_PASSWORD}" >> gradle.properties
 
             -   name: Build Release AAB
-                env:
-                    RELEASE_STORE_FILE: ${{ github.workspace }}/app/keystore/release.jks
-                    RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
-                    RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
-                    RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-                run: ./gradlew bundleRelease --stacktrace
+                run: ./gradlew bundleRelease
 
             -   name: Upload Release AAB
                 uses: actions/upload-artifact@v4
