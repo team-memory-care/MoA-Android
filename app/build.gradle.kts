@@ -32,20 +32,19 @@ android {
                 gradleProperties["RELEASE_STORE_FILE"] as? String
                     ?: System.getenv("RELEASE_STORE_FILE")
                     ?: localProperties["release.keystore.path"] as? String
-                    ?: "${rootProject.projectDir}/app/keystore/release.jks"
+                    ?: "${rootProject.projectDir}/app/keystore/release.jks",
             )
             storePassword = gradleProperties["RELEASE_STORE_PASSWORD"] as? String
                 ?: System.getenv("RELEASE_STORE_PASSWORD")
-                    ?: localProperties["release.keystore.password"] as? String
+                ?: localProperties["release.keystore.password"] as? String
             keyAlias = gradleProperties["RELEASE_KEY_ALIAS"] as? String
                 ?: System.getenv("RELEASE_KEY_ALIAS")
-                    ?: localProperties["release.key.alias"] as? String
+                ?: localProperties["release.key.alias"] as? String
             keyPassword = gradleProperties["RELEASE_KEY_PASSWORD"] as? String
                 ?: System.getenv("RELEASE_KEY_PASSWORD")
-                    ?: localProperties["release.key.password"] as? String
+                ?: localProperties["release.key.password"] as? String
         }
     }
-
 
     buildTypes {
         debug {
