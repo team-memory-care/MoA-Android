@@ -1,3 +1,4 @@
+import java.util.Base64
 import java.util.Properties
 
 plugins {
@@ -19,30 +20,23 @@ android {
         }
     }
 
-    val gradleProperties = Properties().apply {
-        val propFile = rootProject.file("gradle.properties")
-        if (propFile.exists()) {
-            propFile.inputStream().use(::load)
-        }
-    }
-
     signingConfigs {
         create("release") {
             storeFile = file(
-                gradleProperties["RELEASE_STORE_FILE"] as? String
-                    ?: System.getenv("RELEASE_STORE_FILE")
-                    ?: localProperties["release.keystore.path"] as? String
+                System.getenv("RELEASE_STORE_FILE")
                     ?: "${rootProject.projectDir}/app/keystore/release.jks",
             )
-            storePassword = gradleProperties["RELEASE_STORE_PASSWORD"] as? String
-                ?: System.getenv("RELEASE_STORE_PASSWORD")
-                ?: localProperties["release.keystore.password"] as? String
-            keyAlias = gradleProperties["RELEASE_KEY_ALIAS"] as? String
-                ?: System.getenv("RELEASE_KEY_ALIAS")
+
+            storePassword = System.getenv("RELEASE_STORE_PASSWORD_BASE64")?.let {
+                String(Base64.getDecoder().decode(it))
+            } ?: localProperties["release.keystore.password"] as? String
+
+            keyAlias = System.getenv("RELEASE_KEY_ALIAS")
                 ?: localProperties["release.key.alias"] as? String
-            keyPassword = gradleProperties["RELEASE_KEY_PASSWORD"] as? String
-                ?: System.getenv("RELEASE_KEY_PASSWORD")
-                ?: localProperties["release.key.password"] as? String
+
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD_BASE64")?.let {
+                String(Base64.getDecoder().decode(it))
+            } ?: localProperties["release.key.password"] as? String
         }
     }
 
