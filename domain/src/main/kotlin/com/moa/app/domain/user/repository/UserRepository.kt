@@ -5,4 +5,5 @@ import com.moa.app.domain.auth.model.UserProfile
 interface UserRepository {
     suspend fun getUserProfile(): Result<UserProfile>
     suspend fun withdrawal(): Result<Unit>
+    suspend fun validateParentCode(parentCode: String): Result<Long>
 }

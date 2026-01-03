@@ -1,6 +1,7 @@
 package com.moa.app.data.user.datasourceImpl
 
 import com.moa.app.data.user.datasource.UserDataSource
+import com.moa.app.data.user.model.response.SeniorProfileResponse
 import com.moa.app.data.user.model.response.UserProfileResponse
 import com.moa.app.data.user.service.UserService
 import com.moa.app.network.extension.toResult
@@ -16,6 +17,10 @@ class UserDataSourceImpl @Inject constructor(
 
     override suspend fun withdrawal(): Result<Unit> {
         return userService.withdrawal().toResult()
+    }
+
+    override suspend fun validateParentCode(parentCode: String): Result<SeniorProfileResponse> {
+        return userService.validateParentCode(parentCode).toResult { it }
     }
 
 }

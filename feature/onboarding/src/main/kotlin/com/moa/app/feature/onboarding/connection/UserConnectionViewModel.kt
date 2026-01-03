@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.moa.app.domain.auth.model.UserRole
 import com.moa.app.domain.auth.usecase.SetParentRoleUseCase
+import com.moa.app.domain.user.usecase.ValidateParentCodeUseCase
 import com.moa.app.feature.onboarding.connection.model.UserConnectionUiState
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.NavigationOptions
@@ -23,12 +24,13 @@ import timber.log.Timber
 class UserConnectionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val navigator: Navigator,
-    private val setParentRoleUseCase: SetParentRoleUseCase
+    private val setParentRoleUseCase: SetParentRoleUseCase,
+    private val validateParentCodeUseCase: ValidateParentCodeUseCase,
 ) : ViewModel() {
 
     private val userRole = savedStateHandle.toRoute<AppRoute.UserConnection>().userRole
 
-    private val _uiState: MutableStateFlow<UserConnectionUiState> = MutableStateFlow(UserConnectionUiState.INIT)
+    private val _uiState = MutableStateFlow(UserConnectionUiState.INIT)
     val uiState: StateFlow<UserConnectionUiState> = _uiState.asStateFlow()
 
     init {
@@ -39,9 +41,7 @@ class UserConnectionViewModel @Inject constructor(
         val userRole = UserRole.fromString(role)
         _uiState.update { it.copy(userRole = userRole) }
 
-        if (userRole == UserRole.PARENT) {
-            setParentRole()
-        }
+        if (userRole == UserRole.PARENT) setParentRole()
     }
 
     private fun setParentRole() {
@@ -51,7 +51,7 @@ class UserConnectionViewModel @Inject constructor(
                     _uiState.update { it.copy(userCode = userCode) }
                 },
                 onFailure = {
-                    Timber.tag("UserConnectionViewModel").e("setParentRole: $it")
+                    Timber.e("setParentRole: $it")
                 },
             )
         }
@@ -61,23 +61,38 @@ class UserConnectionViewModel @Inject constructor(
         _uiState.update { it.copy(userCode = code) }
     }
 
+    private fun validateUserCode(userCode: String) {
+        viewModelScope.launch {
+            validateParentCodeUseCase(userCode).fold(
+                onSuccess = { userId -> navigateToConnectionCheck(userId) },
+                onFailure = { t ->
+                    Timber.e("validateUserCode: $t")
+                    _uiState.update {
+                        it.copy(errorMessage = "* 유효하지 않은 회원코드예요. 다시 확인해주세요.")
+                    }
+                },
+            )
+        }
+    }
+
+    fun navigateToNext() {
+        val state = _uiState.value
+        if (state.isUserSenior) navigateToSeniorHome() else validateUserCode(state.userCode)
+    }
+
     private fun navigateToSeniorHome() {
         navigator.navigate(
             route = AppRoute.SeniorHome,
             options = NavigationOptions(
-                popUpTo = AppRoute.UserConnection(userRole),
+                popUpTo = AppRoute.UserConnection("CHILD"),
                 inclusive = true,
-                clearBackStack = true
-            )
+                clearBackStack = true,
+            ),
         )
     }
 
-    fun navigateToNext() {
-        if (_uiState.value.isUserSenior) {
-            navigateToSeniorHome()
-        } else {
-            // TODO
-        }
+    private fun navigateToConnectionCheck(userId: Long) {
+        navigator.navigate(route = AppRoute.ConnectionCheck(userId))
     }
 
     fun navigateToBack() = navigator.navigateBack()

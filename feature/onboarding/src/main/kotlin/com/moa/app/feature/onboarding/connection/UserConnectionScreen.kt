@@ -1,6 +1,5 @@
 package com.moa.app.feature.onboarding.connection
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +10,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +23,7 @@ import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.core.textfield.MaOtpTextField
 import com.moa.app.designsystem.component.product.topbar.MaTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.domain.auth.model.UserRole
 import com.moa.app.feature.onboarding.connection.model.UserConnectionUiState
 
 @Composable
@@ -52,12 +55,12 @@ fun UserConnectionContent(
         Column(
             modifier = Modifier
                 .padding(vertical = 24.dp, horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(28.dp)
         ) {
             Text(
                 text = uiState.setTitle,
                 color = MoaTheme.colors.black,
                 style = MoaTheme.typography.headLine2Bold,
+                modifier = Modifier.padding(bottom = 28.dp)
             )
 
             MaOtpTextField(
@@ -68,6 +71,15 @@ fun UserConnectionContent(
                     .fillMaxWidth(),
                 enabled = !uiState.isUserSenior,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
+            )
+
+            Text(
+                text = uiState.errorMessage ?: "",
+                color = MoaTheme.colors.red500,
+                style = MoaTheme.typography.body2Medium,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
             )
         }
 
@@ -93,9 +105,14 @@ fun UserConnectionContent(
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
+    var userCode by remember { mutableStateOf("") }
+
     UserConnectionContent(
-        uiState = UserConnectionUiState.INIT,
-        onChangedUserCode = {},
+        uiState = UserConnectionUiState.INIT.copy(
+            userRole = UserRole.CHILD,
+            userCode = userCode
+        ),
+        onChangedUserCode = { userCode = it },
         onBackClick = {},
         onNextClick = {}
     )

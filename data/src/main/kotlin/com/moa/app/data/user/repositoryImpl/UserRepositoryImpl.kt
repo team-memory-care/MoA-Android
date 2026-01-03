@@ -29,4 +29,9 @@ class UserRepositoryImpl @Inject constructor(
         return userDataSource.withdrawal()
             .onSuccess { tokenManager.clearTokens() }
     }
+
+    override suspend fun validateParentCode(parentCode: String): Result<Long> {
+        return userDataSource.validateParentCode(parentCode)
+            .mapCatching { it.id }
+    }
 }

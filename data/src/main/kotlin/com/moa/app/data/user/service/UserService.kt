@@ -12,4 +12,9 @@ interface UserService {
 
     @DELETE("/api/v1/users/withdraw")
     suspend fun withdrawal(): NetworkResult<Unit>
+
+    @GET("/api/v1/users/parent-code/{parentCode}/verify")
+    suspend fun validateParentCode(
+        @Path("parentCode") parentCode: String
+    ): NetworkResult<SeniorProfileResponse>
 }
