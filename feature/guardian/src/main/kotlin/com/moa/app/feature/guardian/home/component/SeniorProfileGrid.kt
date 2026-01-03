@@ -28,7 +28,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.domain.auth.model.Gender
@@ -133,7 +132,6 @@ private fun SeniorProfileCard(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .offset(x = 8.dp, y = (-8).dp)
-                    .zIndex(2f)
                     .clickable(
                         onClick = onDeleteClick,
                         indication = null,
@@ -223,14 +221,14 @@ private fun PreviewSeniorProfileGrid() {
                     phoneNumber = "",
                 ),
                 SeniorProfile(
-                    id = 1,
+                    id = 2,
                     name = "얼쩌구",
                     birthDate = "",
                     gender = Gender.FEMALE,
                     phoneNumber = "",
                 ),
                 SeniorProfile(
-                    id = 1,
+                    id = 3,
                     name = "저쩌구",
                     birthDate = "",
                     gender = Gender.MALE,

@@ -12,7 +12,7 @@ data class ConnectionCheckUiState(
     val userInfo: String
         get() = "${seniorProfile?.name ?: "name"} (${seniorProfile?.gender?.koreanDisplayName ?: "gender"})"
 
-    val brithDate: String
+    val birthDate: String
         get() = seniorProfile?.birthDate?.replace("-", ".") ?: ""
 
     companion object Companion {

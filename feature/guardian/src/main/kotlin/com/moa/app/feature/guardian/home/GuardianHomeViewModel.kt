@@ -21,10 +21,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GuardianHomeViewModel @Inject constructor(
-    val navigator: Navigator,
-    val fetchUserProfileUseCase: FetchUserProfileUseCase,
-    val fetchSeniorProfilesUseCase: FetchSeniorProfilesUseCase,
-    val deleteSeniorProfileUseCase: DeleteSeniorProfileUseCase,
+    private val navigator: Navigator,
+    private val fetchUserProfileUseCase: FetchUserProfileUseCase,
+    private val fetchSeniorProfilesUseCase: FetchSeniorProfilesUseCase,
+    private val deleteSeniorProfileUseCase: DeleteSeniorProfileUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GuardianHomeUiState.INIT)

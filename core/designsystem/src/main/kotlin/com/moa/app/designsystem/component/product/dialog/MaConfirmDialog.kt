@@ -23,12 +23,12 @@ import com.moa.app.designsystem.theme.MoaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MaConfigDialog(
+fun MaConfirmDialog(
     title: String,
     modifier: Modifier = Modifier,
     confirmButtonText: String,
     onConfirm: () -> Unit,
-    onDialogDismissRequest: (() -> Unit),
+    onDialogDismissRequest: () -> Unit,
     properties: DialogProperties = DialogProperties(),
 ) {
     BasicAlertDialog(
@@ -70,8 +70,8 @@ fun MaConfigDialog(
 
 @Preview
 @Composable
-private fun PreviewMyConfigDialog() {
-    MaConfigDialog(
+private fun PreviewMaConfirmDialog() {
+    MaConfirmDialog(
         title = "회원탈퇴 하시겠습니까?",
         confirmButtonText = "탈퇴하기",
         onConfirm = {},

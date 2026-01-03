@@ -29,7 +29,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.product.dialog.MaAlertDialog
-import com.moa.app.designsystem.component.product.dialog.MaConfigDialog
+import com.moa.app.designsystem.component.product.dialog.MaConfirmDialog
 import com.moa.app.designsystem.component.product.topbar.MaHomeTopBar
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.domain.auth.model.Gender
@@ -71,7 +71,7 @@ fun GuardianHomeScreen(
         }
 
         is DialogState.DeleteComplete -> {
-            MaConfigDialog(
+            MaConfirmDialog(
                 title = "삭제가 완료되었습니다.",
                 confirmButtonText = "확인",
                 onConfirm = viewModel::hideDialog,

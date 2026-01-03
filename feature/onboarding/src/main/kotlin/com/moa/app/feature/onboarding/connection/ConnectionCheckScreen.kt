@@ -79,7 +79,7 @@ private fun ConnectionCheckContent(
                 )
 
                 Text(
-                    text = "생년월일 ${uiState.brithDate}",
+                    text = "생년월일 ${uiState.birthDate}",
                     color = MoaTheme.colors.coolGray50,
                     style = MoaTheme.typography.body1Medium,
                 )
