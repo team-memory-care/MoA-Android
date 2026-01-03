@@ -47,7 +47,7 @@ class SplashViewModel @Inject constructor(
     private fun handleNavigationForRole(userRole: UserRole) {
         when (userRole) {
             UserRole.PARENT -> navigateToRoute(AppRoute.SeniorHome)
-            UserRole.CHILD -> TODO("Not yet implemented")
+            UserRole.CHILD -> navigateToRoute(AppRoute.GuardianHome)
             UserRole.PENDING -> navigateToRoute(AppRoute.SelectUserRole)
             else -> navigateToRoute(AppRoute.AuthLanding)
         }

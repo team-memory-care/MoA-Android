@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +30,7 @@ fun MaAlertDialog(
     title: String,
     modifier: Modifier = Modifier,
     content: String? = null,
+    textAlign: TextAlign = TextAlign.Center,
     confirmButtonText: String,
     dismissButtonText: String,
     onConfirm: () -> Unit,
@@ -59,6 +61,8 @@ fun MaAlertDialog(
                     text = title,
                     color = MoaTheme.colors.black,
                     style = MoaTheme.typography.title1Bold,
+                    textAlign = textAlign,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 if (content != null) {
@@ -67,7 +71,8 @@ fun MaAlertDialog(
                         text = content,
                         color = MoaTheme.colors.coolGray60,
                         style = MoaTheme.typography.body2Medium,
-                        textAlign = TextAlign.Center,
+                        textAlign = textAlign,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
