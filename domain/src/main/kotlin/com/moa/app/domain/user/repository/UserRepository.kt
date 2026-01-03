@@ -10,4 +10,5 @@ interface UserRepository {
     suspend fun fetchSeniorProfile(userId: Long): Result<SeniorProfile>
     suspend fun fetchSeniorProfiles(): Result<List<SeniorProfile>>
     suspend fun connectToSenior(userId: Long): Result<Unit>
+    suspend fun deleteSeniorProfile(userId: Long): Result<Unit>
 }

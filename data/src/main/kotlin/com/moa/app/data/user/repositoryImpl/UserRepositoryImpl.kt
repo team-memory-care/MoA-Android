@@ -74,4 +74,7 @@ class UserRepositoryImpl @Inject constructor(
             }
     }
 
+    override suspend fun deleteSeniorProfile(userId: Long): Result<Unit> {
+        return userDataSource.deleteSeniorProfile(userId)
+    }
 }

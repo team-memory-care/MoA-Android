@@ -4,10 +4,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +25,8 @@ import com.moa.app.designsystem.theme.MoaTheme
 @Composable
 fun MaHomeTopBar(
     onSettingClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -40,18 +43,23 @@ fun MaHomeTopBar(
             modifier = Modifier.size(60.dp, 24.dp)
         )
 
-        Image(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_setting),
-            contentDescription = null,
-            modifier = Modifier
-                .clickable(
-                    onClick = onSettingClick,
-                    role = Role.Button,
-                    interactionSource = null,
-                    indication = null
-                )
-                .padding(12.dp)
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            actions()
+            Image(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_setting),
+                contentDescription = null,
+                modifier = Modifier
+                    .clickable(
+                        onClick = onSettingClick,
+                        role = Role.Button,
+                        interactionSource = null,
+                        indication = null
+                    )
+                    .padding(8.dp)
+            )
+        }
     }
 }
 

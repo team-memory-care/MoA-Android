@@ -37,4 +37,7 @@ class UserDataSourceImpl @Inject constructor(
         return userService.fetchSeniorProfiles().toResult { it }
     }
 
+    override suspend fun deleteSeniorProfile(userId: Long): Result<Unit> {
+        return userService.deleteSeniorProfile(userId).toResult()
+    }
 }

@@ -11,4 +11,5 @@ interface UserDataSource {
     suspend fun connectToSenior(userId: Long): Result<ProfileResponse>
     suspend fun fetchSeniorProfile(userId: Long): Result<SeniorProfileResponse>
     suspend fun fetchSeniorProfiles(): Result<List<SeniorProfileResponse>>
+    suspend fun deleteSeniorProfile(userId: Long): Result<Unit>
 }

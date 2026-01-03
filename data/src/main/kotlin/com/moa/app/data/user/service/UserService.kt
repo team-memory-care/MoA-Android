@@ -32,4 +32,6 @@ interface UserService {
     @GET("/api/v1/users/my-parents")
     suspend fun fetchSeniorProfiles(): NetworkResult<List<SeniorProfileResponse>>
 
+    @DELETE("/api/v1/users/my-parents/{parentId}")
+    suspend fun deleteSeniorProfile(@Path("parentId") userId: Long): NetworkResult<Unit>
 }

@@ -29,6 +29,12 @@ sealed interface AppRoute {
     data object SelectUserRole : AppRoute
 
     @Serializable
+    data class UserConnection(val userRole: String) : AppRoute
+
+    @Serializable
+    data class ConnectionCheck(val userId: Long) : AppRoute
+
+    @Serializable
     data object SeniorHome : AppRoute
 
     @Serializable
@@ -47,11 +53,11 @@ sealed interface AppRoute {
     data object SpaceTimeQuiz : AppRoute
 
     @Serializable
-    data class UserConnection(val userRole: String) : AppRoute
-
-    @Serializable
     data object SeniorSetting : AppRoute
 
     @Serializable
     data object Report : AppRoute
+
+    @Serializable
+    data object GuardianHome : AppRoute
 }
