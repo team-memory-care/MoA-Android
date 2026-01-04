@@ -1,6 +1,11 @@
 package com.moa.app.feature.senior.home
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,35 +38,33 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.flowWithLifecycle
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.product.topbar.MaHomeTopBar
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.senior.home.model.SeniorHomeUiState
-import com.moa.app.feature.senior.quiz.category.model.QuizCategorySideEffect
 
 @Composable
 fun SeniorHomeScreen(
     viewModel: SeniorHomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        // TODO 기획요구사항에 따라 권한 저장 구현하기
+    }
+
     LaunchedEffect(Unit) {
-        viewModel.sideEffect
-            .flowWithLifecycle(lifecycleOwner.lifecycle)
-            .collect { sideEffect ->
-                when (sideEffect) {
-                    is SeniorHomeSideEffect.ShowToast -> {
-                        Toast.makeText(context, sideEffect.message, Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
+        val status = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
+        if (status != PackageManager.PERMISSION_GRANTED) {
+            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
     }
 
     SeniorHomeScreenContent(
@@ -259,7 +262,7 @@ private fun SeniorHomeScreenContent(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun Preview() {
     SeniorHomeScreenContent(

@@ -19,6 +19,5 @@ enum class QuizCategory {
     MEMORY,
     ATTENTION,
     SPACETIME,
-
     ;
 }

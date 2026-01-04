@@ -17,12 +17,44 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.senior.R
+
+@Composable
+fun TopQuizDescription(
+    quizDescription: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Box(
+            contentAlignment = Alignment.CenterStart,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(32.dp))
+                .background(MoaTheme.colors.coolGray98)
+                .padding(vertical = 24.dp, horizontal = 32.dp),
+        ) {
+            Text(
+                text = quizDescription,
+                color = MoaTheme.colors.black,
+                style = MoaTheme.typography.title2Semibold,
+            )
+        }
+
+        Image(
+            painter = painterResource(R.drawable.img_quiz_character_top),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(start = 44.dp)
+                .align(alignment = Alignment.Start)
+        )
+    }
+}
 
 @Composable
 fun CenterQuizDescription(
@@ -102,6 +134,14 @@ fun BottomQuizDescription(
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewTopQuizDescription() {
+    TopQuizDescription(
+        quizDescription = "방금 나온 단어를\n순서대로 말씀해주세요!"
+    )
 }
 
 @Preview(showBackground = true)

@@ -5,5 +5,4 @@ sealed interface Quiz {
     val type: QuizCategory
     val questionFormat: String
     val questionContent: String
-    val answer: String
 }

@@ -1,29 +1,29 @@
 package com.moa.app.data.quiz.model.response
 
-import com.moa.app.domain.quiz.model.AttentionQuiz
+import com.moa.app.domain.quiz.model.MemoryQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("ATTENTION")
-data class AttentionQuizResponse(
+@SerialName("MEMORY")
+data class MemoryQuizResponse(
     override val questionId: Long,
     override val questionFormat: String,
     override val questionContent: String,
-    @SerialName("answer") val answer: String,
-    @SerialName("expression") val expression: String,
-    @SerialName("inputType") val inputType: String,
+    @SerialName("answer") val answer: List<String>,
+    @SerialName("imageUrls") val imageUrls: List<String>,
+    @SerialName("inputMethod") val inputMethod: String,
+    @SerialName("requiredSequenceType") val requiredSequenceType: String,
 ) : QuizResponse()
 
-fun AttentionQuizResponse.toDomain(): AttentionQuiz {
-    return AttentionQuiz(
+fun MemoryQuizResponse.toDomain(): MemoryQuiz {
+    return MemoryQuiz(
         id = this.questionId,
-        type = QuizCategory.ATTENTION,
+        type = QuizCategory.MEMORY,
         questionFormat = this.questionFormat,
         questionContent = this.questionContent,
         answer = this.answer,
-        expression = this.expression,
-        inputType = this.inputType,
+        imageUrls = this.imageUrls,
     )
 }

@@ -7,7 +7,7 @@ data class SpaceTimeQuiz(
     override val type: QuizCategory,
     override val questionFormat: String,
     override val questionContent: String,
-    override val answer: String,
+    val answer: String,
     val questionImageUrl: String,
     val imageOptionsUrl: ImmutableList<String>,
 ) : Quiz {
