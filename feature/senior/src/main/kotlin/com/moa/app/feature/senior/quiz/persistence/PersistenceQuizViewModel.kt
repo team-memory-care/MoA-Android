@@ -3,12 +3,17 @@ package com.moa.app.feature.senior.quiz.persistence
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.domain.quiz.model.LinguisticQuiz
 import com.moa.app.domain.quiz.model.PersistenceQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
+import com.moa.app.domain.quiz.model.QuizScore
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
+import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
+import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -25,34 +30,35 @@ import javax.inject.Inject
 class PersistenceQuizViewModel @Inject constructor(
     private val navigator: Navigator,
     private val fetchQuizUseCase: FetchQuizUseCase,
+    private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<PersistenceQuizUiState> = MutableStateFlow(PersistenceQuizUiState.Loading)
+    private val _uiState = MutableStateFlow(PersistenceQuizUiState.INIT)
     val uiState: StateFlow<PersistenceQuizUiState> = _uiState.asStateFlow()
 
     init {
-        loadQuizzes()
+        loadPersistenceQuizzes()
     }
 
-    private fun loadQuizzes() {
+    private fun loadPersistenceQuizzes() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             val minLoadingTime = async { delay(2000L) }
-            val quizzesDeferred = async {
-                fetchQuizUseCase(QuizCategory.PERSISTENCE)
-            }
+            val quizzesDeferred = async { fetchQuizUseCase(QuizCategory.PERSISTENCE) }
             awaitAll(minLoadingTime, quizzesDeferred)
             quizzesDeferred.await().fold(
                 onSuccess = { quizzes ->
                     val persistenceQuizzes = quizzes.filterIsInstance<PersistenceQuiz>()
                     _uiState.update {
-                        PersistenceQuizUiState.Success(quizzes = persistenceQuizzes.toImmutableList())
+                        it.copy(
+                            isLoading = false,
+                            quizzes = persistenceQuizzes.toImmutableList(),
+                        )
                     }
                 },
                 onFailure = { t ->
-                    _uiState.update {
-                        PersistenceQuizUiState.Error(message = "퀴즈가 존재하지 않습니다.")
-                    }
-                    Timber.tag("PersistenceQuizViewModel").e("loadQuizzes: $t")
+                    Timber.e("loadQuizzes failed: $t")
+                    _uiState.update { it.copy(isLoading = false) }
                 },
             )
         }
@@ -60,27 +66,23 @@ class PersistenceQuizViewModel @Inject constructor(
 
     fun selectAnswer(selectedAnswerIndex: Int) {
         _uiState.update {
-            if (it is PersistenceQuizUiState.Success && !it.showResultDialog) {
-                it.copy(selectedAnswerIndex = selectedAnswerIndex)
-            } else {
-                it
-            }
+            if (it.showResultDialog || it.isLoading) return@update it
+            it.copy(selectedAnswerIndex = selectedAnswerIndex)
         }
     }
 
     fun checkAnswer() {
         _uiState.update {
-            if (it !is PersistenceQuizUiState.Success || it.showResultDialog) return@update it
+            if (it.showResultDialog || it.isLoading) return@update it
             val selectedAnswerIndex = it.selectedAnswerIndex ?: return@update it
             val currentQuiz = it.quizzes.getOrNull(it.currentQuestionIndex) ?: return@update it
             val isCorrect = currentQuiz.isAnswerCorrect(selectedAnswerIndex)
+            val correctAnswer = if (isCorrect) "" else currentQuiz.answer
 
             it.copy(
                 showResultDialog = true,
-                dialogResult = DialogResult(
-                    isCorrect = isCorrect,
-                    correctAnswer = if (isCorrect) "" else currentQuiz.answer,
-                ),
+                quizResult = QuizResult(isCorrect = isCorrect, correctAnswer = correctAnswer),
+                correctCount = if (isCorrect) it.correctCount + 1 else it.correctCount,
             )
         }
 
@@ -91,88 +93,93 @@ class PersistenceQuizViewModel @Inject constructor(
     }
 
     private fun goToNextQuestion() {
-        val currentState = _uiState.value as? PersistenceQuizUiState.Success ?: return
-        val nextQuestionIndex = currentState.currentQuestionIndex + 1
-        val isLastQuestion = nextQuestionIndex >= currentState.quizzes.size
+        val currentState = _uiState.value
+        val nextIndex = currentState.currentQuestionIndex + 1
 
-        if (isLastQuestion) {
-            _uiState.update {
-                if (it is PersistenceQuizUiState.Success) {
-                    it.copy(showResultDialog = false, dialogResult = null)
-                } else {
-                    it
-                }
-            }
-
-            viewModelScope.launch {
-                delay(DIALOG_DISMISS_ANIMATION_MS)
-                exitQuiz()
-            }
+        if (nextIndex >= currentState.quizzes.size) {
+            submitQuizResult(currentState.correctCount, currentState.quizzes.size)
         } else {
-            _uiState.update {
-                if (it is PersistenceQuizUiState.Success) {
-                    it.copy(
-                        currentQuestionIndex = nextQuestionIndex,
-                        selectedAnswerIndex = null,
-                        showResultDialog = false,
-                        dialogResult = null,
-                    )
-                } else {
-                    it
-                }
+            _uiState.update { state ->
+                state.copy(
+                    currentQuestionIndex = nextIndex,
+                    selectedAnswerIndex = null,
+                    showResultDialog = false,
+                    quizResult = null,
+                )
             }
+        }
+    }
+
+    private fun submitQuizResult(correctCount: Int, totalCount: Int) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+
+            val result = QuizScore(
+                totalNumber = totalCount,
+                correctNumber = correctCount,
+                type = QuizCategory.PERSISTENCE,
+            )
+
+            uploadQuizScoreUseCase(result)
+                .onSuccess { exitQuiz() }
+                .onFailure { t ->
+                    Timber.e(t, "Failed to submit quiz result")
+                    _uiState.update { it.copy(isLoading = false, errorMessage = "결과 전송 실패") }
+                    exitQuiz()
+                }
         }
     }
 
     fun onBackClick() {
-        _uiState.update {
-            if (it is PersistenceQuizUiState.Success && !it.exitDialog) {
-                it.copy(exitDialog = true)
-            } else {
-                it
-            }
-        }
+        _uiState.update { it.copy(showExitDialog = true) }
     }
 
     fun onHideExitDialog() {
-        _uiState.update {
-            if (it is PersistenceQuizUiState.Success && it.exitDialog) {
-                it.copy(exitDialog = false)
-            } else {
-                it
-            }
-        }
+        _uiState.update { it.copy(showExitDialog = false) }
     }
 
     fun exitQuiz() = navigator.navigateBack()
 
     companion object {
         private const val DIALOG_DURATION_MS = 2000L
-        private const val DIALOG_DISMISS_ANIMATION_MS = 200L
     }
 }
 
 @Immutable
-sealed interface PersistenceQuizUiState {
-    data object Loading : PersistenceQuizUiState
-    data class Error(val message: String) : PersistenceQuizUiState
-    data class Success(
-        val quizzes: ImmutableList<PersistenceQuiz>,
-        val currentQuestionIndex: Int = 0,
-        val selectedAnswerIndex: Int? = null,
-        val showResultDialog: Boolean = false,
-        val dialogResult: DialogResult? = null,
-        val exitDialog: Boolean = false,
-    ) : PersistenceQuizUiState {
-        val currentStep: Int
-            get() = currentQuestionIndex + 1
+data class PersistenceQuizUiState(
+    val isLoading: Boolean,
+    val errorMessage: String?,
+    val quizzes: ImmutableList<PersistenceQuiz>,
+    val currentQuestionIndex: Int,
+    val selectedAnswerIndex: Int?,
+    val showResultDialog: Boolean,
+    val showExitDialog: Boolean,
+    val quizResult: QuizResult?,
+    val correctCount: Int,
+) {
+    val currentQuiz: PersistenceQuiz?
+        get() = quizzes.getOrNull(currentQuestionIndex)
 
-        val totalSteps: Int
-            get() = quizzes.size
+    val currentStep: Int
+        get() = currentQuestionIndex + 1
 
-        val isContinueButtonEnabled: Boolean
-            get() = selectedAnswerIndex != null && !showResultDialog
+    val totalSteps: Int
+        get() = quizzes.size
+
+    val isContinueButtonEnabled: Boolean
+        get() = selectedAnswerIndex != null && !showResultDialog
+
+    companion object {
+        val INIT = PersistenceQuizUiState(
+            isLoading = false,
+            errorMessage = null,
+            quizzes = persistentListOf(),
+            currentQuestionIndex = 0,
+            selectedAnswerIndex = null,
+            showResultDialog = false,
+            showExitDialog = false,
+            quizResult = null,
+            correctCount = 0,
+        )
     }
 }
-
-data class DialogResult(val isCorrect: Boolean, val correctAnswer: String)
