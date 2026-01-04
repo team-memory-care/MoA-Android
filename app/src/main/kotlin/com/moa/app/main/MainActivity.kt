@@ -36,6 +36,7 @@ import com.moa.app.feature.senior.quiz.attention.AttentionQuizScreen
 import com.moa.app.feature.senior.quiz.persistence.PersistenceQuizScreen
 import com.moa.app.feature.senior.quiz.category.QuizCategoryScreen
 import com.moa.app.feature.senior.quiz.linguistic.LinguisticQuizScreen
+import com.moa.app.feature.senior.quiz.memory.MemoryQuizScreen
 import com.moa.app.feature.senior.quiz.spacetime.SpaceTimeQuizScreen
 import com.moa.app.feature.senior.setting.SeniorSettingScreen
 import com.moa.app.navigation.AppRoute
@@ -87,6 +88,7 @@ class MainActivity : ComponentActivity() {
                         composable<AppRoute.LinguisticQuiz> { LinguisticQuizScreen() }
                         composable<AppRoute.AttentionQuiz> { AttentionQuizScreen() }
                         composable<AppRoute.SpaceTimeQuiz> { SpaceTimeQuizScreen() }
+                        composable<AppRoute.MemoryQuiz> { MemoryQuizScreen() }
                         composable<AppRoute.SeniorSetting> { SeniorSettingScreen() }
                         composable<AppRoute.Report> { ReportScreen() }
                         composable<AppRoute.GuardianHome> { GuardianHomeScreen() }
