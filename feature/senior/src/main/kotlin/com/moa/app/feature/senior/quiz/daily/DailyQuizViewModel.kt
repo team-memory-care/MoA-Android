@@ -227,6 +227,11 @@ class DailyQuizViewModel @Inject constructor(
     }
 
     fun exitQuiz() = navigator.navigateBack()
+
+    override fun onCleared() {
+        super.onCleared()
+        sttManager.destroy()
+    }
 }
 
 
