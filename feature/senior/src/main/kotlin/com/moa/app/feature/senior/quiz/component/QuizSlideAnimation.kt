@@ -3,9 +3,13 @@ package com.moa.app.feature.senior.quiz.component
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -47,20 +51,23 @@ fun <T> CommonSideAnimation(
 ) {
     AnimatedContent(
         targetState = targetState,
-        label = COMMON_SIDE_ANIMATION,
+        label = CARD_TOSS_ANIMATION,
         contentKey = contentKey,
         transitionSpec = {
-            (slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                animationSpec = tween(durationMillis = 300)
-            ) togetherWith slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                animationSpec = tween(durationMillis = 300)
-            )).using(
-                sizeTransform = SizeTransform { _, _ ->
-                    tween(durationMillis = 0)
-                }
+            val enterTransition = fadeIn(
+                animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing)
             )
+
+            val exitTransition = slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing)
+            ) + fadeOut(animationSpec = tween(durationMillis = 300))
+
+            (enterTransition togetherWith exitTransition).using(
+                SizeTransform(clip = false) { _, _ -> tween(0) }
+            ).apply {
+                targetContentZIndex = -1f
+            }
         },
         modifier = modifier
     ) { state ->
@@ -68,5 +75,5 @@ fun <T> CommonSideAnimation(
     }
 }
 
-private const val COMMON_SIDE_ANIMATION = "CommonSideAnimation"
+private const val CARD_TOSS_ANIMATION = "CardTossAnimation"
 private const val QUIZ_SLIDE_ANIMATION = "QuizSlideAnimation"
