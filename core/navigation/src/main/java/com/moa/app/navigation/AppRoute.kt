@@ -66,4 +66,7 @@ sealed interface AppRoute {
 
     @Serializable
     data object GuardianHome : AppRoute
+
+    @Serializable
+    data object GuardianSetting : AppRoute
 }

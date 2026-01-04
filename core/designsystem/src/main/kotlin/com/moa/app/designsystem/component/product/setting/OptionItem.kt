@@ -1,4 +1,4 @@
-package com.moa.app.feature.senior.setting.component
+package com.moa.app.designsystem.component.product.setting
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -38,20 +38,20 @@ fun OptionItem(
                 interactionSource = remember { MutableInteractionSource() },
             )
             .padding(start = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Companion.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Image(
-            imageVector = ImageVector.vectorResource(icon),
+            imageVector = ImageVector.Companion.vectorResource(icon),
             contentDescription = null,
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier.Companion.size(16.dp)
         )
 
         Text(
             text = title,
             color = MoaTheme.colors.coolGray50,
             style = MoaTheme.typography.body1Medium,
-            modifier = Modifier.padding(vertical = 10.dp)
+            modifier = Modifier.Companion.padding(vertical = 10.dp)
         )
     }
 }

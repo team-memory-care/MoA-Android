@@ -1,4 +1,4 @@
-package com.moa.app.feature.senior.setting
+package com.moa.app.feature.guardian.setting
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,39 +18,21 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.designsystem.component.product.dialog.MaAlertDialog
+import com.moa.app.designsystem.component.product.dialog.MaConfirmDialog
+import com.moa.app.designsystem.component.product.setting.OtherSection
 import com.moa.app.designsystem.component.product.setting.ProfileSection
 import com.moa.app.designsystem.component.product.topbar.MaTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
-import com.moa.app.designsystem.component.product.setting.OtherSection
-import com.moa.app.feature.senior.setting.model.SeniorSettingUiState
+import com.moa.app.feature.guardian.setting.model.GuardianSettingUiState
+import com.moa.app.feature.guardian.setting.model.SettingDialogState
 
 @Composable
-fun SeniorSettingScreen(
-    viewModel: SeniorSettingViewModel = hiltViewModel()
+fun GuardianSettingScreen(
+    viewModel: GuardianSettingViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    if (uiState.showLogoutDialog) {
-        MaAlertDialog(
-            title = "로그아웃 하시겠습니까?",
-            confirmButtonText = "로그아웃 하기",
-            dismissButtonText = "취소",
-            onConfirm = viewModel::logOut,
-            onDismiss = viewModel::hideLogoutDialog,
-        )
-    }
-
-    if (uiState.showWithdrawalDialog) {
-        MaAlertDialog(
-            title = "회원탈퇴 하시겠습니까?",
-            confirmButtonText = "탈퇴하기",
-            dismissButtonText = "취소",
-            onConfirm = viewModel::withdrawal,
-            onDismiss = viewModel::hideWithdrawalDialog,
-        )
-    }
-
-    SeniorSettingContent(
+    GuardianSettingContent(
         uiState = uiState,
         onCustomerCenterClick = viewModel::openCustomerCenterUrl,
         onPolicyClick = viewModel::openPolicyUrl,
@@ -58,11 +40,56 @@ fun SeniorSettingScreen(
         onWithdrawalClick = viewModel::showWithdrawalDialog,
         onBackClick = viewModel::navigateToBack
     )
+
+    when (uiState.logoutDialogState) {
+        is SettingDialogState.None -> Unit
+        is SettingDialogState.Confirm -> {
+            MaAlertDialog(
+                title = "로그아웃 하시겠습니까?",
+                confirmButtonText = "로그아웃 하기",
+                dismissButtonText = "취소",
+                onConfirm = viewModel::logout,
+                onDismiss = viewModel::hideLogoutDialog,
+            )
+        }
+
+        is SettingDialogState.Complete -> {
+            MaConfirmDialog(
+                title = "로그아웃 완료되었습니다",
+                confirmButtonText = "확인",
+                onConfirm = viewModel::navigateToClear,
+                onDialogDismissRequest = {},
+            )
+        }
+    }
+
+    when (uiState.withdrawalDialogState) {
+        is SettingDialogState.None -> Unit
+        is SettingDialogState.Confirm -> {
+            MaAlertDialog(
+                title = "회원탈퇴 하시겠습니까?",
+                confirmButtonText = "탈퇴하기",
+                dismissButtonText = "취소",
+                onConfirm = viewModel::withdrawal,
+                onDismiss = viewModel::hideWithdrawalDialog,
+            )
+        }
+
+        is SettingDialogState.Complete -> {
+            MaConfirmDialog(
+                title = "회원탈퇴 완료되었습니다",
+                confirmButtonText = "확인",
+                onConfirm = viewModel::navigateToClear,
+                onDialogDismissRequest = {},
+            )
+        }
+    }
 }
 
 @Composable
-private fun SeniorSettingContent(
-    uiState: SeniorSettingUiState,
+private fun GuardianSettingContent(
+    modifier: Modifier = Modifier,
+    uiState: GuardianSettingUiState,
     onCustomerCenterClick: () -> Unit,
     onPolicyClick: () -> Unit,
     onLogOutClick: () -> Unit,
@@ -70,7 +97,7 @@ private fun SeniorSettingContent(
     onBackClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         MaTopAppBar(title = "설정", onBackClick = onBackClick)
 
@@ -79,8 +106,6 @@ private fun SeniorSettingContent(
                 .fillMaxWidth()
                 .padding(20.dp),
             name = uiState.userName,
-            code = uiState.userCode,
-            isCodeEnabled = true,
             onCopyClick = {},
         )
 
@@ -117,8 +142,8 @@ private fun SeniorSettingContent(
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    SeniorSettingContent(
-        uiState = SeniorSettingUiState.INIT,
+    GuardianSettingContent(
+        uiState = GuardianSettingUiState.INIT,
         onCustomerCenterClick = {},
         onPolicyClick = {},
         onLogOutClick = {},

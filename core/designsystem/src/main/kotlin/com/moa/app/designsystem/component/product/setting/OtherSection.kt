@@ -1,4 +1,4 @@
-package com.moa.app.feature.senior.setting.component
+package com.moa.app.designsystem.component.product.setting
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -38,7 +38,7 @@ fun OtherSection(
             text = "기타",
             color = MoaTheme.colors.black,
             style = MoaTheme.typography.body1Bold,
-            modifier = Modifier
+            modifier = Modifier.Companion
                 .padding(vertical = 10.dp)
                 .padding(start = 20.dp)
         )
@@ -62,7 +62,7 @@ fun OtherSection(
         )
 
         Row(
-            modifier = Modifier
+            modifier = Modifier.Companion
                 .fillMaxWidth()
                 .clickable(
                     onClick = onWithdrawalClick,
@@ -70,21 +70,21 @@ fun OtherSection(
                     interactionSource = remember { MutableInteractionSource() },
                 )
                 .padding(start = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Companion.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Image(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_stop),
+                imageVector = ImageVector.Companion.vectorResource(R.drawable.ic_stop),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(color = MoaTheme.colors.red500),
-                modifier = Modifier.size(16.dp)
+                colorFilter = ColorFilter.Companion.tint(color = MoaTheme.colors.red500),
+                modifier = Modifier.Companion.size(16.dp)
             )
 
             Text(
                 text = "회원 탈퇴",
                 color = MoaTheme.colors.red500,
                 style = MoaTheme.typography.body1Medium,
-                modifier = Modifier.padding(vertical = 10.dp)
+                modifier = Modifier.Companion.padding(vertical = 10.dp)
             )
         }
     }

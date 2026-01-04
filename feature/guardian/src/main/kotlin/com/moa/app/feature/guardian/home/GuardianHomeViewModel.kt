@@ -8,6 +8,7 @@ import com.moa.app.domain.user.usecase.FetchUserProfileUseCase
 import com.moa.app.feature.guardian.home.model.DialogState
 import com.moa.app.feature.guardian.home.model.GuardianHomeUiState
 import com.moa.app.navigation.AppRoute
+import com.moa.app.navigation.NavigationOptions
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -104,7 +105,17 @@ class GuardianHomeViewModel @Inject constructor(
     }
 
     fun navigateToUserConnection() {
-        navigator.navigate(route = AppRoute.UserConnection("CHILD"))
+        navigator.navigate(
+            route = AppRoute.UserConnection("CHILD"),
+            options = NavigationOptions(launchSingleTop = true)
+        )
+    }
+
+    fun navigateToSetting() {
+        navigator.navigate(
+            route = AppRoute.GuardianSetting,
+            options = NavigationOptions(launchSingleTop = true)
+        )
     }
 }
 

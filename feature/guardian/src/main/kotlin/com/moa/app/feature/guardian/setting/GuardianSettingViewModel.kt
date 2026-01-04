@@ -1,11 +1,12 @@
-package com.moa.app.feature.senior.setting
+package com.moa.app.feature.guardian.setting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.auth.usecase.LogOutUseCase
 import com.moa.app.domain.auth.usecase.WithdrawalUseCase
 import com.moa.app.domain.user.usecase.FetchUserProfileUseCase
-import com.moa.app.feature.senior.setting.model.SeniorSettingUiState
+import com.moa.app.feature.guardian.setting.model.GuardianSettingUiState
+import com.moa.app.feature.guardian.setting.model.SettingDialogState
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.NavigationOptions
 import com.moa.app.navigation.Navigator
@@ -19,60 +20,67 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class SeniorSettingViewModel @Inject constructor(
+class GuardianSettingViewModel @Inject constructor(
     private val navigator: Navigator,
     private val fetchUserProfileUseCase: FetchUserProfileUseCase,
     private val logOutUseCase: LogOutUseCase,
     private val withdrawalUseCase: WithdrawalUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SeniorSettingUiState.INIT)
-    val uiState: StateFlow<SeniorSettingUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(GuardianSettingUiState.INIT)
+    val uiState: StateFlow<GuardianSettingUiState> = _uiState.asStateFlow()
 
     init {
         fetchUserProfile()
     }
 
     fun showLogoutDialog() {
-        _uiState.update { it.copy(showLogoutDialog = true) }
+        _uiState.update { it.copy(logoutDialogState = SettingDialogState.Confirm) }
     }
 
     fun hideLogoutDialog() {
-        _uiState.update { it.copy(showLogoutDialog = false) }
+        _uiState.update { it.copy(logoutDialogState = SettingDialogState.None) }
     }
 
     fun showWithdrawalDialog() {
-        _uiState.update { it.copy(showWithdrawalDialog = true) }
+        _uiState.update { it.copy(withdrawalDialogState = SettingDialogState.Confirm) }
     }
 
     fun hideWithdrawalDialog() {
-        _uiState.update { it.copy(showWithdrawalDialog = false) }
+        _uiState.update { it.copy(withdrawalDialogState = SettingDialogState.None) }
     }
 
     private fun fetchUserProfile() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             fetchUserProfileUseCase().fold(
                 onSuccess = { userProfile ->
                     _uiState.update {
-                        it.copy(userName = userProfile.name, userCode = userProfile.authCode)
+                        it.copy(userName = userProfile.name, isLoading = false)
                     }
                 },
-                onFailure = {
-                    Timber.tag("fetchUserProfile").e("fetchUserProfile: $it")
+                onFailure = { t ->
+                    Timber.e("fetchUserProfile: $t")
+                    _uiState.update { it.copy(isLoading = false) }
                 },
             )
         }
     }
 
-    fun logOut() {
+    fun logout() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             logOutUseCase().fold(
                 onSuccess = {
-                    navigateToClear()
+                    _uiState.update {
+                        it.copy(isLoading = false, logoutDialogState = SettingDialogState.Complete)
+                    }
                 },
-                onFailure = {
-                    Timber.tag("logOut").e("logOut: $it")
-                    hideLogoutDialog()
+                onFailure = { t ->
+                    Timber.e("Logout Failed: $t")
+                    _uiState.update {
+                        it.copy(isLoading = false, logoutDialogState = SettingDialogState.None)
+                    }
                 },
             )
         }
@@ -80,13 +88,18 @@ class SeniorSettingViewModel @Inject constructor(
 
     fun withdrawal() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             withdrawalUseCase().fold(
                 onSuccess = {
-                    navigateToClear()
+                    _uiState.update {
+                        it.copy(isLoading = false, withdrawalDialogState = SettingDialogState.Complete)
+                    }
                 },
-                onFailure = {
-                    Timber.tag("withdrawal").e("withdrawal: $it")
-                    hideWithdrawalDialog()
+                onFailure = { t ->
+                    Timber.e("Withdrawal Failed: $t")
+                    _uiState.update {
+                        it.copy(isLoading = false, withdrawalDialogState = SettingDialogState.None)
+                    }
                 },
             )
         }
@@ -98,7 +111,7 @@ class SeniorSettingViewModel @Inject constructor(
 
     fun navigateToBack() = navigator.navigateBack()
 
-    private fun navigateToClear() {
+    fun navigateToClear() {
         navigator.navigate(
             route = AppRoute.AuthLanding,
             options = NavigationOptions(
@@ -110,7 +123,8 @@ class SeniorSettingViewModel @Inject constructor(
     }
 
     companion object {
-        private const val POLICY_URL = "https://woongaaaa.notion.site/Legal-2b41a839ca3c80bcb357fd347f9535f3"
+        private const val POLICY_URL =
+            "https://woongaaaa.notion.site/Legal-2b41a839ca3c80bcb357fd347f9535f3"
         private const val CUSTOMER_CENTER_URL = "https://pf.kakao.com/_XxaxbYn/chat"
     }
 }
