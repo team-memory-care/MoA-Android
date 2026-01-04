@@ -21,7 +21,7 @@ class UserRepositoryImpl @Inject constructor(
                     birthDate = response.birthDate,
                     phoneNumber = response.phoneNumber,
                     gender = Gender.fromString(response.gender),
-                    authCode = response.parentCode
+                    authCode = response.parentCode ?: ""
                 )
             }
     }

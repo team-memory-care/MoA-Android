@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.moa.app.designsystem.theme.MoATheme
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.guardian.home.GuardianHomeScreen
+import com.moa.app.feature.guardian.setting.GuardianSettingScreen
 import com.moa.app.feature.onboarding.connection.ConnectionCheckScreen
 import com.moa.app.feature.onboarding.connection.UserConnectionScreen
 import com.moa.app.feature.onboarding.landing.AuthLandingScreen
@@ -94,6 +95,7 @@ class MainActivity : ComponentActivity() {
                         composable<AppRoute.SeniorSetting> { SeniorSettingScreen() }
                         composable<AppRoute.Report> { ReportScreen() }
                         composable<AppRoute.GuardianHome> { GuardianHomeScreen() }
+                        composable<AppRoute.GuardianSetting> { GuardianSettingScreen() }
                     }
                 }
             }
