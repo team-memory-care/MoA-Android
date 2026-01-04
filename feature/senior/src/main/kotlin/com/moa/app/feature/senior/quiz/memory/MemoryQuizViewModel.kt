@@ -1,6 +1,10 @@
 package com.moa.app.feature.senior.quiz.memory
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import androidx.compose.runtime.Immutable
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.MemoryQuiz
@@ -13,6 +17,7 @@ import com.moa.app.feature.senior.quiz.stt.SttManager
 import com.moa.app.feature.senior.quiz.stt.SttState
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
@@ -30,6 +35,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MemoryQuizViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val navigator: Navigator,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
@@ -42,6 +48,11 @@ class MemoryQuizViewModel @Inject constructor(
     init {
         observeSttState()
         loadMemoryQuizzes()
+
+        when (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)) {
+            PackageManager.PERMISSION_GRANTED -> {}
+            else -> switchToTextMode()
+        }
     }
 
     fun displayQuizImages() {
