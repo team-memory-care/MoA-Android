@@ -56,6 +56,9 @@ sealed interface AppRoute {
     data object MemoryQuiz : AppRoute
 
     @Serializable
+    data object DailyQuiz : AppRoute
+
+    @Serializable
     data object SeniorSetting : AppRoute
 
     @Serializable
