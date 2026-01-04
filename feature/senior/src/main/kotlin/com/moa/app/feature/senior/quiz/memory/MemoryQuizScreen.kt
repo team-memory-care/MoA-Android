@@ -1,32 +1,23 @@
 package com.moa.app.feature.senior.quiz.memory
 
-import android.Manifest
-import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import com.moa.app.designsystem.component.product.dialog.MaAlertDialog
 import com.moa.app.designsystem.component.product.topbar.MaStepProgressTopAppBar
 import com.moa.app.domain.quiz.model.MemoryQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
-import com.moa.app.feature.senior.quiz.component.CommonSideAnimation
 import com.moa.app.feature.senior.quiz.component.QuizLoadContent
 import com.moa.app.feature.senior.quiz.component.QuizResultDialog
 import com.moa.app.feature.senior.quiz.component.QuizSlideAnimation
@@ -106,7 +97,7 @@ private fun MemoryQuizContent(
         uiState.currentQuiz?.let { targetQuiz ->
             QuizSlideAnimation(
                 targetState = targetQuiz,
-                modifier = Modifier.padding(bottom = 12.dp),
+                modifier = Modifier.weight(1f),
             ) { question ->
                 when (uiState.quizState) {
                     MemoryQuizSetState.WAITING_TO_START -> {

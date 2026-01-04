@@ -44,7 +44,8 @@ fun MemoryQuizReadyContent(
             onClick = onContinueClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 12.dp),
         ) {
             Text(
                 text = "계속",
