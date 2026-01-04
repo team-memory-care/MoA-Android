@@ -41,10 +41,9 @@ class AttentionQuizViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun loadAttentionQuizzes() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             val minLoadingTime = async { delay(2000L) }
-            val quizzesDeferred = async {
-                fetchQuizUseCase(QuizCategory.ATTENTION)
-            }
+            val quizzesDeferred = async { fetchQuizUseCase(QuizCategory.ATTENTION) }
             awaitAll(minLoadingTime, quizzesDeferred)
             quizzesDeferred.getCompleted().fold(
                 onSuccess = { quizzes ->
