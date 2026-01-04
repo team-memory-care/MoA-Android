@@ -7,11 +7,8 @@ import com.moa.app.feature.senior.home.model.SeniorHomeUiState
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,7 +46,7 @@ class SeniorHomeViewModel @Inject constructor(
     }
 
     fun navigateToDailyQuiz() {
-        navigator.navigate(AppRoute.LinguisticQuiz)
+        navigator.navigate(AppRoute.DailyQuiz)
     }
 
     fun navigateToReport() {

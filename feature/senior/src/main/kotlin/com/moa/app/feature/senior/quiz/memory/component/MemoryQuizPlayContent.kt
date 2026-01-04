@@ -57,7 +57,7 @@ fun MemoryQuizPlayContent(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.TopCenter,
     ) {
         Box(
             modifier = Modifier.offset(x = centeringOffset),

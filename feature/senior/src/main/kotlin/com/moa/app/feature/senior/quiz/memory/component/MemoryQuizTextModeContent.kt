@@ -77,7 +77,9 @@ fun MemoryQuizTextModeContent(
         MaButton(
             onClick = onContinueClick,
             enabled = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp),
         ) {
             Text(
                 text = "계속",

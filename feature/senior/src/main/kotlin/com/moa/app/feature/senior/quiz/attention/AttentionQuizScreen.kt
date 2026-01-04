@@ -20,12 +20,11 @@ import com.moa.app.designsystem.component.product.dialog.MaAlertDialog
 import com.moa.app.designsystem.component.product.topbar.MaStepProgressTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.domain.quiz.model.QuizCategory
-import com.moa.app.feature.senior.quiz.attention.component.KeyPadContent
 import com.moa.app.feature.senior.quiz.attention.model.AttentionQuizUiState
-import com.moa.app.feature.senior.quiz.component.BottomQuizDescription
 import com.moa.app.feature.senior.quiz.component.QuizLoadContent
 import com.moa.app.feature.senior.quiz.component.QuizResultDialog
 import com.moa.app.feature.senior.quiz.component.QuizSlideAnimation
+import com.moa.app.feature.senior.quiz.component.quizform.AttentionQuizForm
 
 @Composable
 fun AttentionQuizScreen(
@@ -90,23 +89,14 @@ private fun AttentionQuizContent(
                 targetState = targetQuiz,
                 modifier = Modifier.weight(1f),
             ) { question ->
-                Column {
-                    BottomQuizDescription(
-                        quizDescription = "${question.expression}은?",
-                        onImageClick = {},
-                        modifier = Modifier.padding(horizontal = 60.dp),
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    KeyPadContent(
-                        input = uiState.userAnswer,
-                        onInputChanged = onInputChanged,
-                        onDeleteClick = onInputClear,
-                        maxInputLength = question.answer.length,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-                }
+                AttentionQuizForm(
+                    question = question.expression,
+                    input = uiState.userAnswer,
+                    maxInputLength = question.answer.length,
+                    onInputChanged = onInputChanged,
+                    onImageClick = {},
+                    onDeleteClick = onInputClear,
+                )
             }
         }
 
