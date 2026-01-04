@@ -57,9 +57,7 @@ fun MemoryQuizForm(
                         modifier = Modifier.padding(horizontal = 20.dp),
                         onContinueClick = onContinueTextClick,
                         answers = userTextAnswers,
-                        onTextAnswerChange = { index, answer ->
-                            onTextAnswerChange(index, answer)
-                        }
+                        onTextAnswerChange = onTextAnswerChange
                     )
                 }
             }

@@ -134,7 +134,8 @@ class DailyQuizViewModel @Inject constructor(
 
     fun updateAnswer(userAnswer: String) {
         _uiState.update {
-            if ((it.attentionQuizAnswer + userAnswer).length > (it.currentQuiz as AttentionQuiz).answer.length) {
+            val currentQuiz = it.currentQuiz as? AttentionQuiz ?: return@update it
+            if ((it.attentionQuizAnswer + userAnswer).length > currentQuiz.answer.length) {
                 return@update it
             }
             it.copy(attentionQuizAnswer = it.attentionQuizAnswer + userAnswer)
@@ -267,10 +268,15 @@ data class DailyQuizUiState(
         get() = currentQuestionIndex + 1
 
     val isContinueButtonEnabled: Boolean
-        get() = !isChecking && when (currentQuiz) {
-            is PersistenceQuiz, is LinguisticQuiz, is SpaceTimeQuiz -> selectedAnswerIndex != null
-            is AttentionQuiz -> attentionQuizAnswer.length == (currentQuiz as AttentionQuiz).answer.length
-            else -> false
+        get() {
+            if (isChecking) return false
+            val quiz = currentQuiz ?: return false
+
+            return when (quiz) {
+                is PersistenceQuiz, is LinguisticQuiz, is SpaceTimeQuiz -> selectedAnswerIndex != null
+                is AttentionQuiz -> attentionQuizAnswer.length == quiz.answer.length
+                is MemoryQuiz -> false
+            }
         }
 
     companion object {
