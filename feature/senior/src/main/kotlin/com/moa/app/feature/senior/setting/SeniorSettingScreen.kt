@@ -18,10 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.designsystem.component.product.dialog.MaAlertDialog
+import com.moa.app.designsystem.component.product.setting.ProfileSection
 import com.moa.app.designsystem.component.product.topbar.MaTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
-import com.moa.app.feature.senior.setting.component.OtherSection
-import com.moa.app.feature.senior.setting.component.ProfileSection
+import com.moa.app.designsystem.component.product.setting.OtherSection
 import com.moa.app.feature.senior.setting.model.SeniorSettingUiState
 
 @Composable
@@ -80,6 +80,7 @@ private fun SeniorSettingContent(
                 .padding(20.dp),
             name = uiState.userName,
             code = uiState.userCode,
+            isCodeEnabled = true,
             onCopyClick = {},
         )
 

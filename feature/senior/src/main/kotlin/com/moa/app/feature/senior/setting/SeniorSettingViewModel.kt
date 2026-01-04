@@ -1,6 +1,5 @@
 package com.moa.app.feature.senior.setting
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.auth.usecase.LogOutUseCase
@@ -27,7 +26,7 @@ class SeniorSettingViewModel @Inject constructor(
     private val withdrawalUseCase: WithdrawalUseCase,
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<SeniorSettingUiState> = MutableStateFlow(SeniorSettingUiState.INIT)
+    private val _uiState = MutableStateFlow(SeniorSettingUiState.INIT)
     val uiState: StateFlow<SeniorSettingUiState> = _uiState.asStateFlow()
 
     init {
