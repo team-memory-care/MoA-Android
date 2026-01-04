@@ -29,7 +29,7 @@ data class LinguisticQuizUiState(
 
     companion object {
         val INIT = LinguisticQuizUiState(
-            isLoading = true,
+            isLoading = false,
             errorMessage = null,
             quizzes = persistentListOf(),
             currentQuestionIndex = 0,
