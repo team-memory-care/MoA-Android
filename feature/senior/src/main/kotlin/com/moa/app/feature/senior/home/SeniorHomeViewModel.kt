@@ -24,12 +24,8 @@ class SeniorHomeViewModel @Inject constructor(
     private val fetchUserProfileUseCase: FetchUserProfileUseCase,
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<SeniorHomeUiState> = MutableStateFlow(SeniorHomeUiState.INIT)
+    private val _uiState = MutableStateFlow(SeniorHomeUiState.INIT)
     val uiState: StateFlow<SeniorHomeUiState> = _uiState.asStateFlow()
-
-    private val _sideEffect: MutableSharedFlow<SeniorHomeSideEffect> = MutableSharedFlow()
-    val sideEffect: SharedFlow<SeniorHomeSideEffect> = _sideEffect.asSharedFlow()
-
 
     init {
         fetchUserProfile()
@@ -64,8 +60,4 @@ class SeniorHomeViewModel @Inject constructor(
     fun navigateToSetting() {
         navigator.navigate(AppRoute.SeniorSetting)
     }
-}
-
-sealed interface SeniorHomeSideEffect {
-    data class ShowToast(val message: String) : SeniorHomeSideEffect
 }
