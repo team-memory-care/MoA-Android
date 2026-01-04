@@ -19,6 +19,13 @@ class QuizRepositoryImpl @Inject constructor(
             }
     }
 
+    override suspend fun fetchDailyQuizzes(): Result<List<Quiz>> {
+        return quizDataSource.fetchDailyQuizzes()
+            .mapCatching { responses ->
+                responses.map { it.toDomain() }
+            }
+    }
+
     override suspend fun uploadQuizScore(quizScore: QuizScore): Result<Unit> {
         return quizDataSource.uploadQuizScore(quizScore)
     }

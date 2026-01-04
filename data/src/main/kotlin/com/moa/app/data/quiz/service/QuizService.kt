@@ -16,4 +16,7 @@ interface QuizService {
 
     @POST("/api/v1/quiz/result")
     suspend fun uploadQuizScore(@Body request: QuizScoreRequest): NetworkResult<Unit>
+
+    @GET("/api/v1/quiz/today")
+    suspend fun fetchTodayQuizzes(): NetworkResult<List<QuizResponse>>
 }

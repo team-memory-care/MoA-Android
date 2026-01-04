@@ -6,5 +6,6 @@ import com.moa.app.domain.quiz.model.QuizScore
 
 interface QuizDataSource {
     suspend fun fetchQuizzes(type: QuizCategory): Result<List<QuizResponse>>
+    suspend fun fetchDailyQuizzes(): Result<List<QuizResponse>>
     suspend fun uploadQuizScore(quizScore: QuizScore): Result<Unit>
 }
