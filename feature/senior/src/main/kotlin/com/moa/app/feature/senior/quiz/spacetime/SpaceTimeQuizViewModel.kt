@@ -39,6 +39,7 @@ class SpaceTimeQuizViewModel @Inject constructor(
 
     private fun loadSpaceTimeQuizzes() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             val minLoadingTime = async { delay(2000L) }
             val quizzesDeferred = async { fetchQuizUseCase(QuizCategory.SPACETIME) }
             awaitAll(minLoadingTime, quizzesDeferred)
