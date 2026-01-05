@@ -1,6 +1,5 @@
 package com.moa.app.feature.report
 
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

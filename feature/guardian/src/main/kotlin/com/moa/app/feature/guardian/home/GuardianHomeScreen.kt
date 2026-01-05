@@ -1,5 +1,8 @@
 package com.moa.app.feature.guardian.home
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
@@ -38,12 +43,14 @@ import com.moa.app.feature.guardian.home.component.SeniorProfileGrid
 import com.moa.app.feature.guardian.home.model.DialogState
 import com.moa.app.feature.guardian.home.model.GuardianHomeUiState
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.delay
 
 @Composable
 fun GuardianHomeScreen(
     viewModel: GuardianHomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    BackPressHandler()
 
     GuardianHomeContent(
         uiState = uiState,
@@ -161,6 +168,29 @@ private fun GuardianHomeContent(
                 color = MoaTheme.colors.white,
                 style = MoaTheme.typography.body2Semibold,
             )
+        }
+    }
+}
+
+@Composable
+fun BackPressHandler() {
+    val activity = LocalActivity.current
+    val context = LocalContext.current
+    var backPressedOnce by remember { mutableStateOf(false) }
+
+    LaunchedEffect(backPressedOnce) {
+        if (backPressedOnce) {
+            delay(2000L)
+            backPressedOnce = false
+        }
+    }
+
+    BackHandler(enabled = true) {
+        if (backPressedOnce) {
+            activity?.finish()
+        } else {
+            backPressedOnce = true
+            Toast.makeText(context, "뒤로가기를 한 번 더 누르면 종료됩니다.", Toast.LENGTH_LONG).show()
         }
     }
 }
