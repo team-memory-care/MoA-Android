@@ -1,17 +1,19 @@
 package com.moa.app.feature.senior.setting.model
 
 data class SeniorSettingUiState(
+    val isLoading: Boolean,
     val userName: String,
     val userCode: String,
-    val showLogoutDialog: Boolean,
-    val showWithdrawalDialog: Boolean,
+    val withdrawalDialogState: SettingDialogState,
+    val logoutDialogState: SettingDialogState,
 ) {
     companion object {
         val INIT = SeniorSettingUiState(
+            isLoading = false,
             userName = "",
             userCode = "",
-            showLogoutDialog = false,
-            showWithdrawalDialog = false,
+            withdrawalDialogState = SettingDialogState.None,
+            logoutDialogState = SettingDialogState.None,
         )
     }
 }
