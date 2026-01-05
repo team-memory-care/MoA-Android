@@ -12,8 +12,8 @@ class ReportRepositoryImpl @Inject constructor(
     private val reportDataSource: ReportDataSource,
 ) : ReportRepository {
 
-    override suspend fun fetchDailyReport(date: String): Result<DailyReport?> {
-        return reportDataSource.fetchDailyReport(date)
+    override suspend fun fetchDailyReport(date: String, parentId: Long?): Result<DailyReport?> {
+        return reportDataSource.fetchDailyReport(date, parentId)
             .mapCatching { it?.toDomain() }
     }
 
@@ -21,13 +21,14 @@ class ReportRepositoryImpl @Inject constructor(
         year: Int,
         month: Int,
         week: Int,
+        parentId: Long?
     ): Result<WeeklyReport?> {
-        return reportDataSource.fetchWeeklyReport(year, month, week)
+        return reportDataSource.fetchWeeklyReport(year, month, week, parentId)
             .mapCatching { it?.toDomain() }
     }
 
-    override suspend fun fetchMonthlyReport(year: Int, month: Int): Result<MonthlyReport?> {
-        return reportDataSource.fetchMonthlyReport(year, month)
+    override suspend fun fetchMonthlyReport(year: Int, month: Int, parentId: Long?): Result<MonthlyReport?> {
+        return reportDataSource.fetchMonthlyReport(year, month, parentId)
             .mapCatching { it?.toDomain() }
     }
 }
