@@ -39,7 +39,7 @@ import kotlinx.collections.immutable.persistentListOf
 fun SeniorProfileGrid(
     profiles: ImmutableList<SeniorProfile>,
     deletable: Boolean,
-    onProfileClick: (SeniorProfile) -> Unit,
+    onProfileClick: (Long) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -76,7 +76,7 @@ fun SeniorProfileGrid(
                                     gender = item.data.gender,
                                     backgroundColor = item.backgroundColor,
                                     isDeletable = deletable,
-                                    onClick = { onProfileClick(item.data) },
+                                    onClick = { onProfileClick(item.data.id) },
                                     onDeleteClick = { onDeleteClick(item.data.id) },
                                 )
                             }

@@ -111,6 +111,13 @@ class GuardianHomeViewModel @Inject constructor(
         )
     }
 
+    fun navigateToReport(profileId: Long) {
+        navigator.navigate(
+            route = AppRoute.Report(profileId),
+            options = NavigationOptions(launchSingleTop = true)
+        )
+    }
+
     fun navigateToSetting() {
         navigator.navigate(
             route = AppRoute.GuardianSetting,
