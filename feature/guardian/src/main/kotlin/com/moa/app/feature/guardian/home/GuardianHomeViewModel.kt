@@ -118,6 +118,13 @@ class GuardianHomeViewModel @Inject constructor(
         )
     }
 
+    fun navigateToAlert() {
+        navigator.navigate(
+            route = AppRoute.GuardianAlert,
+            options = NavigationOptions(launchSingleTop = true)
+        )
+    }
+
     fun navigateToSetting() {
         navigator.navigate(
             route = AppRoute.GuardianSetting,

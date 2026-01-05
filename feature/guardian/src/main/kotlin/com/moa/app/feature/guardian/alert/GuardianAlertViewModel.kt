@@ -1,0 +1,13 @@
+package com.moa.app.feature.guardian.alert
+
+import androidx.lifecycle.ViewModel
+import com.moa.app.navigation.Navigator
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+@HiltViewModel
+class GuardianAlertViewModel @Inject constructor(
+    private val navigator: Navigator
+) : ViewModel() {
+    fun navigateToBack() = navigator.navigateBack()
+}

@@ -115,7 +115,7 @@ class GuardianSettingViewModel @Inject constructor(
         navigator.navigate(
             route = AppRoute.AuthLanding,
             options = NavigationOptions(
-                popUpTo = AppRoute.SeniorSetting,
+                popUpTo = AppRoute.GuardianSetting,
                 inclusive = true,
                 clearBackStack = true,
             ),

@@ -47,7 +47,7 @@ fun GuardianHomeScreen(
 
     GuardianHomeContent(
         uiState = uiState,
-        onAlertClick = {},
+        onAlertClick = viewModel::navigateToAlert,
         onSettingClick = viewModel::navigateToSetting,
         onProfileClick = viewModel::navigateToReport,
         toggleDeletable = viewModel::updateDeletable,

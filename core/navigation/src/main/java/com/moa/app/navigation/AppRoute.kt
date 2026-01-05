@@ -69,4 +69,7 @@ sealed interface AppRoute {
 
     @Serializable
     data object GuardianSetting : AppRoute
+
+    @Serializable
+    data object GuardianAlert : AppRoute
 }
