@@ -50,9 +50,8 @@ class SeniorHomeViewModel @Inject constructor(
     }
 
     fun navigateToReport() {
-        navigator.navigate(AppRoute.Report)
+        navigator.navigate(AppRoute.Report(null))
     }
-
 
     fun navigateToSetting() {
         navigator.navigate(AppRoute.SeniorSetting)

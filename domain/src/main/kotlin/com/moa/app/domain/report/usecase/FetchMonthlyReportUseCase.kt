@@ -7,7 +7,7 @@ import javax.inject.Inject
 class FetchMonthlyReportUseCase @Inject constructor(
     private val reportRepository: ReportRepository,
 ) {
-    suspend operator fun invoke(year: Int, month: Int): Result<MonthlyReport?> {
-        return reportRepository.fetchMonthlyReport(year, month)
+    suspend operator fun invoke(year: Int, month: Int, parentId: Long?): Result<MonthlyReport?> {
+        return reportRepository.fetchMonthlyReport(year, month, parentId)
     }
 }

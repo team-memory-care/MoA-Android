@@ -12,20 +12,21 @@ class ReportDataSourceImpl @Inject constructor(
     private val reportService: ReportService,
 ) : ReportDataSource {
 
-    override suspend fun fetchDailyReport(date: String): Result<DailyReportResponse?> {
-        return reportService.fetchDailyReport(date).toResult { it }
+    override suspend fun fetchDailyReport(date: String, parentId: Long?): Result<DailyReportResponse?> {
+        return reportService.fetchDailyReport(date, parentId).toResult { it }
     }
 
     override suspend fun fetchWeeklyReport(
         year: Int,
         month: Int,
         week: Int,
+        parentId: Long?
     ): Result<WeeklyReportResponse?> {
-        return reportService.fetchWeeklyReport(year, month, week).toResult { it }
+        return reportService.fetchWeeklyReport(year, month, week, parentId).toResult { it }
     }
 
-    override suspend fun fetchMonthlyReport(year: Int, month: Int): Result<MonthlyReportResponse?> {
-        return reportService.fetchMonthlyReport(year, month).toResult { it }
+    override suspend fun fetchMonthlyReport(year: Int, month: Int, parentId: Long?): Result<MonthlyReportResponse?> {
+        return reportService.fetchMonthlyReport(year, month, parentId).toResult { it }
     }
 
 }

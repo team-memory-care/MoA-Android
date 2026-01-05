@@ -62,11 +62,14 @@ sealed interface AppRoute {
     data object SeniorSetting : AppRoute
 
     @Serializable
-    data object Report : AppRoute
+    data class Report(val parentId: Long?) : AppRoute
 
     @Serializable
     data object GuardianHome : AppRoute
 
     @Serializable
     data object GuardianSetting : AppRoute
+
+    @Serializable
+    data object GuardianAlert : AppRoute
 }
