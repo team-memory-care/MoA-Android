@@ -17,7 +17,7 @@ class NetworkResultCallAdapter(
         val handler = if (successType == Unit::class.java) {
             UnitResponseHandler() as ResponseHandler<Any>
         } else {
-            ResponseHandler<Any>()
+            ResponseHandler()
         }
 
         return NetworkResultCall(call as Call<BaseResponse<Any>>, handler) as Call<NetworkResult<*>>
