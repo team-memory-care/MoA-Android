@@ -71,6 +71,7 @@ class MemoryQuizViewModel @Inject constructor(
                     is SttState.Speaking -> _uiState.update { it.copy(isSpeaking = true) }
                     is SttState.Success -> {
                         Timber.d("STT Success: ${state.result}")
+                        sttManager.stopListening()
                         checkAnswer(state.result)
                     }
 
