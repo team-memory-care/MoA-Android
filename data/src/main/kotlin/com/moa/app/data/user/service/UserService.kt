@@ -1,6 +1,5 @@
 package com.moa.app.data.user.service
 
-import com.moa.app.data.user.model.response.ProfileResponse
 import com.moa.app.data.user.model.response.SeniorProfileResponse
 import com.moa.app.data.user.model.response.UserProfileResponse
 import com.moa.app.network.model.NetworkResult
@@ -19,12 +18,10 @@ interface UserService {
     suspend fun withdrawal(): NetworkResult<Unit>
 
     @GET("/api/v1/users/parent-code/{parentCode}/verify")
-    suspend fun validateParentCode(
-        @Path("parentCode") parentCode: String
-    ): NetworkResult<SeniorProfileResponse>
+    suspend fun validateParentCode(@Path("parentCode") parentCode: String): NetworkResult<SeniorProfileResponse>
 
     @POST("/api/v1/users/link-parent")
-    suspend fun connectToSenior(@Query("parentId") userId: Long): NetworkResult<ProfileResponse>
+    suspend fun connectToSenior(@Query("parentId") userId: Long): NetworkResult<Unit>
 
     @GET("/api/v1/users/parent/{parentId}")
     suspend fun fetchSeniorProfile(@Path("parentId") userId: Long): NetworkResult<SeniorProfileResponse>

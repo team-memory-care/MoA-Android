@@ -6,7 +6,7 @@ import com.moa.app.domain.user.model.SeniorProfile
 
 @Immutable
 data class ConnectionCheckUiState(
-    val isLogin: Boolean,
+    val isLoading: Boolean,
     val seniorProfile: SeniorProfile?,
 ) {
     val userInfo: String
@@ -17,7 +17,7 @@ data class ConnectionCheckUiState(
 
     companion object Companion {
         val INIT = ConnectionCheckUiState(
-            isLogin = false,
+            isLoading = false,
             seniorProfile = null,
         )
     }

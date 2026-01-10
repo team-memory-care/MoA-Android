@@ -8,16 +8,15 @@ internal open class ResponseHandler<T> {
     open fun handle(response: Response<BaseResponse<T>>): NetworkResult<T> {
         val body = response.body()
 
-        return if (response.isSuccessful && body != null) {
-            if (body.success) {
-                body.data?.let {
-                    NetworkResult.Success(it)
-                } ?: NetworkResult.Error(code = response.code(), message = "Response data is null")
+        if (response.isSuccessful) {
+            return if (body != null && body.success) {
+                @Suppress("UNCHECKED_CAST")
+                NetworkResult.Success(body.data as T)
             } else {
-                NetworkResult.Error(code = response.code(), message = body.message)
+                NetworkResult.Error(code = response.code(), message = body?.message ?: "Unknown Error")
             }
-        } else {
-            NetworkResult.Error(code = response.code(), message = response.message())
         }
+
+        return NetworkResult.Error(code = response.code(), message = response.message())
     }
 }

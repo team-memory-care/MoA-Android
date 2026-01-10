@@ -1,7 +1,6 @@
 package com.moa.app.data.user.datasourceImpl
 
 import com.moa.app.data.user.datasource.UserDataSource
-import com.moa.app.data.user.model.response.ProfileResponse
 import com.moa.app.data.user.model.response.SeniorProfileResponse
 import com.moa.app.data.user.model.response.UserProfileResponse
 import com.moa.app.data.user.service.UserService
@@ -24,9 +23,8 @@ class UserDataSourceImpl @Inject constructor(
         return userService.validateParentCode(parentCode).toResult { it }
     }
 
-    override suspend fun connectToSenior(userId: Long): Result<ProfileResponse> {
-//        return userService.connectToSenior(userId).toResult()
-        return userService.connectToSenior(userId).toResult { it }
+    override suspend fun connectToSenior(userId: Long): Result<Unit> {
+        return userService.connectToSenior(userId).toResult()
     }
 
     override suspend fun fetchSeniorProfile(userId: Long): Result<SeniorProfileResponse> {
