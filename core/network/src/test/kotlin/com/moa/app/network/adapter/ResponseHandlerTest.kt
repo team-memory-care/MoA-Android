@@ -150,20 +150,32 @@ class ResponseHandlerTest {
     }
 
     @Nested
-    @DisplayName("타입 안전성 테스트")
+    @DisplayName("타입 안전성 및 Nullable 테스트")
     inner class TypeSafetyTests {
 
         @Test
-        @DisplayName("TestData 핸들러에 data=null 응답 시 Error 반환")
-        fun testDataHandlerWithNullDataReturnsError() {
+        @DisplayName("Nullable 타입(TestData?)에서 data=null 응답 시 Success(null) 반환")
+        fun nullableHandlerWithNullDataReturnsSuccess() {
             // given
-            val handler = ResponseHandler<TestData>()
+            val nullableHandler = ResponseHandler<TestData?>()
             val response = Response.success(
-                BaseResponse<TestData>(
-                    success = true,
-                    message = "ok",
-                    data = null
-                )
+                BaseResponse<TestData?>(success = true, message = "ok", data = null)
+            )
+
+            // when
+            val result = nullableHandler.handle(response)
+
+            // then
+            assertThat(result).isInstanceOf(NetworkResult.Success::class.java)
+            assertThat((result as NetworkResult.Success).data).isNull()
+        }
+
+        @Test
+        @DisplayName("비즈니스 로직 실패(success=false) 시에는 반드시 Error 반환")
+        fun businessFailureStillReturnsError() {
+            // given
+            val response = Response.success(
+                BaseResponse<TestData>(success = false, message = "서버 에러", data = null)
             )
 
             // when
@@ -171,40 +183,7 @@ class ResponseHandlerTest {
 
             // then
             assertThat(result).isInstanceOf(NetworkResult.Error::class.java)
-
-            val error = result as NetworkResult.Error
-            assertThat(error.code).isEqualTo(200)
-            assertThat(error.message).isEqualTo("Response data is null")
-        }
-
-        @Test
-        @DisplayName("여러 타입에서 data=null 시 모두 Error 반환")
-        fun variousTypesWithNullDataReturnError() {
-            // given - User 타입
-            val userHandler = ResponseHandler<User>()
-            val userResponse = Response.success(
-                BaseResponse<User>(success = true, message = "ok", data = null)
-            )
-
-            // when
-            val userResult = userHandler.handle(userResponse)
-
-            // then
-            assertThat(userResult).isInstanceOf(NetworkResult.Error::class.java)
-            assertThat((userResult as NetworkResult.Error).message)
-                .isEqualTo("Response data is null")
-
-            // given
-            val listHandler = ResponseHandler<List<String>>()
-            val listResponse = Response.success(
-                BaseResponse<List<String>>(success = true, message = "ok", data = null)
-            )
-
-            // when
-            val listResult = listHandler.handle(listResponse)
-
-            // then
-            assertThat(listResult).isInstanceOf(NetworkResult.Error::class.java)
+            assertThat((result as NetworkResult.Error).message).isEqualTo("서버 에러")
         }
     }
 }
