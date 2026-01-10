@@ -106,7 +106,7 @@ private fun MemoryQuizContent(
                     MemoryQuizSetState.QUESTION_DISPLAY -> {
                         MemoryQuizPlayContent(
                             imageUrls = targetQuiz.imageUrls,
-                            onImagesFinished = onImagesFinished
+                            onImagesFinished = onImagesFinished,
                         )
                     }
 
@@ -127,9 +127,7 @@ private fun MemoryQuizContent(
                                     modifier = Modifier.padding(horizontal = 20.dp),
                                     onContinueClick = onContinueTextClick,
                                     answers = uiState.userTextAnswers,
-                                    onTextAnswerChange = { index, answer ->
-                                        onTextAnswerChange(index, answer)
-                                    }
+                                    onTextAnswerChange = onTextAnswerChange,
                                 )
                             }
                         }
@@ -153,11 +151,7 @@ private fun MemoryQuizContentPreview() {
                     questionFormat = "",
                     questionContent = "",
                     answer = listOf("사과", "당근", "의자"),
-                    imageUrls = listOf(
-                        "https://moa-bucket-s3.s3.ap-northeast-2.amazonaws.com/8d120aaa-0_memory_2.png",
-                        "https://moa-bucket-s3.s3.ap-northeast-2.amazonaws.com/03548c44-e_memory_4.png",
-                        "https://moa-bucket-s3.s3.ap-northeast-2.amazonaws.com/37300c63-c_memory_8.png",
-                    ),
+                    imageUrls = listOf("", "", ""),
                 ),
             ),
         ),
