@@ -38,13 +38,13 @@ class ConnectionCheckViewModel @Inject constructor(
 
     private fun loadSeniorProfile(userId: Long) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLogin = true) }
+            _uiState.update { it.copy(isLoading = true) }
             fetchSeniorProfilesUseCase(userId).fold(
                 onSuccess = { seniorProfile ->
-                    _uiState.update { it.copy(isLogin = false, seniorProfile = seniorProfile) }
+                    _uiState.update { it.copy(isLoading = false, seniorProfile = seniorProfile) }
                 },
                 onFailure = { t ->
-                    _uiState.update { it.copy(isLogin = false) }
+                    _uiState.update { it.copy(isLoading = false) }
                     Timber.e("loadSeniorProfile: $t")
                 },
             )
@@ -53,14 +53,14 @@ class ConnectionCheckViewModel @Inject constructor(
 
     fun connectToSenior() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLogin = true) }
+            _uiState.update { it.copy(isLoading = true) }
             connectToSeniorUseCase(userId).fold(
                 onSuccess = {
-                    _uiState.update { it.copy(isLogin = false) }
+                    _uiState.update { it.copy(isLoading = false) }
                     navigateToGuardianHome()
                 },
                 onFailure = { t ->
-                    _uiState.update { it.copy(isLogin = false) }
+                    _uiState.update { it.copy(isLoading = false) }
                     Timber.e("connectToSenior: $t")
                 }
             )
