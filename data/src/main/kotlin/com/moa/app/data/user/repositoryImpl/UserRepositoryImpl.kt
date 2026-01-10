@@ -37,13 +37,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun connectToSenior(userId: Long): Result<Unit> {
-//        return userDataSource.connectToSenior(userId)
-        val response = userDataSource.connectToSenior(userId)
-
-        return response.fold(
-            onSuccess = { Result.success(Unit) },
-            onFailure = { Result.failure(it) }
-        )
+        return userDataSource.connectToSenior(userId)
     }
 
     override suspend fun fetchSeniorProfile(userId: Long): Result<SeniorProfile> {
