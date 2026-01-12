@@ -32,12 +32,13 @@ fun SpaceTimeQuizForm(
     questionImageUrl: String,
     imageOptionsUrl: ImmutableList<String>,
     selectedAnswerIndex: Int?,
+    onImageClick: () -> Unit,
     onOptionSelected: (Int) -> Unit,
 ) {
     Column(modifier = modifier) {
         CenterQuizDescription(
             quizDescription = "겹치는 모양을\n찾아주세요!",
-            onImageClick = {},
+            onImageClick = onImageClick,
             modifier = Modifier.height(120.dp),
         )
 
@@ -91,6 +92,7 @@ private fun PreviewSpaceTimeQuizForm() {
             questionImageUrl = "",
             imageOptionsUrl = persistentListOf("", ""),
             selectedAnswerIndex = null,
+            onImageClick = {},
             onOptionSelected = {},
         )
     }
