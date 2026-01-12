@@ -16,7 +16,7 @@ import kotlinx.coroutines.delay
 fun TerminateOnDoubleBack(
     enabled: Boolean = true,
     delayMillis: Long = 2000L,
-    message: String = "뒤로가기를 한 번 더 누르면 종료됩니다."
+    message: String = "뒤로가기를 한 번 더 누르면 종료됩니다.",
 ) {
     val activity = LocalActivity.current
     var backPressedOnce by remember { mutableStateOf(false) }
