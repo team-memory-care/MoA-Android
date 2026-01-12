@@ -4,4 +4,5 @@ data class QuizScore(
     val totalNumber: Int,
     val correctNumber: Int,
     val type: QuizCategory,
+    val category: String = "PRACTICE",
 )
