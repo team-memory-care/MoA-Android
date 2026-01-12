@@ -15,6 +15,7 @@ import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.stt.SttManager
 import com.moa.app.feature.senior.quiz.stt.SttState
+import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -39,6 +40,7 @@ class MemoryQuizViewModel @Inject constructor(
     private val navigator: Navigator,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
+    private val ttsManager: TtsManager,
     private val sttManager: SttManager,
 ) : ViewModel() {
 
@@ -53,6 +55,16 @@ class MemoryQuizViewModel @Inject constructor(
             PackageManager.PERMISSION_GRANTED -> {}
             else -> switchToTextMode()
         }
+    }
+
+    fun speakCurrentQuestion() {
+        val currentState = _uiState.value
+        val instruction = when (currentState.inputMode) {
+            InputMode.VOICE -> "방금 나온 단어를 순서대로 말씀해주세요!"
+            InputMode.TEXT -> "들었던 단어를 밑에 써주세요!"
+        }
+
+        ttsManager.speak(instruction)
     }
 
     fun displayQuizImages() {
@@ -85,7 +97,10 @@ class MemoryQuizViewModel @Inject constructor(
         }
     }
 
-    fun startListening() = sttManager.startListening()
+    fun startListening() {
+        if (ttsManager.isSpeaking) ttsManager.stop()
+        sttManager.startListening()
+    }
 
     fun displayChangeModeButton() {
         _uiState.update { it.copy(isChangeModeButtonEnabled = true) }
@@ -123,6 +138,7 @@ class MemoryQuizViewModel @Inject constructor(
     }
 
     fun checkTextAnswer() {
+        if (ttsManager.isSpeaking) ttsManager.stop()
         _uiState.update {
             val quiz = it.currentQuiz ?: return@update it
             val answer = it.userTextAnswers
@@ -218,6 +234,7 @@ class MemoryQuizViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         sttManager.destroy()
+        ttsManager.destroy()
     }
 }
 
@@ -245,6 +262,9 @@ data class MemoryQuizUiState(
 
     val currentStep: Int
         get() = currentQuestionIndex + 1
+
+    val isTextContinueButtonEnabled: Boolean
+        get() = userTextAnswers.all { it.isNotBlank() }
 
     companion object {
         val INIT = MemoryQuizUiState(

@@ -3,13 +3,13 @@ package com.moa.app.feature.senior.quiz.persistence
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moa.app.domain.quiz.model.LinguisticQuiz
 import com.moa.app.domain.quiz.model.PersistenceQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.model.QuizScore
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.model.QuizResult
+import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -29,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PersistenceQuizViewModel @Inject constructor(
     private val navigator: Navigator,
+    private val ttsManager: TtsManager,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
 ) : ViewModel() {
@@ -38,6 +39,11 @@ class PersistenceQuizViewModel @Inject constructor(
 
     init {
         loadPersistenceQuizzes()
+    }
+
+    fun speakCurrentQuestion() {
+        val currentQuiz = _uiState.value.currentQuiz ?: return
+        ttsManager.speak(currentQuiz.questionContent)
     }
 
     private fun loadPersistenceQuizzes() {
@@ -72,6 +78,7 @@ class PersistenceQuizViewModel @Inject constructor(
     }
 
     fun checkAnswer() {
+        if (ttsManager.isSpeaking) ttsManager.stop()
         _uiState.update {
             if (it.showResultDialog || it.isLoading) return@update it
             val selectedAnswerIndex = it.selectedAnswerIndex ?: return@update it
@@ -121,7 +128,10 @@ class PersistenceQuizViewModel @Inject constructor(
             )
 
             uploadQuizScoreUseCase(result)
-                .onSuccess { exitQuiz() }
+                .onSuccess {
+                    _uiState.update { it.copy(isLoading = false) }
+                    exitQuiz()
+                }
                 .onFailure { t ->
                     Timber.e(t, "Failed to submit quiz result")
                     _uiState.update { it.copy(isLoading = false, errorMessage = "결과 전송 실패") }
@@ -139,6 +149,11 @@ class PersistenceQuizViewModel @Inject constructor(
     }
 
     fun exitQuiz() = navigator.navigateBack()
+
+    override fun onCleared() {
+        super.onCleared()
+        ttsManager.destroy()
+    }
 
     companion object {
         private const val DIALOG_DURATION_MS = 2000L

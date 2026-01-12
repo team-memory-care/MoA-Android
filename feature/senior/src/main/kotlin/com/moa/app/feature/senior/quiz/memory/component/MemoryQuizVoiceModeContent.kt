@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moa.app.designsystem.R
@@ -37,11 +38,13 @@ import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.core.button.MaButtonColors
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.senior.quiz.component.TopQuizDescription
+import com.moa.app.ui.extension.clickableWithoutRipple
 
 @Composable
 fun MemoryQuizVoiceModeContent(
     isSpeaking: Boolean,
     showChangeModeButton: Boolean,
+    onImageClick: () -> Unit,
     onStartSpeakingClick: () -> Unit,
     onUnableToSpeakClick: () -> Unit,
     onChangeModeClick: () -> Unit,
@@ -53,7 +56,9 @@ fun MemoryQuizVoiceModeContent(
     ) {
         TopQuizDescription(
             quizDescription = "방금 나온 단어를\n순서대로 말씀해주세요!",
-            modifier = Modifier.padding(horizontal = 20.dp)
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .clickableWithoutRipple(onClick = onImageClick, role = Role.Button)
         )
 
         VoiceInputButton(
@@ -192,6 +197,7 @@ private fun PreviewMemoryQuizVoiceModeContent() {
     MemoryQuizVoiceModeContent(
         isSpeaking = true,
         showChangeModeButton = true,
+        onImageClick = {},
         onStartSpeakingClick = {},
         onUnableToSpeakClick = {},
         onChangeModeClick = {},

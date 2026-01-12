@@ -21,6 +21,8 @@ import com.moa.app.feature.senior.quiz.memory.MemoryQuizSetState
 import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.stt.SttManager
 import com.moa.app.feature.senior.quiz.stt.SttState
+import com.moa.app.feature.senior.quiz.tts.QuizTextNormalizer
+import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -41,6 +43,7 @@ import javax.inject.Inject
 class DailyQuizViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val navigator: Navigator,
+    private val ttsManager: TtsManager,
     private val sttManager: SttManager,
     private val fetchDailyQuizzesUseCase: FetchDailyQuizzesUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
@@ -57,6 +60,28 @@ class DailyQuizViewModel @Inject constructor(
             PackageManager.PERMISSION_GRANTED -> {}
             else -> switchToTextMode()
         }
+    }
+
+    fun speakCurrentQuestion() {
+        val state = _uiState.value
+        val quiz = state.currentQuiz ?: return
+        if (state.isLoading || state.showResultDialog) return
+
+        val text = when (quiz) {
+            is PersistenceQuiz -> quiz.questionContent
+            is LinguisticQuiz -> "아래의 그림은 무엇일까요?"
+            is SpaceTimeQuiz -> "겹치는 모양을 찾아주세요!"
+            is AttentionQuiz -> QuizTextNormalizer.normalizeExpression(quiz.expression + "=")
+            is MemoryQuiz -> {
+                when (state.memoryQuizInputMode) {
+                    InputMode.VOICE -> "방금 나온 단어를 순서대로 말씀해주세요!"
+                    InputMode.TEXT -> "들었던 단어를 밑에 써주세요!"
+                }
+
+            }
+        }
+
+        ttsManager.speak(text)
     }
 
     private fun loadDailyQuizzes() {
@@ -109,7 +134,10 @@ class DailyQuizViewModel @Inject constructor(
         }
     }
 
-    fun startListening() = sttManager.startListening()
+    fun startListening() {
+        if (ttsManager.isSpeaking) ttsManager.stop()
+        sttManager.startListening()
+    }
 
     fun displayChangeModeButton() {
         _uiState.update { it.copy(isChangeModeButtonEnabled = true) }
@@ -128,9 +156,7 @@ class DailyQuizViewModel @Inject constructor(
     }
 
     fun selectAnswer(selectedAnswerIndex: Int) {
-        _uiState.update {
-            it.copy(selectedAnswerIndex = selectedAnswerIndex)
-        }
+        _uiState.update { it.copy(selectedAnswerIndex = selectedAnswerIndex) }
     }
 
     fun updateAnswer(userAnswer: String) {
@@ -148,6 +174,7 @@ class DailyQuizViewModel @Inject constructor(
     }
 
     fun checkAnswer(sttResult: String? = null) {
+        if (ttsManager.isSpeaking) ttsManager.stop()
         if (_uiState.value.isChecking) return
 
         _uiState.update { state ->
@@ -280,6 +307,9 @@ data class DailyQuizUiState(
                 is MemoryQuiz -> false
             }
         }
+
+    val isTextContinueButtonEnabled: Boolean
+        get() = memoryQuizTextAnswers.all { it.isNotBlank() }
 
     companion object {
         val INIT = DailyQuizUiState(

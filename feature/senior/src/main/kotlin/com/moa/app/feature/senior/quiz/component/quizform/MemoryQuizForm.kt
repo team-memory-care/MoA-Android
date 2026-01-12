@@ -1,10 +1,7 @@
 package com.moa.app.feature.senior.quiz.component.quizform
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.moa.app.feature.senior.quiz.memory.InputMode
 import com.moa.app.feature.senior.quiz.memory.MemoryQuizSetState
 import com.moa.app.feature.senior.quiz.memory.component.MemoryQuizPlayContent
@@ -20,8 +17,10 @@ fun MemoryQuizForm(
     isChangeModeButtonEnabled: Boolean,
     imageUrls: List<String>,
     userTextAnswers: List<String>,
+    isTextContinueButtonEnabled: Boolean,
     onStartQuizClick: () -> Unit,
     onImagesFinished: () -> Unit,
+    onImageClick: () -> Unit,
     onStartSpeakingClick: () -> Unit,
     onUnableToSpeakClick: () -> Unit,
     onChangeModeClick: () -> Unit,
@@ -48,16 +47,18 @@ fun MemoryQuizForm(
                         showChangeModeButton = isChangeModeButtonEnabled,
                         onStartSpeakingClick = onStartSpeakingClick,
                         onUnableToSpeakClick = onUnableToSpeakClick,
+                        onImageClick = onImageClick,
                         onChangeModeClick = onChangeModeClick,
                     )
                 }
 
                 InputMode.TEXT -> {
                     MemoryQuizTextModeContent(
-                        modifier = Modifier.padding(horizontal = 20.dp),
-                        onContinueClick = onContinueTextClick,
                         answers = userTextAnswers,
-                        onTextAnswerChange = onTextAnswerChange
+                        isContinueEnabled = isTextContinueButtonEnabled,
+                        onTextAnswerChange = onTextAnswerChange,
+                        onImageClick = onImageClick,
+                        onContinueClick = onContinueTextClick,
                     )
                 }
             }
@@ -75,8 +76,10 @@ private fun PreviewMemoryQuizForm() {
         isChangeModeButtonEnabled = false,
         imageUrls = listOf("", "", ""),
         userTextAnswers = listOf("", "", ""),
+        isTextContinueButtonEnabled = false,
         onStartQuizClick = {},
         onImagesFinished = {},
+        onImageClick = {},
         onStartSpeakingClick = {},
         onUnableToSpeakClick = {},
         onChangeModeClick = {},

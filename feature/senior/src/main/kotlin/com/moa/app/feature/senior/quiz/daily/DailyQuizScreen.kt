@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,7 +36,10 @@ import com.moa.app.feature.senior.quiz.component.quizform.LinguisticQuizForm
 import com.moa.app.feature.senior.quiz.component.quizform.MemoryQuizForm
 import com.moa.app.feature.senior.quiz.component.quizform.PersistenceQuizForm
 import com.moa.app.feature.senior.quiz.component.quizform.SpaceTimeQuizForm
+import com.moa.app.feature.senior.quiz.memory.MemoryQuizSetState
 import com.moa.app.ui.extension.quizMaxWidth
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 
 @Composable
 fun DailyQuizScreen(
@@ -42,6 +47,22 @@ fun DailyQuizScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     BackHandler(enabled = true, onBack = viewModel::onBackClick)
+
+    val currentQuizId = uiState.currentQuiz?.id
+    LaunchedEffect(currentQuizId) {
+        if (currentQuizId == null) return@LaunchedEffect
+
+        snapshotFlow {
+            Triple(uiState.isLoading, uiState.memoryQuizState, uiState.memoryQuizInputMode)
+        }
+            .filter { (isLoading, memoryQuizState, _) ->
+                if (isLoading) return@filter false
+                val quiz = uiState.currentQuiz
+                if (quiz is MemoryQuiz) memoryQuizState == MemoryQuizSetState.ANSWERING else true
+            }
+            .distinctUntilChanged()
+            .collect { viewModel.speakCurrentQuestion() }
+    }
 
     if (uiState.isLoading) {
         QuizLoadContent(QuizCategory.ALL)
@@ -57,6 +78,7 @@ fun DailyQuizScreen(
             onChangeModeClick = viewModel::switchToTextMode,
             onUnableToSpeakClick = viewModel::displayChangeModeButton,
             onTextAnswerChange = viewModel::updateTextAnswer,
+            onImageClick = viewModel::speakCurrentQuestion,
             onContinueClick = viewModel::checkAnswer,
             onBackClick = viewModel::exitQuiz,
         )
@@ -94,6 +116,7 @@ private fun DailyQuizContent(
     onChangeModeClick: () -> Unit,
     onUnableToSpeakClick: () -> Unit,
     onTextAnswerChange: (Int, String) -> Unit,
+    onImageClick: () -> Unit,
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
 ) {
@@ -127,6 +150,7 @@ private fun DailyQuizContent(
                                 questionContent = quiz.questionContent,
                                 answerOptions = quiz.answerOptions,
                                 selectedAnswerIndex = uiState.selectedAnswerIndex,
+                                onImageClick = onImageClick,
                                 onOptionSelected = onOptionSelected,
                             )
                         }
@@ -137,6 +161,7 @@ private fun DailyQuizContent(
                                 questionImage = quiz.questionImage,
                                 answerOptions = quiz.answerOptions,
                                 selectedAnswerIndex = uiState.selectedAnswerIndex,
+                                onImageClick = onImageClick,
                                 onOptionClick = onOptionSelected,
                             )
                         }
@@ -149,8 +174,10 @@ private fun DailyQuizContent(
                                 isChangeModeButtonEnabled = uiState.isChangeModeButtonEnabled,
                                 imageUrls = quiz.imageUrls,
                                 userTextAnswers = uiState.memoryQuizTextAnswers,
+                                isTextContinueButtonEnabled = uiState.isTextContinueButtonEnabled,
                                 onStartQuizClick = onStartQuizClick,
                                 onImagesFinished = onImagesFinished,
+                                onImageClick = onImageClick,
                                 onStartSpeakingClick = onStartSpeakingClick,
                                 onUnableToSpeakClick = onUnableToSpeakClick,
                                 onChangeModeClick = onChangeModeClick,
@@ -167,7 +194,7 @@ private fun DailyQuizContent(
                                 maxInputLength = quiz.answer.length,
                                 onInputChanged = onInputChanged,
                                 onDeleteClick = onDeleteClick,
-                                onImageClick = {},
+                                onImageClick = onImageClick,
                             )
                         }
 
@@ -177,6 +204,7 @@ private fun DailyQuizContent(
                                 questionImageUrl = quiz.questionImageUrl,
                                 imageOptionsUrl = quiz.imageOptionsUrl,
                                 selectedAnswerIndex = uiState.selectedAnswerIndex,
+                                onImageClick = onImageClick,
                                 onOptionSelected = onOptionSelected,
                             )
                         }
@@ -220,5 +248,6 @@ private fun PreviewDailyQuizContent() {
         onTextAnswerChange = { _, _ -> },
         onBackClick = {},
         onContinueClick = {},
+        onImageClick = {},
     )
 }

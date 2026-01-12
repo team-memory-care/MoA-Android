@@ -33,12 +33,13 @@ fun LinguisticQuizForm(
     questionImage: String,
     answerOptions: ImmutableList<String>,
     selectedAnswerIndex: Int?,
+    onImageClick: () -> Unit,
     onOptionClick: (Int) -> Unit,
 ) {
     Column(modifier = modifier) {
         CenterQuizDescription(
             quizDescription = "아래의 그림은\n무엇일까요?",
-            onImageClick = {},
+            onImageClick = onImageClick,
         )
 
         AsyncImage(
@@ -105,6 +106,7 @@ private fun PreviewLinguisticQuizForm() {
             questionImage = "",
             answerOptions = persistentListOf("사과", "바나나", "딸기", "책"),
             selectedAnswerIndex = null,
+            onImageClick = {},
             onOptionClick = {},
         )
     }

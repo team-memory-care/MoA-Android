@@ -26,6 +26,7 @@ import com.moa.app.ui.extension.clickableWithoutRipple
 @Composable
 fun TopQuizDescription(
     quizDescription: String,
+    onImageClick: () -> Unit= {},
     modifier: Modifier = Modifier,
     alignImageEnd: Boolean = false,
 ) {
@@ -53,6 +54,7 @@ fun TopQuizDescription(
             modifier = Modifier
                 .padding(start = 44.dp)
                 .align(alignment = alignment)
+                .clickableWithoutRipple(onClick = onImageClick, role = Role.Button)
         )
     }
 }

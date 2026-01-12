@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +39,8 @@ import com.moa.app.feature.senior.quiz.linguistic.model.LinguisticQuizUiState
 import com.moa.app.ui.extension.quizMaxWidth
 import com.moa.app.ui.preview.FoldablePreviews
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun LinguisticQuizScreen(
@@ -45,12 +49,24 @@ fun LinguisticQuizScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     BackHandler(enabled = true, onBack = viewModel::onBackClick)
 
+    val currentQuizId = uiState.currentQuiz?.id
+    LaunchedEffect(currentQuizId) {
+        if (currentQuizId == null) return@LaunchedEffect
+
+        snapshotFlow { uiState.isLoading }
+            .filter { isLoading -> !isLoading }
+            .first()
+
+        viewModel.speakCurrentQuestion()
+    }
+
     if (uiState.isLoading && uiState.quizzes.isEmpty()) {
         QuizLoadContent(QuizCategory.LINGUISTIC)
     } else {
         LinguisticQuizContent(
             uiState = uiState,
             onOptionClick = viewModel::selectAnswer,
+            onImageClick = viewModel::speakCurrentQuestion,
             onContinueClick = viewModel::checkAnswer,
             onBackClick = viewModel::onBackClick,
         )
@@ -79,6 +95,7 @@ fun LinguisticQuizScreen(
 private fun LinguisticQuizContent(
     uiState: LinguisticQuizUiState,
     onOptionClick: (Int) -> Unit,
+    onImageClick: () -> Unit,
     onContinueClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -108,6 +125,7 @@ private fun LinguisticQuizContent(
                         questionImage = question.questionImage,
                         answerOptions = question.answerOptions,
                         selectedAnswerIndex = uiState.selectedAnswerIndex,
+                        onImageClick = onImageClick,
                         onOptionClick = onOptionClick,
                     )
                 }
@@ -115,7 +133,7 @@ private fun LinguisticQuizContent(
 
             MaButton(
                 onClick = onContinueClick,
-                enabled = true,
+                enabled = uiState.isContinueButtonEnabled,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
@@ -154,6 +172,7 @@ private fun Preview() {
                     ),
                 ),
             ),
+            onImageClick = {},
             onOptionClick = {},
             onContinueClick = {},
             onBackClick = {},

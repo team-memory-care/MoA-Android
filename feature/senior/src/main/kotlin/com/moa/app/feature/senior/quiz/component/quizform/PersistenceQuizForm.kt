@@ -22,11 +22,13 @@ fun PersistenceQuizForm(
     answerOptions: ImmutableList<String>,
     selectedAnswerIndex: Int?,
     onOptionSelected: (Int) -> Unit,
+    onImageClick: () -> Unit,
 ) {
     Column(modifier = modifier) {
         TopQuizDescription(
             quizDescription = questionContent,
             alignImageEnd = true,
+            onImageClick = onImageClick,
         )
 
         answerOptions.forEachIndexed { index, option ->
@@ -60,6 +62,7 @@ private fun PreviewPersistenceQuizForm() {
         questionContent = "오늘은 몇 년도인가요?",
         answerOptions = persistentListOf("2025년", "2022년", "2020년"),
         selectedAnswerIndex = null,
+        onImageClick = {},
         onOptionSelected = {},
     )
 }

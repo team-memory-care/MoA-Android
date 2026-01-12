@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +32,8 @@ import com.moa.app.feature.senior.quiz.component.quizform.AttentionQuizForm
 import com.moa.app.ui.extension.quizMaxWidth
 import com.moa.app.ui.preview.FoldablePreviews
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun AttentionQuizScreen(
@@ -38,11 +42,23 @@ fun AttentionQuizScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     BackHandler(enabled = true, onBack = viewModel::onBackClick)
 
+    val currentQuizId = uiState.currentQuiz?.id
+    LaunchedEffect(currentQuizId) {
+        if (currentQuizId == null) return@LaunchedEffect
+
+        snapshotFlow { uiState.isLoading }
+            .filter { isLoading -> !isLoading }
+            .first()
+
+        viewModel.speakCurrentQuestion()
+    }
+
     if (uiState.isLoading && uiState.quizzes.isEmpty()) {
         QuizLoadContent(QuizCategory.ATTENTION)
     } else {
         AttentionQuizContent(
             uiState = uiState,
+            onImageClick = viewModel::speakCurrentQuestion,
             onInputChanged = viewModel::updateUserInput,
             onInputClear = viewModel::clearUserInput,
             onContinueClick = viewModel::checkAnswer,
@@ -72,6 +88,7 @@ fun AttentionQuizScreen(
 @Composable
 private fun AttentionQuizContent(
     uiState: AttentionQuizUiState,
+    onImageClick: () -> Unit,
     onInputChanged: (String) -> Unit,
     onInputClear: () -> Unit,
     onContinueClick: () -> Unit,
@@ -104,7 +121,7 @@ private fun AttentionQuizContent(
                         input = uiState.userAnswer,
                         maxInputLength = question.answer.length,
                         onInputChanged = onInputChanged,
-                        onImageClick = {},
+                        onImageClick = onImageClick,
                         onDeleteClick = onInputClear,
                     )
                 }
@@ -143,6 +160,7 @@ private fun Preview() {
                 ),
             ),
         ),
+        onImageClick = {},
         onInputChanged = {},
         onInputClear = {},
         onContinueClick = {},
