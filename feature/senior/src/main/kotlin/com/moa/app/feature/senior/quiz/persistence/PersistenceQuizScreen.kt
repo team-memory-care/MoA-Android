@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,8 @@ import com.moa.app.feature.senior.quiz.component.QuizLoadContent
 import com.moa.app.feature.senior.quiz.component.QuizResultDialog
 import com.moa.app.feature.senior.quiz.component.QuizSlideAnimation
 import com.moa.app.feature.senior.quiz.component.quizform.PersistenceQuizForm
+import com.moa.app.ui.extension.quizMaxWidth
+import com.moa.app.ui.preview.FoldablePreviews
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -71,9 +74,7 @@ private fun PersistenceQuizContent(
     onContinueClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
         MaStepProgressTopAppBar(
             title = "지남력 퀴즈",
             onBackClick = onBackClick,
@@ -83,68 +84,49 @@ private fun PersistenceQuizContent(
 
         Spacer(modifier = Modifier.height(28.dp))
 
-        uiState.currentQuiz?.let { targetQuiz ->
-            QuizSlideAnimation(
-                targetState = targetQuiz,
-                modifier = Modifier.weight(1f),
-            ) { question ->
-                PersistenceQuizForm(
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                    questionContent = question.questionContent,
-                    answerOptions = question.answerOptions,
-                    selectedAnswerIndex = uiState.selectedAnswerIndex,
-                    onOptionSelected = onOptionSelected,
+        Column(
+            modifier = Modifier
+                .quizMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 12.dp)
+                .align(Alignment.CenterHorizontally),
+        ) {
+            uiState.currentQuiz?.let { targetQuiz ->
+                QuizSlideAnimation(
+                    targetState = targetQuiz,
+                    modifier = Modifier.weight(1f)
+                ) { question ->
+                    PersistenceQuizForm(
+                        questionContent = question.questionContent,
+                        answerOptions = question.answerOptions,
+                        selectedAnswerIndex = uiState.selectedAnswerIndex,
+                        onOptionSelected = onOptionSelected,
+                    )
+                }
+            }
+
+            MaButton(
+                onClick = onContinueClick,
+                enabled = uiState.isContinueButtonEnabled,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = "계속",
+                    style = MoaTheme.typography.body1Bold,
+                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
                 )
             }
-        }
-
-        MaButton(
-            onClick = onContinueClick,
-            enabled = uiState.isContinueButtonEnabled,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 12.dp),
-        ) {
-            Text(
-                text = "계속",
-                style = MoaTheme.typography.body1Bold,
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
-            )
         }
     }
 }
 
 @Preview(showBackground = true)
+@FoldablePreviews
 @Composable
 private fun Preview() {
     PersistenceQuizContent(
         uiState = PersistenceQuizUiState.INIT.copy(
             quizzes = persistentListOf(
-                PersistenceQuiz(
-                    id = 1,
-                    type = QuizCategory.PERSISTENCE,
-                    questionFormat = "",
-                    questionContent = "오늘은 몇 년도인가요?",
-                    answer = "2025년",
-                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
-                ),
-                PersistenceQuiz(
-                    id = 1,
-                    type = QuizCategory.PERSISTENCE,
-                    questionFormat = "",
-                    questionContent = "오늘은 몇 년도인가요?",
-                    answer = "2025년",
-                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
-                ),
-                PersistenceQuiz(
-                    id = 1,
-                    type = QuizCategory.PERSISTENCE,
-                    questionFormat = "",
-                    questionContent = "오늘은 몇 년도인가요?",
-                    answer = "2025년",
-                    answerOptions = persistentListOf("2025년", "2022년", "2020년"),
-                ),
                 PersistenceQuiz(
                     id = 1,
                     type = QuizCategory.PERSISTENCE,

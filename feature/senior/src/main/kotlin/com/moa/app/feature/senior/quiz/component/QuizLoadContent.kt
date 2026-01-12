@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +27,8 @@ import com.moa.app.feature.senior.quiz.category.model.loadBackgroundColor
 import com.moa.app.feature.senior.quiz.category.model.loadDescription
 import com.moa.app.feature.senior.quiz.category.model.loadReadyColor
 import com.moa.app.feature.senior.quiz.category.model.loadTitleColor
+import com.moa.app.ui.extension.quizMaxWidth
+import com.moa.app.ui.preview.FoldablePreviews
 
 @Composable
 fun QuizLoadContent(
@@ -35,13 +39,17 @@ fun QuizLoadContent(
         Image(
             painter = painterResource(com.moa.app.designsystem.R.drawable.img_load_quiz),
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
                 .background(category.loadBackgroundColor)
         )
 
         Column(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier
+                .quizMaxWidth()
+                .fillMaxSize()
+                .align(Alignment.Center),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -55,10 +63,8 @@ fun QuizLoadContent(
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
-                    .background(
-                        color = MoaTheme.colors.white,
-                        shape = RoundedCornerShape(32.dp),
-                    )
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(MoaTheme.colors.white)
                     .padding(vertical = 26.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -81,6 +87,7 @@ fun QuizLoadContent(
 }
 
 @Preview
+@FoldablePreviews
 @Composable
 private fun Preview() {
     QuizLoadContent(

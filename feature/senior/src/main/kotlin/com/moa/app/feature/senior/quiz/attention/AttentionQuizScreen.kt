@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -19,12 +20,16 @@ import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.product.dialog.MaAlertDialog
 import com.moa.app.designsystem.component.product.topbar.MaStepProgressTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.domain.quiz.model.AttentionQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.feature.senior.quiz.attention.model.AttentionQuizUiState
 import com.moa.app.feature.senior.quiz.component.QuizLoadContent
 import com.moa.app.feature.senior.quiz.component.QuizResultDialog
 import com.moa.app.feature.senior.quiz.component.QuizSlideAnimation
 import com.moa.app.feature.senior.quiz.component.quizform.AttentionQuizForm
+import com.moa.app.ui.extension.quizMaxWidth
+import com.moa.app.ui.preview.FoldablePreviews
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun AttentionQuizScreen(
@@ -72,9 +77,7 @@ private fun AttentionQuizContent(
     onContinueClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
         MaStepProgressTopAppBar(
             title = "주의력/계산 퀴즈",
             onBackClick = onBackClick,
@@ -84,47 +87,65 @@ private fun AttentionQuizContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        uiState.currentQuiz?.let { targetQuiz ->
-            QuizSlideAnimation(
-                targetState = targetQuiz,
-                modifier = Modifier.weight(1f),
-            ) { question ->
-                AttentionQuizForm(
-                    question = question.expression,
-                    input = uiState.userAnswer,
-                    maxInputLength = question.answer.length,
-                    onInputChanged = onInputChanged,
-                    onImageClick = {},
-                    onDeleteClick = onInputClear,
+        Column(
+            modifier = Modifier
+                .quizMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 12.dp)
+                .align(Alignment.CenterHorizontally),
+        ) {
+            uiState.currentQuiz?.let { targetQuiz ->
+                QuizSlideAnimation(
+                    targetState = targetQuiz,
+                    modifier = Modifier.weight(1f),
+                ) { question ->
+                    AttentionQuizForm(
+                        question = question.expression,
+                        input = uiState.userAnswer,
+                        maxInputLength = question.answer.length,
+                        onInputChanged = onInputChanged,
+                        onImageClick = {},
+                        onDeleteClick = onInputClear,
+                    )
+                }
+            }
+
+            MaButton(
+                onClick = onContinueClick,
+                enabled = uiState.isContinueButtonEnabled,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "계속",
+                    style = MoaTheme.typography.body1Bold,
+                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
                 )
             }
-        }
-
-        MaButton(
-            onClick = onContinueClick,
-            enabled = uiState.isContinueButtonEnabled,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 12.dp),
-        ) {
-            Text(
-                text = "계속",
-                style = MoaTheme.typography.body1Bold,
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
-            )
         }
     }
 }
 
+@FoldablePreviews
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
     AttentionQuizContent(
-        uiState = AttentionQuizUiState.INIT,
+        uiState = AttentionQuizUiState.INIT.copy(
+            quizzes = persistentListOf(
+                AttentionQuiz(
+                    id = 1,
+                    type = QuizCategory.ATTENTION,
+                    questionFormat = "",
+                    questionContent = "",
+                    answer = "",
+                    expression = "1 + 1",
+                    inputType = "",
+                ),
+            ),
+        ),
         onInputChanged = {},
         onInputClear = {},
         onContinueClick = {},
-        onBackClick = {}
+        onBackClick = {},
     )
 }

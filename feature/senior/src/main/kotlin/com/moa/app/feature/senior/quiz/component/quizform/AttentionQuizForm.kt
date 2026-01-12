@@ -35,7 +35,6 @@ fun AttentionQuizForm(
             onInputChanged = onInputChanged,
             onDeleteClick = onDeleteClick,
             maxInputLength = maxInputLength,
-            modifier = Modifier.padding(horizontal = 20.dp)
         )
     }
 }

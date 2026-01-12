@@ -26,13 +26,16 @@ import com.moa.app.ui.extension.clickableWithoutRipple
 @Composable
 fun TopQuizDescription(
     quizDescription: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    alignImageEnd: Boolean = false,
 ) {
+    val alignment = if (alignImageEnd) Alignment.End else Alignment.Start
     Column(modifier = modifier) {
         Box(
             contentAlignment = Alignment.CenterStart,
             modifier = Modifier
                 .fillMaxWidth()
+                .defaultMinSize(minHeight = 104.dp)
                 .clip(RoundedCornerShape(32.dp))
                 .background(MoaTheme.colors.coolGray98)
                 .padding(vertical = 24.dp, horizontal = 32.dp),
@@ -40,7 +43,7 @@ fun TopQuizDescription(
             Text(
                 text = quizDescription,
                 color = MoaTheme.colors.black,
-                style = MoaTheme.typography.title2Semibold,
+                style = MoaTheme.typography.title2Semibold
             )
         }
 
@@ -49,7 +52,7 @@ fun TopQuizDescription(
             contentDescription = null,
             modifier = Modifier
                 .padding(start = 44.dp)
-                .align(alignment = Alignment.Start)
+                .align(alignment = alignment)
         )
     }
 }
@@ -61,7 +64,7 @@ fun CenterQuizDescription(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.defaultMinSize(minHeight = 120.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
@@ -75,6 +78,7 @@ fun CenterQuizDescription(
             contentAlignment = Alignment.CenterStart,
             modifier = Modifier
                 .weight(1f)
+                .defaultMinSize(minHeight = 120.dp)
                 .padding(vertical = 12.dp)
                 .clip(RoundedCornerShape(32.dp))
                 .background(color = MoaTheme.colors.coolGray98)
