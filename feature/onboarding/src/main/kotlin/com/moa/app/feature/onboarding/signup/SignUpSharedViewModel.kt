@@ -75,18 +75,22 @@ class SignUpSharedViewModel @Inject constructor(
 
     fun requestPhoneAuthCode() {
         viewModelScope.launch {
-            phoneAuthCodeUseCase(
-                phoneNumber = _signUpPhoneAuthUiState.value.phoneNumber,
-            ).fold(
+            if (_signUpPhoneAuthUiState.value.isLoading) return@launch
+            _signUpPhoneAuthUiState.update { it.copy(isLoading = true) }
+            phoneAuthCodeUseCase(phoneNumber = _signUpPhoneAuthUiState.value.phoneNumber).fold(
                 onSuccess = {
-                    _signUpPhoneAuthUiState.update { it.copy(isAuthCodeRequested = true) }
+                    _signUpPhoneAuthUiState.update { it.copy(isLoading = false, isAuthCodeRequested = true) }
                     _signUpPhoneAuthSideEffect.emit(SignUpPhoneAuthSideEffect.FocusOnAuthCodeField)
                 },
                 onFailure = { error ->
+                    Timber.e("requestPhoneAuthCode error: $error")
                     _signUpPhoneAuthUiState.update {
-                        it.copy(isPhoneNumberError = true, phoneNumberErrorMessage = error.message)
+                        it.copy(
+                            isLoading = false,
+                            isPhoneNumberError = true,
+                            phoneNumberErrorMessage = "인증번호 요청에 실패했습니다.",
+                        )
                     }
-                    Timber.tag("SignUpSharedViewModel").e("requestAuthCode: $error")
                 },
             )
         }
@@ -94,7 +98,9 @@ class SignUpSharedViewModel @Inject constructor(
 
     fun signUp() {
         viewModelScope.launch {
+            if (_signUpPhoneAuthUiState.value.isLoading) return@launch
             val gender = _signUpUserProfileUiState.value.gender ?: return@launch
+            _signUpPhoneAuthUiState.update { it.copy(isLoading = true) }
             signUpUseCase(
                 userProfile = UserProfile(
                     name = _signUpUserProfileUiState.value.name,
@@ -107,7 +113,11 @@ class SignUpSharedViewModel @Inject constructor(
                 onSuccess = { navigateToComplete() },
                 onFailure = { error ->
                     _signUpPhoneAuthUiState.update {
-                        it.copy(isAuthCodeError = true, authCodeErrorMessage = error.message)
+                        it.copy(
+                            isLoading = false,
+                            isAuthCodeError = true,
+                            authCodeErrorMessage = "인증번호가 일치하지 않아요.\n다시 확인해주세요."
+                        )
                     }
                 },
             )

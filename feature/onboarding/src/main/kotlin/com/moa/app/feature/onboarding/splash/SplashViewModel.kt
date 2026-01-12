@@ -58,7 +58,8 @@ class SplashViewModel @Inject constructor(
             route = route,
             options = NavigationOptions(
                 popUpTo = AppRoute.Splash,
-                inclusive = true
+                inclusive = true,
+                clearBackStack = true
             )
         )
     }

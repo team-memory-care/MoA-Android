@@ -113,7 +113,7 @@ private fun SignUpPhoneAuthScreenContent(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     placeholder = {
                         Text(
-                            text = "예) 010-1234-5678",
+                            text = "예) 01012345678",
                             color = MoaTheme.colors.coolGray60,
                             style = MoaTheme.typography.body1Medium,
                         )
@@ -121,7 +121,6 @@ private fun SignUpPhoneAuthScreenContent(
                     trailingContent = {
                         MaButton(
                             onClick = onAuthCodeRequestClick,
-                            enabled = !uiState.isAuthCodeRequested,
                             colors = MaButtonDefaults.maBlackButtonColors(),
                             shape = RoundedCornerShape(8.dp)
                         ) {
