@@ -9,6 +9,7 @@ import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.linguistic.model.LinguisticQuizUiState
 import com.moa.app.feature.senior.quiz.model.QuizResult
+import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -26,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LinguisticQuizViewModel @Inject constructor(
     private val navigator: Navigator,
+    private val ttsManager: TtsManager,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
 ) : ViewModel() {
@@ -35,6 +37,11 @@ class LinguisticQuizViewModel @Inject constructor(
 
     init {
         loadLinguisticQuizzes()
+    }
+
+    fun speakCurrentQuestion() {
+        if (_uiState.value.currentQuiz == null) return
+        ttsManager.speak("아래의 그림은 무엇일까요?")
     }
 
     private fun loadLinguisticQuizzes() {
@@ -69,6 +76,7 @@ class LinguisticQuizViewModel @Inject constructor(
     }
 
     fun checkAnswer() {
+        if (ttsManager.isSpeaking) ttsManager.stop()
         _uiState.update { state ->
             val selectedAnswerIndex = state.selectedAnswerIndex ?: return@update state
             val quiz = state.currentQuiz ?: return@update state
@@ -135,5 +143,10 @@ class LinguisticQuizViewModel @Inject constructor(
     }
 
     fun exitQuiz() = navigator.navigateBack()
+
+    override fun onCleared() {
+        super.onCleared()
+        ttsManager.destroy()
+    }
 
 }
