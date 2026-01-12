@@ -1,6 +1,5 @@
 package com.moa.app.feature.onboarding.signin
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.auth.model.UserRole
@@ -30,7 +29,7 @@ class SignInViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<SignInUiState> = MutableStateFlow(SignInUiState.init)
+    private val _uiState = MutableStateFlow(SignInUiState.init)
     val uiState: StateFlow<SignInUiState> = _uiState.asStateFlow()
 
     private val _sideEffect: MutableSharedFlow<SignInSideEffect> = MutableSharedFlow()
@@ -46,41 +45,45 @@ class SignInViewModel @Inject constructor(
 
     fun requestAuthCode() {
         viewModelScope.launch {
-            phoneAuthCodeUseCase(phoneNumber = _uiState.value.phoneNumber, isUserRegistered = true)
-                .fold(
-                    onSuccess = {
-                        _uiState.update { it.copy(isAuthCodeRequested = true) }
-                        _sideEffect.emit(SignInSideEffect.FocusOnAuthCodeField)
-                    },
-                    onFailure = { error ->
-                        _uiState.update {
-                            it.copy(
-                                isPhoneNumberError = true,
-                                phoneNumberErrorMessage = "인증번호 요청에 실패했습니다.",
-                            )
-                        }
-                        Timber.tag("SignInViewModel").e("requestAuthCode: $error")
-                    },
-                )
+            if (_uiState.value.isLoading) return@launch
+            _uiState.update { it.copy(isLoading = true) }
+            phoneAuthCodeUseCase(
+                phoneNumber = _uiState.value.phoneNumber,
+                isUserRegistered = true,
+            ).fold(
+                onSuccess = {
+                    _uiState.update { it.copy(isLoading = false, isAuthCodeRequested = true) }
+                    _sideEffect.emit(SignInSideEffect.FocusOnAuthCodeField)
+                },
+                onFailure = { error ->
+                    Timber.e("requestAuthCode: $error")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isPhoneNumberError = true,
+                            phoneNumberErrorMessage = "인증번호 요청에 실패했습니다.",
+                        )
+                    }
+                },
+            )
         }
     }
 
     fun signIn() {
         viewModelScope.launch {
+            if (_uiState.value.isLoading) return@launch
             val phoneNumber = _uiState.value.phoneNumber
             val authCode = _uiState.value.authCode
             signInUseCase(phoneNumber, authCode).fold(
-                onSuccess = { userRole ->
-                    handleNavigationForRole(userRole)
-                },
-                onFailure = { t ->
+                onSuccess = { userRole -> handleNavigationForRole(userRole) },
+                onFailure = { error ->
+                    Timber.e("signIn: $error")
                     _uiState.update {
                         it.copy(
                             isAuthCodeError = true,
                             authCodeErrorMessage = "인증번호가 일치하지 않아요.\n다시 확인해주세요.",
                         )
                     }
-                    Timber.tag("SignInViewModel").e("signIn: $t")
                 },
             )
         }
@@ -89,7 +92,7 @@ class SignInViewModel @Inject constructor(
     private fun handleNavigationForRole(userRole: UserRole) {
         when (userRole) {
             UserRole.PARENT -> navigateToRoute(AppRoute.SeniorHome)
-            UserRole.CHILD -> {}
+            UserRole.CHILD -> navigateToRoute(AppRoute.GuardianHome)
             UserRole.PENDING -> navigateToRoute(AppRoute.SelectUserRole)
             else -> {}
         }
