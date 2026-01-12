@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +28,8 @@ import com.moa.app.feature.senior.quiz.memory.component.MemoryQuizTextModeConten
 import com.moa.app.feature.senior.quiz.memory.component.MemoryQuizVoiceModeContent
 import com.moa.app.ui.extension.quizMaxWidth
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 
 @Composable
 fun MemoryQuizScreen(
@@ -34,19 +38,33 @@ fun MemoryQuizScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     BackHandler(enabled = true, onBack = viewModel::onBackClick)
 
+    val currentQuizId = uiState.currentQuiz?.id
+    LaunchedEffect(currentQuizId) {
+        if (currentQuizId == null) return@LaunchedEffect
+        snapshotFlow {
+            Triple(uiState.quizState, uiState.inputMode, uiState.isLoading)
+        }
+            .filter { (quizState, _, isLoading) ->
+                quizState == MemoryQuizSetState.ANSWERING && !isLoading
+            }
+            .distinctUntilChanged()
+            .collect { viewModel.speakCurrentQuestion() }
+    }
+
     if (uiState.isLoading && uiState.quizzes.isEmpty()) {
         QuizLoadContent(QuizCategory.MEMORY)
     } else {
         MemoryQuizContent(
             uiState = uiState,
             onStartQuizClick = viewModel::displayQuizImages,
+            onImagesFinished = viewModel::onImagesFinished,
             onStartSpeakingClick = viewModel::startListening,
             onChangeModeClick = viewModel::switchToTextMode,
             onUnableToSpeakClick = viewModel::displayChangeModeButton,
             onContinueTextClick = viewModel::checkTextAnswer,
             onTextAnswerChange = viewModel::updateTextAnswer,
+            onImageClick = viewModel::speakCurrentQuestion,
             onBackClick = viewModel::onBackClick,
-            onImagesFinished = viewModel::onImagesFinished,
         )
     }
 
@@ -74,12 +92,13 @@ private fun MemoryQuizContent(
     uiState: MemoryQuizUiState,
     modifier: Modifier = Modifier,
     onStartQuizClick: () -> Unit,
+    onImagesFinished: () -> Unit,
     onStartSpeakingClick: () -> Unit,
     onChangeModeClick: () -> Unit,
     onUnableToSpeakClick: () -> Unit,
     onTextAnswerChange: (Int, String) -> Unit,
     onContinueTextClick: () -> Unit,
-    onImagesFinished: () -> Unit,
+    onImageClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     Column(
@@ -122,6 +141,7 @@ private fun MemoryQuizContent(
                                     MemoryQuizVoiceModeContent(
                                         isSpeaking = uiState.isSpeaking,
                                         showChangeModeButton = uiState.isChangeModeButtonEnabled,
+                                        onImageClick = onImageClick,
                                         onStartSpeakingClick = onStartSpeakingClick,
                                         onUnableToSpeakClick = onUnableToSpeakClick,
                                         onChangeModeClick = onChangeModeClick,
@@ -130,9 +150,11 @@ private fun MemoryQuizContent(
 
                                 InputMode.TEXT -> {
                                     MemoryQuizTextModeContent(
-                                        onContinueClick = onContinueTextClick,
+                                        onImageClick = onImageClick,
                                         answers = uiState.userTextAnswers,
+                                        isContinueEnabled = uiState.isTextContinueButtonEnabled,
                                         onTextAnswerChange = onTextAnswerChange,
+                                        onContinueClick = onContinueTextClick,
                                     )
                                 }
                             }
@@ -169,5 +191,6 @@ private fun MemoryQuizContentPreview() {
         onTextAnswerChange = { _, _ -> },
         onBackClick = {},
         onImagesFinished = {},
+        onImageClick = {},
     )
 }

@@ -48,6 +48,7 @@ fun MemoryQuizForm(
                         showChangeModeButton = isChangeModeButtonEnabled,
                         onStartSpeakingClick = onStartSpeakingClick,
                         onUnableToSpeakClick = onUnableToSpeakClick,
+                        onImageClick = {},
                         onChangeModeClick = onChangeModeClick,
                     )
                 }
@@ -55,9 +56,11 @@ fun MemoryQuizForm(
                 InputMode.TEXT -> {
                     MemoryQuizTextModeContent(
                         modifier = Modifier.padding(horizontal = 20.dp),
-                        onContinueClick = onContinueTextClick,
                         answers = userTextAnswers,
-                        onTextAnswerChange = onTextAnswerChange
+                        isContinueEnabled = true,
+                        onTextAnswerChange = onTextAnswerChange,
+                        onImageClick = {},
+                        onContinueClick = onContinueTextClick,
                     )
                 }
             }

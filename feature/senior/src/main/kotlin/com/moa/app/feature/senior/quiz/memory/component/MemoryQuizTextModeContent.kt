@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,6 +27,8 @@ import com.moa.app.feature.senior.quiz.component.CenterQuizDescription
 fun MemoryQuizTextModeContent(
     modifier: Modifier = Modifier,
     answers: List<String>,
+    isContinueEnabled: Boolean,
+    onImageClick: () -> Unit,
     onTextAnswerChange: (Int, String) -> Unit,
     onContinueClick: () -> Unit,
 ) {
@@ -40,9 +41,8 @@ fun MemoryQuizTextModeContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CenterQuizDescription(
-            modifier = Modifier.height(120.dp),
             quizDescription = "들었던 단어를\n밑에 써주세요!",
-            onImageClick = {},
+            onImageClick = onImageClick,
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -76,7 +76,7 @@ fun MemoryQuizTextModeContent(
 
         MaButton(
             onClick = onContinueClick,
-            enabled = true,
+            enabled = isContinueEnabled,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
@@ -95,6 +95,8 @@ fun MemoryQuizTextModeContent(
 private fun PreviewMemoryQuizTextModeContent() {
     MemoryQuizTextModeContent(
         answers = listOf("", "", ""),
+        isContinueEnabled = true,
+        onImageClick = {},
         onTextAnswerChange = { _, _ -> },
         onContinueClick = {},
     )
