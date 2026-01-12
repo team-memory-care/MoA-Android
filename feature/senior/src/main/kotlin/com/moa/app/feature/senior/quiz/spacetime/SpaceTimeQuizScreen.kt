@@ -148,7 +148,7 @@ private fun Preview() {
                         id = 1,
                         questionImageUrl = "",
                         imageOptionsUrl = persistentListOf("", ""),
-                        type = QuizCategory.ATTENTION,
+                        type = QuizCategory.SPACETIME,
                         questionFormat = "",
                         questionContent = "",
                         answer = "",
