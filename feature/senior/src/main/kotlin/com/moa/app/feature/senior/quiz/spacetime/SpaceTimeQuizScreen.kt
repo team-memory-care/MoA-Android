@@ -1,9 +1,7 @@
 package com.moa.app.feature.senior.quiz.spacetime
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,27 +9,34 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
+import coil3.annotation.ExperimentalCoilApi
+import coil3.asImage
+import coil3.compose.AsyncImagePreviewHandler
+import coil3.compose.LocalAsyncImagePreviewHandler
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaButton
-import com.moa.app.designsystem.component.core.button.MaQuizButton
-import com.moa.app.designsystem.component.core.button.QuizButtonState
 import com.moa.app.designsystem.component.product.dialog.MaAlertDialog
 import com.moa.app.designsystem.component.product.topbar.MaStepProgressTopAppBar
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.domain.quiz.model.QuizCategory
-import com.moa.app.feature.senior.quiz.component.CenterQuizDescription
+import com.moa.app.domain.quiz.model.SpaceTimeQuiz
 import com.moa.app.feature.senior.quiz.component.QuizLoadContent
 import com.moa.app.feature.senior.quiz.component.QuizResultDialog
 import com.moa.app.feature.senior.quiz.component.QuizSlideAnimation
+import com.moa.app.feature.senior.quiz.component.quizform.SpaceTimeQuizForm
 import com.moa.app.feature.senior.quiz.spacetime.model.SpaceTimeQuizUiState
+import com.moa.app.ui.extension.quizMaxWidth
+import com.moa.app.ui.preview.FoldablePreviews
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SpaceTimeQuizScreen(
@@ -89,81 +94,70 @@ private fun SpaceTimeQuizContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        uiState.currentQuiz?.let { targetQuiz ->
-            QuizSlideAnimation(
-                targetState = targetQuiz,
-                modifier = Modifier.weight(1f),
-            ) { question ->
-                Column(
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                ) {
-                    CenterQuizDescription(
-                        quizDescription = "겹치는 모양을\n찾아주세요!",
-                        onImageClick = {},
-                        modifier = Modifier.height(120.dp),
+        Column(
+            modifier = Modifier
+                .quizMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 12.dp)
+                .align(Alignment.CenterHorizontally),
+        ) {
+            uiState.currentQuiz?.let { targetQuiz ->
+                QuizSlideAnimation(
+                    targetState = targetQuiz,
+                    modifier = Modifier.weight(1f),
+                ) { question ->
+                    SpaceTimeQuizForm(
+                        questionImageUrl = question.questionImageUrl,
+                        imageOptionsUrl = question.imageOptionsUrl,
+                        selectedAnswerIndex = uiState.selectedAnswerIndex,
+                        onOptionSelected = onOptionSelected
                     )
-
-                    AsyncImage(
-                        model = question.questionImageUrl,
-                        placeholder = painterResource(R.drawable.img_default_card_2),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Row(
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        question.imageOptionsUrl.forEachIndexed { index, option ->
-                            val buttonState = when (uiState.selectedAnswerIndex) {
-                                null -> QuizButtonState.DEFAULT
-                                index -> QuizButtonState.SELECTED
-                                else -> QuizButtonState.UNSELECTED
-                            }
-
-                            MaQuizButton(
-                                onClick = { onOptionSelected(index) },
-                                state = buttonState,
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                AsyncImage(
-                                    model = option,
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(vertical = 16.dp)
-                                )
-                            }
-                        }
-                    }
                 }
             }
-        }
 
-        MaButton(
-            onClick = onContinueClick,
-            enabled = uiState.isContinueButtonEnabled,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 12.dp),
-        ) {
-            Text(
-                text = "계속",
-                style = MoaTheme.typography.body1Bold,
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
-            )
+            MaButton(
+                onClick = onContinueClick,
+                enabled = uiState.isContinueButtonEnabled,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "계속",
+                    style = MoaTheme.typography.body1Bold,
+                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
+                )
+            }
         }
     }
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Preview(showBackground = true)
+@FoldablePreviews
 @Composable
 private fun Preview() {
-    SpaceTimeQuizContent(
-        uiState = SpaceTimeQuizUiState.INIT,
-        onOptionSelected = {},
-        onContinueClick = {},
-        onBackClick = {}
-    )
+    val previewHandler = AsyncImagePreviewHandler { request ->
+        val drawable = ContextCompat.getDrawable(request.context, R.drawable.img_default_card)!!
+        drawable.asImage()
+    }
+
+    CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) {
+        SpaceTimeQuizContent(
+            uiState = SpaceTimeQuizUiState.INIT.copy(
+                quizzes = persistentListOf(
+                    SpaceTimeQuiz(
+                        id = 1,
+                        questionImageUrl = "",
+                        imageOptionsUrl = persistentListOf("", ""),
+                        type = QuizCategory.SPACETIME,
+                        questionFormat = "",
+                        questionContent = "",
+                        answer = "",
+                    )
+                )
+            ),
+            onOptionSelected = {},
+            onContinueClick = {},
+            onBackClick = {}
+        )
+    }
 }

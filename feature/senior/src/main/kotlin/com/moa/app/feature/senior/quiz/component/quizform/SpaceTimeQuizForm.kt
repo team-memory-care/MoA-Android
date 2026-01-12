@@ -8,11 +8,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import coil3.annotation.ExperimentalCoilApi
+import coil3.asImage
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePreviewHandler
+import coil3.compose.LocalAsyncImagePreviewHandler
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaQuizButton
 import com.moa.app.designsystem.component.core.button.QuizButtonState
@@ -28,9 +34,7 @@ fun SpaceTimeQuizForm(
     selectedAnswerIndex: Int?,
     onOptionSelected: (Int) -> Unit,
 ) {
-    Column(
-        modifier = modifier.padding(horizontal = 20.dp),
-    ) {
+    Column(modifier = modifier) {
         CenterQuizDescription(
             quizDescription = "겹치는 모양을\n찾아주세요!",
             onImageClick = {},
@@ -73,13 +77,21 @@ fun SpaceTimeQuizForm(
     }
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun PreviewSpaceTimeQuizForm() {
-    SpaceTimeQuizForm(
-        questionImageUrl = "",
-        imageOptionsUrl = persistentListOf(),
-        selectedAnswerIndex = null,
-        onOptionSelected = {},
-    )
+    val previewHandler = AsyncImagePreviewHandler { request ->
+        val drawable = ContextCompat.getDrawable(request.context, R.drawable.img_default_card)!!
+        drawable.asImage()
+    }
+
+    CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) {
+        SpaceTimeQuizForm(
+            questionImageUrl = "",
+            imageOptionsUrl = persistentListOf("", ""),
+            selectedAnswerIndex = null,
+            onOptionSelected = {},
+        )
+    }
 }

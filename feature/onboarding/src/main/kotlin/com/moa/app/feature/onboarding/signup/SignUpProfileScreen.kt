@@ -222,24 +222,24 @@ private fun SignUpProfileScreenContent(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 MaSelectButton(
-                    onClick = onSelectedFemale,
-                    selected = uiState.isGenderFemale,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(
-                        text = Gender.FEMALE.displayText,
-                        style = MoaTheme.typography.body1Medium,
-                        modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
-                    )
-                }
-
-                MaSelectButton(
                     onClick = onSelectedMale,
                     selected = uiState.isGenderMale,
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(
                         text = Gender.MALE.displayText,
+                        style = MoaTheme.typography.body1Medium,
+                        modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
+                    )
+                }
+
+                MaSelectButton(
+                    onClick = onSelectedFemale,
+                    selected = uiState.isGenderFemale,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        text = Gender.FEMALE.displayText,
                         style = MoaTheme.typography.body1Medium,
                         modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
                     )

@@ -36,7 +36,7 @@ fun MemoryQuizTextModeContent(
     val labels = listOf("첫번째", "두번째", "세번째")
 
     Column(
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CenterQuizDescription(

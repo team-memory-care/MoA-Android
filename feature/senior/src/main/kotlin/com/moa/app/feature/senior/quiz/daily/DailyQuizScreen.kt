@@ -2,12 +2,15 @@ package com.moa.app.feature.senior.quiz.daily
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,20 +26,19 @@ import com.moa.app.domain.quiz.model.MemoryQuiz
 import com.moa.app.domain.quiz.model.PersistenceQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.model.SpaceTimeQuiz
-import com.moa.app.feature.senior.quiz.component.quizform.AttentionQuizForm
-import com.moa.app.feature.senior.quiz.component.quizform.LinguisticQuizForm
 import com.moa.app.feature.senior.quiz.component.QuizLoadContent
 import com.moa.app.feature.senior.quiz.component.QuizResultDialog
 import com.moa.app.feature.senior.quiz.component.QuizSlideAnimation
+import com.moa.app.feature.senior.quiz.component.quizform.AttentionQuizForm
+import com.moa.app.feature.senior.quiz.component.quizform.LinguisticQuizForm
 import com.moa.app.feature.senior.quiz.component.quizform.MemoryQuizForm
 import com.moa.app.feature.senior.quiz.component.quizform.PersistenceQuizForm
 import com.moa.app.feature.senior.quiz.component.quizform.SpaceTimeQuizForm
-import com.moa.app.feature.senior.quiz.memory.InputMode
-import com.moa.app.feature.senior.quiz.memory.MemoryQuizSetState
+import com.moa.app.ui.extension.quizMaxWidth
 
 @Composable
 fun DailyQuizScreen(
-    viewModel: DailyQuizViewModel = hiltViewModel()
+    viewModel: DailyQuizViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     BackHandler(enabled = true, onBack = viewModel::onBackClick)
@@ -93,10 +95,10 @@ private fun DailyQuizContent(
     onUnableToSpeakClick: () -> Unit,
     onTextAnswerChange: (Int, String) -> Unit,
     onBackClick: () -> Unit,
-    onContinueClick: () -> Unit
+    onContinueClick: () -> Unit,
 ) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         MaStepProgressTopAppBar(
             title = "오늘의 퀴즈",
@@ -105,86 +107,98 @@ private fun DailyQuizContent(
             currentStep = uiState.currentStep,
         )
 
-        uiState.currentQuiz?.let { targetQuiz ->
-            QuizSlideAnimation(
-                targetState = targetQuiz,
-                modifier = Modifier.weight(1f),
-            ) { quiz ->
-                when (quiz) {
-                    is PersistenceQuiz -> {
-                        PersistenceQuizForm(
-                            modifier = Modifier.padding(horizontal = 20.dp),
-                            questionContent = quiz.questionContent,
-                            answerOptions = quiz.answerOptions,
-                            selectedAnswerIndex = uiState.selectedAnswerIndex,
-                            onOptionSelected = onOptionSelected
-                        )
-                    }
+        Spacer(modifier = Modifier.height(24.dp))
 
-                    is LinguisticQuiz -> {
-                        LinguisticQuizForm(
-                            questionImage = quiz.questionImage,
-                            answerOptions = quiz.answerOptions,
-                            selectedAnswerIndex = uiState.selectedAnswerIndex,
-                            onOptionClick = onOptionSelected,
-                        )
-                    }
+        Column(
+            modifier = Modifier
+                .quizMaxWidth()
+                .align(Alignment.CenterHorizontally),
+        ) {
 
-                    is MemoryQuiz -> {
-                        MemoryQuizForm(
-                            quizState = uiState.memoryQuizState,
-                            inputMode = uiState.memoryQuizInputMode,
-                            isSpeaking = uiState.isSpeaking,
-                            isChangeModeButtonEnabled = uiState.isChangeModeButtonEnabled,
-                            imageUrls = quiz.imageUrls,
-                            userTextAnswers = uiState.memoryQuizTextAnswers,
-                            onStartQuizClick = onStartQuizClick,
-                            onImagesFinished = onImagesFinished,
-                            onStartSpeakingClick = onStartSpeakingClick,
-                            onUnableToSpeakClick = onUnableToSpeakClick,
-                            onChangeModeClick = onChangeModeClick,
-                            onContinueTextClick = onContinueClick,
-                            onTextAnswerChange = onTextAnswerChange,
-                        )
-                    }
+            uiState.currentQuiz?.let { targetQuiz ->
+                QuizSlideAnimation(
+                    targetState = targetQuiz,
+                    modifier = Modifier.weight(1f),
+                ) { quiz ->
+                    when (quiz) {
+                        is PersistenceQuiz -> {
+                            PersistenceQuizForm(
+                                modifier = Modifier.padding(horizontal = 20.dp),
+                                questionContent = quiz.questionContent,
+                                answerOptions = quiz.answerOptions,
+                                selectedAnswerIndex = uiState.selectedAnswerIndex,
+                                onOptionSelected = onOptionSelected,
+                            )
+                        }
 
-                    is AttentionQuiz -> {
-                        AttentionQuizForm(
-                            question = quiz.expression,
-                            input = uiState.attentionQuizAnswer,
-                            maxInputLength = quiz.answer.length,
-                            onInputChanged = onInputChanged,
-                            onDeleteClick = onDeleteClick,
-                            onImageClick = {}
-                        )
-                    }
+                        is LinguisticQuiz -> {
+                            LinguisticQuizForm(
+                                Modifier.padding(horizontal = 20.dp),
+                                questionImage = quiz.questionImage,
+                                answerOptions = quiz.answerOptions,
+                                selectedAnswerIndex = uiState.selectedAnswerIndex,
+                                onOptionClick = onOptionSelected,
+                            )
+                        }
 
-                    is SpaceTimeQuiz -> {
-                        SpaceTimeQuizForm(
-                            questionImageUrl = quiz.questionImageUrl,
-                            imageOptionsUrl = quiz.imageOptionsUrl,
-                            selectedAnswerIndex = uiState.selectedAnswerIndex,
-                            onOptionSelected = onOptionSelected
-                        )
+                        is MemoryQuiz -> {
+                            MemoryQuizForm(
+                                quizState = uiState.memoryQuizState,
+                                inputMode = uiState.memoryQuizInputMode,
+                                isSpeaking = uiState.isSpeaking,
+                                isChangeModeButtonEnabled = uiState.isChangeModeButtonEnabled,
+                                imageUrls = quiz.imageUrls,
+                                userTextAnswers = uiState.memoryQuizTextAnswers,
+                                onStartQuizClick = onStartQuizClick,
+                                onImagesFinished = onImagesFinished,
+                                onStartSpeakingClick = onStartSpeakingClick,
+                                onUnableToSpeakClick = onUnableToSpeakClick,
+                                onChangeModeClick = onChangeModeClick,
+                                onContinueTextClick = onContinueClick,
+                                onTextAnswerChange = onTextAnswerChange,
+                            )
+                        }
+
+                        is AttentionQuiz -> {
+                            AttentionQuizForm(
+                                Modifier.padding(horizontal = 20.dp),
+                                question = quiz.expression,
+                                input = uiState.attentionQuizAnswer,
+                                maxInputLength = quiz.answer.length,
+                                onInputChanged = onInputChanged,
+                                onDeleteClick = onDeleteClick,
+                                onImageClick = {},
+                            )
+                        }
+
+                        is SpaceTimeQuiz -> {
+                            SpaceTimeQuizForm(
+                                Modifier.padding(horizontal = 20.dp),
+                                questionImageUrl = quiz.questionImageUrl,
+                                imageOptionsUrl = quiz.imageOptionsUrl,
+                                selectedAnswerIndex = uiState.selectedAnswerIndex,
+                                onOptionSelected = onOptionSelected,
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        if (uiState.currentQuiz !is MemoryQuiz) {
-            MaButton(
-                onClick = onContinueClick,
-                enabled = uiState.isContinueButtonEnabled,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 12.dp),
-            ) {
-                Text(
-                    text = "계속",
-                    style = MoaTheme.typography.body1Bold,
-                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
-                )
+            if (uiState.currentQuiz !is MemoryQuiz) {
+                MaButton(
+                    onClick = onContinueClick,
+                    enabled = uiState.isContinueButtonEnabled,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .padding(bottom = 12.dp),
+                ) {
+                    Text(
+                        text = "계속",
+                        style = MoaTheme.typography.body1Bold,
+                        modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
+                    )
+                }
             }
         }
     }

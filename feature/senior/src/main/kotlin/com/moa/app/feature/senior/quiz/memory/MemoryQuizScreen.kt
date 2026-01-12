@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,6 +24,7 @@ import com.moa.app.feature.senior.quiz.memory.component.MemoryQuizPlayContent
 import com.moa.app.feature.senior.quiz.memory.component.MemoryQuizReadyContent
 import com.moa.app.feature.senior.quiz.memory.component.MemoryQuizTextModeContent
 import com.moa.app.feature.senior.quiz.memory.component.MemoryQuizVoiceModeContent
+import com.moa.app.ui.extension.quizMaxWidth
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -93,42 +94,47 @@ private fun MemoryQuizContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        uiState.currentQuiz?.let { targetQuiz ->
-            QuizSlideAnimation(
-                targetState = targetQuiz,
-                modifier = Modifier.weight(1f),
-            ) { question ->
-                when (uiState.quizState) {
-                    MemoryQuizSetState.WAITING_TO_START -> {
-                        MemoryQuizReadyContent(onContinueClick = onStartQuizClick)
-                    }
+        Column(
+            modifier = Modifier
+                .quizMaxWidth()
+                .align(Alignment.CenterHorizontally),
+        ) {
+            uiState.currentQuiz?.let { targetQuiz ->
+                QuizSlideAnimation(
+                    targetState = targetQuiz,
+                    modifier = Modifier.weight(1f),
+                ) { question ->
+                    when (uiState.quizState) {
+                        MemoryQuizSetState.WAITING_TO_START -> {
+                            MemoryQuizReadyContent(onContinueClick = onStartQuizClick)
+                        }
 
-                    MemoryQuizSetState.QUESTION_DISPLAY -> {
-                        MemoryQuizPlayContent(
-                            imageUrls = targetQuiz.imageUrls,
-                            onImagesFinished = onImagesFinished,
-                        )
-                    }
+                        MemoryQuizSetState.QUESTION_DISPLAY -> {
+                            MemoryQuizPlayContent(
+                                imageUrls = targetQuiz.imageUrls,
+                                onImagesFinished = onImagesFinished,
+                            )
+                        }
 
-                    MemoryQuizSetState.ANSWERING -> {
-                        when (uiState.inputMode) {
-                            InputMode.VOICE -> {
-                                MemoryQuizVoiceModeContent(
-                                    isSpeaking = uiState.isSpeaking,
-                                    showChangeModeButton = uiState.isChangeModeButtonEnabled,
-                                    onStartSpeakingClick = onStartSpeakingClick,
-                                    onUnableToSpeakClick = onUnableToSpeakClick,
-                                    onChangeModeClick = onChangeModeClick,
-                                )
-                            }
+                        MemoryQuizSetState.ANSWERING -> {
+                            when (uiState.inputMode) {
+                                InputMode.VOICE -> {
+                                    MemoryQuizVoiceModeContent(
+                                        isSpeaking = uiState.isSpeaking,
+                                        showChangeModeButton = uiState.isChangeModeButtonEnabled,
+                                        onStartSpeakingClick = onStartSpeakingClick,
+                                        onUnableToSpeakClick = onUnableToSpeakClick,
+                                        onChangeModeClick = onChangeModeClick,
+                                    )
+                                }
 
-                            InputMode.TEXT -> {
-                                MemoryQuizTextModeContent(
-                                    modifier = Modifier.padding(horizontal = 20.dp),
-                                    onContinueClick = onContinueTextClick,
-                                    answers = uiState.userTextAnswers,
-                                    onTextAnswerChange = onTextAnswerChange,
-                                )
+                                InputMode.TEXT -> {
+                                    MemoryQuizTextModeContent(
+                                        onContinueClick = onContinueTextClick,
+                                        answers = uiState.userTextAnswers,
+                                        onTextAnswerChange = onTextAnswerChange,
+                                    )
+                                }
                             }
                         }
                     }
