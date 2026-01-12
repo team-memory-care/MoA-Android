@@ -85,9 +85,7 @@ private fun SeniorHomeScreenContent(
     onSettingClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MoaTheme.colors.white),
+        modifier = Modifier.fillMaxSize()
     ) {
         MaHomeTopBar(onSettingClick = onSettingClick)
 
