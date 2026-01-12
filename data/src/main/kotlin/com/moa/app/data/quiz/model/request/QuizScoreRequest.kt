@@ -9,7 +9,8 @@ import kotlinx.serialization.Serializable
 data class QuizScoreRequest(
     @SerialName("totalNumber") val totalNumber: Int,
     @SerialName("correctNumber") val correctNumber: Int,
-    @SerialName("type") val type: QuizCategory
+    @SerialName("type") val type: QuizCategory,
+    @SerialName("category") val category: String
 )
 
 fun QuizScore.toDto(): QuizScoreRequest {
@@ -17,5 +18,6 @@ fun QuizScore.toDto(): QuizScoreRequest {
         totalNumber = totalNumber,
         correctNumber = correctNumber,
         type = type,
+        category = category
     )
 }

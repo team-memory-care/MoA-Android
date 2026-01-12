@@ -208,6 +208,7 @@ class DailyQuizViewModel @Inject constructor(
                 totalNumber = totalCount,
                 correctNumber = correctCount,
                 type = QuizCategory.ALL,
+                category = "TODAY"
             )
 
             uploadQuizScoreUseCase(result)
