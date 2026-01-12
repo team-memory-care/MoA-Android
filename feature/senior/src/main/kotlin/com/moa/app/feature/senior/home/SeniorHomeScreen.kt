@@ -2,8 +2,6 @@ package com.moa.app.feature.senior.home
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -46,6 +44,7 @@ import com.moa.app.designsystem.component.core.button.MaButton
 import com.moa.app.designsystem.component.product.topbar.MaHomeTopBar
 import com.moa.app.designsystem.theme.MoaTheme
 import com.moa.app.feature.senior.home.model.SeniorHomeUiState
+import com.moa.app.ui.TerminateOnDoubleBack
 
 @Composable
 fun SeniorHomeScreen(
@@ -53,6 +52,7 @@ fun SeniorHomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    TerminateOnDoubleBack()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()

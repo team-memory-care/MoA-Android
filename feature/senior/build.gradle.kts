@@ -11,6 +11,7 @@ android {
 dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.navigation)
+    implementation(projects.core.ui)
     implementation(projects.domain)
 
     implementation(libs.timber)
@@ -19,6 +20,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.androidx.adaptive)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
