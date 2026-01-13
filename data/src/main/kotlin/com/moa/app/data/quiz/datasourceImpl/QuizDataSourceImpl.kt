@@ -17,6 +17,10 @@ class QuizDataSourceImpl @Inject constructor(
         return quizService.fetchQuizzes((type)).toResult { it }
     }
 
+    override suspend fun fetchDailyQuizzes(): Result<List<QuizResponse>> {
+        return quizService.fetchTodayQuizzes().toResult { it }
+    }
+
     override suspend fun uploadQuizScore(quizScore: QuizScore): Result<Unit> {
         return quizService.uploadQuizScore(quizScore.toDto()).toResult()
     }

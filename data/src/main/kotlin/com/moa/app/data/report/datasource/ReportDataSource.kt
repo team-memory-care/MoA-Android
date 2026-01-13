@@ -5,7 +5,7 @@ import com.moa.app.data.report.model.response.MonthlyReportResponse
 import com.moa.app.data.report.model.response.WeeklyReportResponse
 
 interface ReportDataSource {
-    suspend fun fetchDailyReport(date: String): Result<DailyReportResponse?>
-    suspend fun fetchWeeklyReport(year: Int, month: Int, week: Int): Result<WeeklyReportResponse?>
-    suspend fun fetchMonthlyReport(year: Int, month: Int): Result<MonthlyReportResponse?>
+    suspend fun fetchDailyReport(date: String, parentId: Long?): Result<DailyReportResponse?>
+    suspend fun fetchWeeklyReport(year: Int, month: Int, week: Int, parentId: Long?): Result<WeeklyReportResponse?>
+    suspend fun fetchMonthlyReport(year: Int, month: Int, parentId: Long?): Result<MonthlyReportResponse?>
 }

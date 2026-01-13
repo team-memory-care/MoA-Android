@@ -19,6 +19,10 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.moa.app.designsystem.theme.MoATheme
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.feature.guardian.alert.GuardianAlertScreen
+import com.moa.app.feature.guardian.home.GuardianHomeScreen
+import com.moa.app.feature.guardian.setting.GuardianSettingScreen
+import com.moa.app.feature.onboarding.connection.ConnectionCheckScreen
 import com.moa.app.feature.onboarding.connection.UserConnectionScreen
 import com.moa.app.feature.onboarding.landing.AuthLandingScreen
 import com.moa.app.feature.onboarding.role.SelectUserRoleScreen
@@ -31,9 +35,11 @@ import com.moa.app.feature.onboarding.splash.SplashScreen
 import com.moa.app.feature.report.ReportScreen
 import com.moa.app.feature.senior.home.SeniorHomeScreen
 import com.moa.app.feature.senior.quiz.attention.AttentionQuizScreen
-import com.moa.app.feature.senior.quiz.persistence.PersistenceQuizScreen
 import com.moa.app.feature.senior.quiz.category.QuizCategoryScreen
+import com.moa.app.feature.senior.quiz.daily.DailyQuizScreen
 import com.moa.app.feature.senior.quiz.linguistic.LinguisticQuizScreen
+import com.moa.app.feature.senior.quiz.memory.MemoryQuizScreen
+import com.moa.app.feature.senior.quiz.persistence.PersistenceQuizScreen
 import com.moa.app.feature.senior.quiz.spacetime.SpaceTimeQuizScreen
 import com.moa.app.feature.senior.setting.SeniorSettingScreen
 import com.moa.app.navigation.AppRoute
@@ -77,15 +83,21 @@ class MainActivity : ComponentActivity() {
                             composable<AppRoute.SignUpComplete> { SignUpCompleteScreen() }
                         }
                         composable<AppRoute.SelectUserRole> { SelectUserRoleScreen() }
+                        composable<AppRoute.UserConnection> { UserConnectionScreen() }
+                        composable<AppRoute.ConnectionCheck> { ConnectionCheckScreen() }
                         composable<AppRoute.SeniorHome> { SeniorHomeScreen() }
                         composable<AppRoute.QuizCategory> { QuizCategoryScreen() }
                         composable<AppRoute.PersistenceQuiz> { PersistenceQuizScreen() }
                         composable<AppRoute.LinguisticQuiz> { LinguisticQuizScreen() }
                         composable<AppRoute.AttentionQuiz> { AttentionQuizScreen() }
                         composable<AppRoute.SpaceTimeQuiz> { SpaceTimeQuizScreen() }
-                        composable<AppRoute.UserConnection> { UserConnectionScreen() }
+                        composable<AppRoute.MemoryQuiz> { MemoryQuizScreen() }
+                        composable<AppRoute.DailyQuiz> { DailyQuizScreen() }
                         composable<AppRoute.SeniorSetting> { SeniorSettingScreen() }
                         composable<AppRoute.Report> { ReportScreen() }
+                        composable<AppRoute.GuardianHome> { GuardianHomeScreen() }
+                        composable<AppRoute.GuardianSetting> { GuardianSettingScreen() }
+                        composable<AppRoute.GuardianAlert> { GuardianAlertScreen() }
                     }
                 }
             }

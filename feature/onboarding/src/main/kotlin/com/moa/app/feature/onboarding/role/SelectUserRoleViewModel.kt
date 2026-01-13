@@ -3,7 +3,6 @@ package com.moa.app.feature.onboarding.role
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.auth.model.UserRole
-import com.moa.app.feature.onboarding.role.model.SelectUserSideEffect
 import com.moa.app.feature.onboarding.role.model.SelectUserUiState
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.NavigationOptions
@@ -24,29 +23,15 @@ class SelectUserRoleViewModel @Inject constructor(
     private val navigator: Navigator
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<SelectUserUiState> = MutableStateFlow(SelectUserUiState.INIT)
+    private val _uiState = MutableStateFlow(SelectUserUiState.INIT)
     val uiState: StateFlow<SelectUserUiState> = _uiState.asStateFlow()
-
-    private val _sideEffect: MutableSharedFlow<SelectUserSideEffect> = MutableSharedFlow()
-    val sideEffect: SharedFlow<SelectUserSideEffect> = _sideEffect.asSharedFlow()
 
     fun updateUserRole(role: UserRole) {
         _uiState.update { it.copy(userRole = role) }
     }
 
-    fun navigateToBack() = navigator.navigateBack()
-
     fun navigateToUserConnection() {
         val role = _uiState.value.userRole ?: return
-
-        if (role == UserRole.CHILD) {
-            viewModelScope.launch {
-                _sideEffect.emit(
-                    SelectUserSideEffect.ShowToast("보호자 역할은 아직 지원하지 않습니다")
-                )
-            }
-            return
-        }
 
         navigator.navigate(
             route = AppRoute.UserConnection(role.toString()),
@@ -55,4 +40,6 @@ class SelectUserRoleViewModel @Inject constructor(
             )
         )
     }
+
+    fun navigateToBack() = navigator.navigateBack()
 }

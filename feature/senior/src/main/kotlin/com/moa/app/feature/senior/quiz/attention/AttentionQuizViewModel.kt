@@ -9,6 +9,8 @@ import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.attention.model.AttentionQuizUiState
 import com.moa.app.feature.senior.quiz.model.QuizResult
+import com.moa.app.feature.senior.quiz.tts.QuizTextNormalizer
+import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -27,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AttentionQuizViewModel @Inject constructor(
     private val navigator: Navigator,
+    private val ttsManager: TtsManager,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
 ) : ViewModel() {
@@ -38,13 +41,18 @@ class AttentionQuizViewModel @Inject constructor(
         loadAttentionQuizzes()
     }
 
+    fun speakCurrentQuestion() {
+        val quiz = _uiState.value.currentQuiz ?: return
+        val normalizedText = QuizTextNormalizer.normalizeExpression(quiz.expression + "=")
+        ttsManager.speak(normalizedText)
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun loadAttentionQuizzes() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             val minLoadingTime = async { delay(2000L) }
-            val quizzesDeferred = async {
-                fetchQuizUseCase(QuizCategory.ATTENTION)
-            }
+            val quizzesDeferred = async { fetchQuizUseCase(QuizCategory.ATTENTION) }
             awaitAll(minLoadingTime, quizzesDeferred)
             quizzesDeferred.getCompleted().fold(
                 onSuccess = { quizzes ->
@@ -75,6 +83,7 @@ class AttentionQuizViewModel @Inject constructor(
     }
 
     fun checkAnswer() {
+        if (ttsManager.isSpeaking) ttsManager.stop()
         _uiState.update { state ->
             if (state.userAnswer.isEmpty()) return@update state
             val currentQuiz = state.currentQuiz ?: return@update state
@@ -148,6 +157,9 @@ class AttentionQuizViewModel @Inject constructor(
     }
 
     fun exitQuiz() = navigator.navigateBack()
+
+    override fun onCleared() {
+        super.onCleared()
+        ttsManager.destroy()
+    }
 }
-
-

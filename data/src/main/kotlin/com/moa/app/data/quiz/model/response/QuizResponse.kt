@@ -13,7 +13,6 @@ sealed class QuizResponse {
     @SerialName("questionId") abstract val questionId: Long
     @SerialName("questionFormat") abstract val questionFormat: String
     @SerialName("questionContent") abstract val questionContent: String
-    @SerialName("answer") abstract val answer: String
 }
 
 fun QuizResponse.toDomain(): Quiz {
@@ -22,5 +21,6 @@ fun QuizResponse.toDomain(): Quiz {
         is LinguisticQuizResponse -> this.toDomain()
         is AttentionQuizResponse -> this.toDomain()
         is SpaceTimeQuizResponse -> this.toDomain()
+        is MemoryQuizResponse -> this.toDomain()
     }
 }

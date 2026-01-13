@@ -30,7 +30,7 @@ data class AttentionQuizUiState(
 
     companion object {
         val INIT = AttentionQuizUiState(
-            isLoading = true,
+            isLoading = false,
             errorMessage = null,
             quizzes = persistentListOf(),
             currentQuestionIndex = 0,

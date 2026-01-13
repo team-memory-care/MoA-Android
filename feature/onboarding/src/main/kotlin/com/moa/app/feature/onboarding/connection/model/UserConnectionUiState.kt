@@ -4,7 +4,8 @@ import com.moa.app.domain.auth.model.UserRole
 
 data class UserConnectionUiState(
     val userCode: String,
-    val userRole: UserRole?
+    val userRole: UserRole?,
+    val errorMessage: String?
 ) {
     val isUserSenior: Boolean
         get() = userRole == UserRole.PARENT
@@ -22,7 +23,8 @@ data class UserConnectionUiState(
     companion object {
         val INIT = UserConnectionUiState(
             userCode = "",
-            userRole = null
+            userRole = null,
+            errorMessage = null
         )
 
         private const val SENIOR_TITLE = "가족이나 보호자에게\n회원코드를 보내주세요"

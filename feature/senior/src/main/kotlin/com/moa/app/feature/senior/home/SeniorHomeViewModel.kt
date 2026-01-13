@@ -7,11 +7,8 @@ import com.moa.app.feature.senior.home.model.SeniorHomeUiState
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,12 +21,8 @@ class SeniorHomeViewModel @Inject constructor(
     private val fetchUserProfileUseCase: FetchUserProfileUseCase,
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<SeniorHomeUiState> = MutableStateFlow(SeniorHomeUiState.INIT)
+    private val _uiState = MutableStateFlow(SeniorHomeUiState.INIT)
     val uiState: StateFlow<SeniorHomeUiState> = _uiState.asStateFlow()
-
-    private val _sideEffect: MutableSharedFlow<SeniorHomeSideEffect> = MutableSharedFlow()
-    val sideEffect: SharedFlow<SeniorHomeSideEffect> = _sideEffect.asSharedFlow()
-
 
     init {
         fetchUserProfile()
@@ -53,19 +46,14 @@ class SeniorHomeViewModel @Inject constructor(
     }
 
     fun navigateToDailyQuiz() {
-        navigator.navigate(AppRoute.LinguisticQuiz)
+        navigator.navigate(AppRoute.DailyQuiz)
     }
 
     fun navigateToReport() {
-        navigator.navigate(AppRoute.Report)
+        navigator.navigate(AppRoute.Report(null))
     }
-
 
     fun navigateToSetting() {
         navigator.navigate(AppRoute.SeniorSetting)
     }
-}
-
-sealed interface SeniorHomeSideEffect {
-    data class ShowToast(val message: String) : SeniorHomeSideEffect
 }

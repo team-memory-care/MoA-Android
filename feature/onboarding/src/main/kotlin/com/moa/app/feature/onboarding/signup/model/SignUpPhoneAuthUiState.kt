@@ -1,6 +1,7 @@
 package com.moa.app.feature.onboarding.signup.model
 
 data class SignUpPhoneAuthUiState(
+    val isLoading: Boolean,
     val phoneNumber: String,
     val authCode: String,
     val isAuthCodeRequested: Boolean,
@@ -11,6 +12,7 @@ data class SignUpPhoneAuthUiState(
 ) {
     companion object {
         val init = SignUpPhoneAuthUiState(
+            isLoading = false,
             phoneNumber = "",
             authCode = "",
             isAuthCodeRequested = false,

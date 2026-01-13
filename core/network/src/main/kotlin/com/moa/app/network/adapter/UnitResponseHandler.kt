@@ -6,13 +6,12 @@ import retrofit2.Response
 
 internal class UnitResponseHandler : ResponseHandler<Unit>() {
     override fun handle(response: Response<BaseResponse<Unit>>): NetworkResult<Unit> {
-        val body = response.body()
-
-        return if (response.isSuccessful && body != null) {
-            if (body.success) {
-                NetworkResult.Success(Unit)
-            } else {
+        return if (response.isSuccessful) {
+            val body = response.body()
+            if (body != null && !body.success) {
                 NetworkResult.Error(code = response.code(), message = body.message)
+            } else {
+                NetworkResult.Success(Unit)
             }
         } else {
             NetworkResult.Error(code = response.code(), message = response.message())

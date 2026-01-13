@@ -12,6 +12,6 @@ data class UserProfileResponse(
     @SerialName("role") val role: String,
     @SerialName("gender") val gender: String,
     @SerialName("status") val status: String,
-    @SerialName("parentCode") val parentCode: String,
-    @SerialName("parentUserId") val parentUserId: Long?
+    @SerialName("parentCode") val parentCode: String?,
+    @SerialName("parentUserIds") val parentUserIds: List<Long>?
 )

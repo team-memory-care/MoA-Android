@@ -1,7 +1,6 @@
 package com.moa.app.designsystem.component.core.button
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
@@ -26,6 +25,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.ui.extension.clickableWithoutRipple
 
 @Composable
 fun MaButton(
@@ -53,11 +53,10 @@ fun MaButton(
         modifier = modifier
             .semantics { role = Role.Button }
             .background(color = backgroundColor, shape = shape)
-            .clickable(
+            .clickableWithoutRipple(
                 enabled = enabled,
                 onClick = onClick,
                 interactionSource = interactionSource,
-                indication = null,
             ),
         contentAlignment = Alignment.Center,
     ) {

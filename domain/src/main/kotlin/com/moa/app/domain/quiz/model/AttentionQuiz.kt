@@ -5,7 +5,7 @@ data class AttentionQuiz(
     override val type: QuizCategory,
     override val questionFormat: String,
     override val questionContent: String,
-    override val answer: String,
+    val answer: String,
     val expression: String,
     val inputType: String,
 ) : Quiz {

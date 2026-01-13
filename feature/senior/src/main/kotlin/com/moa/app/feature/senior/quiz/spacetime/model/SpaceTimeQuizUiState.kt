@@ -33,7 +33,7 @@ data class SpaceTimeQuizUiState(
 
     companion object {
         val INIT = SpaceTimeQuizUiState(
-            isLoading = true,
+            isLoading = false,
             errorMessage = null,
             quizzes = persistentListOf(),
             currentQuestionIndex = 0,

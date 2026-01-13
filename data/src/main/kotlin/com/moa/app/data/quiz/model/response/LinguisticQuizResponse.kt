@@ -12,7 +12,7 @@ data class LinguisticQuizResponse(
     override val questionId: Long,
     override val questionFormat: String,
     override val questionContent: String,
-    override val answer: String,
+    @SerialName("answer") val answer: String,
     @SerialName("imageUrl") val imageUrl: String,
     @SerialName("answerOptions") val answerOptions: List<String>,
 ) : QuizResponse()

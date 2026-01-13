@@ -12,6 +12,7 @@ interface ReportService {
     @GET("/api/v1/report/daily")
     suspend fun fetchDailyReport(
         @Query("date") date: String,
+        @Query("parentId") parentId: Long?,
     ): NetworkResult<DailyReportResponse?>
 
     @GET("/api/v1/report/weekly")
@@ -19,12 +20,14 @@ interface ReportService {
         @Query("year") year: Int,
         @Query("month") month: Int,
         @Query("week") week: Int,
+        @Query("parentId") parentId: Long?,
     ): NetworkResult<WeeklyReportResponse?>
 
     @GET("/api/v1/report/monthly")
     suspend fun fetchMonthlyReport(
         @Query("year") year: Int,
         @Query("month") month: Int,
+        @Query("parentId") parentId: Long?,
     ): NetworkResult<MonthlyReportResponse?>
 
 }

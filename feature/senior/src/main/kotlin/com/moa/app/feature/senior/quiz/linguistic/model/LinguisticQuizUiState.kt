@@ -27,9 +27,12 @@ data class LinguisticQuizUiState(
     val currentStep: Int
         get() = currentQuestionIndex + 1
 
+    val isContinueButtonEnabled: Boolean
+        get() = selectedAnswerIndex != null
+
     companion object {
         val INIT = LinguisticQuizUiState(
-            isLoading = true,
+            isLoading = false,
             errorMessage = null,
             quizzes = persistentListOf(),
             currentQuestionIndex = 0,

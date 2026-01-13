@@ -15,10 +15,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -39,7 +41,20 @@ fun MaOtpTextField(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     interactionSource: MutableInteractionSource? = null,
     placeholder: String = "0",
+    autoHideKeyboard: Boolean = true,
+    onComplete: (() -> Unit)? = null,
 ) {
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(otpText) {
+        if (otpText.length == otpCount) {
+            if (autoHideKeyboard) {
+                focusManager.clearFocus()
+            }
+            onComplete?.invoke()
+        }
+    }
+
     BasicTextField(
         value = otpText,
         onValueChange = {

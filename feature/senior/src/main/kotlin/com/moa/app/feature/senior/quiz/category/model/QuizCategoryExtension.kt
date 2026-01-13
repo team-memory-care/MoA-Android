@@ -56,7 +56,7 @@ val QuizCategory.loadDescription: String
         QuizCategory.MEMORY -> "기억력은\n단어와 그림을 기억해요"
         QuizCategory.ATTENTION -> "주의력/계산은\n집중과 계산을 해봐요"
         QuizCategory.SPACETIME -> "시공간 구조는\n도형과 공간을 이해해요"
-        QuizCategory.ALL -> ""
+        QuizCategory.ALL -> "오늘의 퀴즈를\n준비하고 있어요."
     }
 
 val QuizCategory.loadBackgroundColor: Color
@@ -67,7 +67,7 @@ val QuizCategory.loadBackgroundColor: Color
         QuizCategory.MEMORY -> MoaTheme.colors.red200
         QuizCategory.ATTENTION -> MoaTheme.colors.purple100
         QuizCategory.SPACETIME -> MoaTheme.colors.neutralGray95
-        QuizCategory.ALL -> MoaTheme.colors.blue100
+        QuizCategory.ALL -> MoaTheme.colors.green100
     }
 
 val QuizCategory.loadTitleColor: Color
@@ -78,7 +78,7 @@ val QuizCategory.loadTitleColor: Color
         QuizCategory.MEMORY -> MoaTheme.colors.red700
         QuizCategory.ATTENTION -> MoaTheme.colors.purple700
         QuizCategory.SPACETIME -> MoaTheme.colors.coolGray10
-        QuizCategory.ALL -> MoaTheme.colors.blue700
+        QuizCategory.ALL -> MoaTheme.colors.green700
     }
 
 val QuizCategory.loadReadyColor: Color
@@ -89,6 +89,6 @@ val QuizCategory.loadReadyColor: Color
         QuizCategory.MEMORY -> MoaTheme.colors.red300
         QuizCategory.ATTENTION -> MoaTheme.colors.purple300
         QuizCategory.SPACETIME -> MoaTheme.colors.coolGray10
-        QuizCategory.ALL -> MoaTheme.colors.blue200
+        QuizCategory.ALL -> MoaTheme.colors.green300
     }
 
