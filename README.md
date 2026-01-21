@@ -21,7 +21,7 @@
 ***Team***
 > **Android**
 >
-> [@wjdrjs00](https://github.com/wjdrjs00, "깃허브")
+> **Daehyun Kim** [@wjdrjs00](https://github.com/wjdrjs00, "깃허브")
 
 ***Contact***
 
