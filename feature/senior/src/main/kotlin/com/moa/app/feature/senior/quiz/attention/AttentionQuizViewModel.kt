@@ -158,8 +158,4 @@ class AttentionQuizViewModel @Inject constructor(
 
     fun exitQuiz() = navigator.navigateBack()
 
-    override fun onCleared() {
-        super.onCleared()
-        ttsManager.destroy()
-    }
 }

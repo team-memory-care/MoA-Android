@@ -144,9 +144,4 @@ class LinguisticQuizViewModel @Inject constructor(
 
     fun exitQuiz() = navigator.navigateBack()
 
-    override fun onCleared() {
-        super.onCleared()
-        ttsManager.destroy()
-    }
-
 }

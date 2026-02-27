@@ -2,63 +2,131 @@ package com.moa.app.feature.senior.quiz.tts
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.Locale
+import java.util.UUID
 
 class AndroidTtsManager @Inject constructor(
-    @ApplicationContext private val context: Context
-) : TtsManager, TextToSpeech.OnInitListener {
+    @ApplicationContext private val context: Context,
+) : TtsManager, DefaultLifecycleObserver {
+
+    private enum class EngineState { UNINITIALIZED, INITIALIZING, READY, ERROR }
 
     private var tts: TextToSpeech? = null
-    private var isReady = false
-    private var pendingTask: (() -> Unit)? = null
 
-    override val isSpeaking: Boolean
-        get() = tts?.isSpeaking ?: false
+    private val engineState = MutableStateFlow(EngineState.UNINITIALIZED)
 
-    private fun initEngine() {
-        if (tts != null) return
-        tts = TextToSpeech(context, this)
-    }
+    private val _playbackState = MutableStateFlow(PlaybackState.IDLE)
+    override val playbackState: StateFlow<PlaybackState> = _playbackState.asStateFlow()
 
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            val result = tts?.setLanguage(Locale.KOREAN)
-            if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
-                isReady = true
-                pendingTask?.invoke()
-                pendingTask = null
-            }
-        } else {
-            tts = null
-        }
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
+    init {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this@AndroidTtsManager)
     }
 
     override fun speak(text: String, isFlush: Boolean) {
-        if (tts == null) {
-            initEngine()
-        }
+        scope.launch {
+            checkAndInitializeEngine()
 
-        if (!isReady) {
-            pendingTask = { speak(text, isFlush) }
-            return
-        }
+            val currentState = engineState.first { it == EngineState.READY || it == EngineState.ERROR }
 
-        val queueMode = if (isFlush) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
-        tts?.speak(text, queueMode, null, text.hashCode().toString())
+            if (currentState == EngineState.ERROR) {
+                _playbackState.value = PlaybackState.ERROR
+                return@launch
+            }
+
+            val queueMode = if (isFlush) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
+            val utteranceId = UUID.randomUUID().toString()
+
+            try {
+                tts?.speak(text, queueMode, null, utteranceId)
+            } catch (e: Exception) {
+                _playbackState.value = PlaybackState.ERROR
+            }
+        }
+    }
+
+    private fun checkAndInitializeEngine() {
+        val canInitialize = engineState.compareAndSet(
+            expect = EngineState.UNINITIALIZED,
+            update = EngineState.INITIALIZING,
+        ) || engineState.compareAndSet(
+            expect = EngineState.ERROR,
+            update = EngineState.INITIALIZING,
+        )
+
+        if (canInitialize) initEngine()
+    }
+
+    private fun initEngine() {
+        tts = TextToSpeech(context) { status ->
+            if (status != TextToSpeech.SUCCESS) {
+                engineState.update { EngineState.ERROR }
+                return@TextToSpeech
+            }
+
+            tts?.setSpeechRate(0.85f)
+            val result = tts?.setLanguage(Locale.KOREAN)
+
+            when (result) {
+                TextToSpeech.LANG_MISSING_DATA, TextToSpeech.LANG_NOT_SUPPORTED, null -> {
+                    engineState.update { EngineState.ERROR }
+                }
+
+                else -> {
+                    setupProgressListener()
+                    engineState.update { EngineState.READY }
+                }
+            }
+        }
+    }
+
+    private fun setupProgressListener() {
+        tts?.setOnUtteranceProgressListener(
+            object : UtteranceProgressListener() {
+                override fun onStart(utteranceId: String?) {
+                    _playbackState.value = PlaybackState.SPEAKING
+                }
+
+                override fun onDone(utteranceId: String?) {
+                    _playbackState.value = PlaybackState.IDLE
+                }
+
+                override fun onError(utteranceId: String?, errorCode: Int) {
+                    _playbackState.value = PlaybackState.ERROR
+                }
+
+                @Deprecated("Deprecated in Java")
+                override fun onError(utteranceId: String?) {
+                    _playbackState.value = PlaybackState.ERROR
+                }
+            },
+        )
     }
 
     override fun stop() {
         tts?.stop()
-        pendingTask = null
+        _playbackState.value = PlaybackState.IDLE
     }
 
-    override fun destroy() {
-        tts?.stop()
-        tts?.shutdown()
-        tts = null
-        isReady = false
-        pendingTask = null
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        stop()
     }
+
 }
