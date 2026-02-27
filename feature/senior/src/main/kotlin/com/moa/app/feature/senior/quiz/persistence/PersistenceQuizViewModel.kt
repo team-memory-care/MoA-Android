@@ -150,11 +150,6 @@ class PersistenceQuizViewModel @Inject constructor(
 
     fun exitQuiz() = navigator.navigateBack()
 
-    override fun onCleared() {
-        super.onCleared()
-        ttsManager.destroy()
-    }
-
     companion object {
         private const val DIALOG_DURATION_MS = 2000L
     }

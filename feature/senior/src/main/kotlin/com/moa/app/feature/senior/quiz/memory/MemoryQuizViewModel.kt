@@ -234,7 +234,6 @@ class MemoryQuizViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         sttManager.destroy()
-        ttsManager.destroy()
     }
 }
 
