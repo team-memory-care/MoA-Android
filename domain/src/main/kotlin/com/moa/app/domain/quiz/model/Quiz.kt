@@ -5,4 +5,6 @@ sealed interface Quiz {
     val type: QuizCategory
     val questionFormat: String
     val questionContent: String
+
+    fun isAnswerCorrect(userAnswer: UserAnswer): Boolean
 }

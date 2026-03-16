@@ -11,8 +11,14 @@ data class SpaceTimeQuiz(
     val questionImageUrl: String,
     val imageOptionsUrl: ImmutableList<String>,
 ) : Quiz {
-    fun isAnswerCorrect(selectedAnswerIndex: Int): Boolean {
-        if (selectedAnswerIndex !in imageOptionsUrl.indices) return false
-        return (selectedAnswerIndex + 1).toString() == answer
+    override fun isAnswerCorrect(userAnswer: UserAnswer): Boolean {
+        return when (userAnswer) {
+            is UserAnswer.Selection -> {
+                if (userAnswer.index !in imageOptionsUrl.indices) return false
+                (userAnswer.index + 1).toString() == answer
+            }
+
+            else -> false
+        }
     }
 }

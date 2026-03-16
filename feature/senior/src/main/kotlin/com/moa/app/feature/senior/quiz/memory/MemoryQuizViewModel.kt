@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.MemoryQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.model.QuizScore
+import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.model.QuizResult
@@ -121,7 +122,7 @@ class MemoryQuizViewModel @Inject constructor(
     private fun checkAnswer(answer: String) {
         _uiState.update {
             val quiz = it.currentQuiz ?: return@update it
-            val isCorrect = quiz.isAnswerCorrect(answer)
+            val isCorrect = quiz.isAnswerCorrect(UserAnswer.Text(answer))
             val correctAnswer = if (isCorrect) "" else "다른 값"
 
             it.copy(
@@ -142,7 +143,7 @@ class MemoryQuizViewModel @Inject constructor(
         _uiState.update {
             val quiz = it.currentQuiz ?: return@update it
             val answer = it.userTextAnswers
-            val isCorrect = quiz.isAnswerCorrect(answer)
+            val isCorrect = quiz.isAnswerCorrect(UserAnswer.MultipleText(answer))
             val correctAnswer = if (isCorrect) "" else "다른 값"
 
             it.copy(

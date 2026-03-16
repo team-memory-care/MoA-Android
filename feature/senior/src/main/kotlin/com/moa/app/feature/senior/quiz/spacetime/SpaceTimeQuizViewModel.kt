@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.model.QuizScore
 import com.moa.app.domain.quiz.model.SpaceTimeQuiz
+import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.model.QuizResult
@@ -80,7 +81,7 @@ class SpaceTimeQuizViewModel @Inject constructor(
         _uiState.update { state ->
             val selectedAnswerIndex = state.selectedAnswerIndex ?: return@update state
             val quiz = state.currentQuiz ?: return@update state
-            val isCorrect = quiz.isAnswerCorrect(selectedAnswerIndex)
+            val isCorrect = quiz.isAnswerCorrect(UserAnswer.Selection(selectedAnswerIndex))
             val correctAnswer = if (isCorrect) "" else "다른 모양"
 
             state.copy(
