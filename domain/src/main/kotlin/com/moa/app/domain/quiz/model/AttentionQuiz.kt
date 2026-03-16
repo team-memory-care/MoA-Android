@@ -9,7 +9,10 @@ data class AttentionQuiz(
     val expression: String,
     val inputType: String,
 ) : Quiz {
-    fun isAnswerCorrect(userAnswer: String): Boolean {
-        return answer == userAnswer
+    override fun isAnswerCorrect(userAnswer: UserAnswer): Boolean {
+        return when (userAnswer) {
+            is UserAnswer.Text -> userAnswer.answer == answer
+            else -> false
+        }
     }
 }

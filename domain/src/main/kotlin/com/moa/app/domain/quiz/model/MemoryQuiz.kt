@@ -8,7 +8,15 @@ data class MemoryQuiz(
     val answer: List<String>,
     val imageUrls: List<String>,
 ) : Quiz {
-    fun isAnswerCorrect(userAnswer: String): Boolean {
+    override fun isAnswerCorrect(userAnswer: UserAnswer): Boolean {
+        return when (userAnswer) {
+            is UserAnswer.Text -> isAnswerCorrect(userAnswer.answer)
+            is UserAnswer.MultipleText -> isAnswerCorrect(userAnswer.answers)
+            else -> false
+        }
+    }
+
+    private fun isAnswerCorrect(userAnswer: String): Boolean {
         if (userAnswer.isBlank()) return false
 
         val cleanedInput = userAnswer.replace(SPACE_REGEX, "")
@@ -23,7 +31,7 @@ data class MemoryQuiz(
         return true
     }
 
-    fun isAnswerCorrect(userAnswer: List<String>): Boolean {
+    private fun isAnswerCorrect(userAnswer: List<String>): Boolean {
         if (userAnswer.isEmpty()) return false
         return userAnswer == answer
     }

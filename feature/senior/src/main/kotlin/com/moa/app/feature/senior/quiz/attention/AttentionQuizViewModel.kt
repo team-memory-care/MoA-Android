@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.AttentionQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.model.QuizScore
+import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.attention.model.AttentionQuizUiState
@@ -87,7 +88,7 @@ class AttentionQuizViewModel @Inject constructor(
         _uiState.update { state ->
             if (state.userAnswer.isEmpty()) return@update state
             val currentQuiz = state.currentQuiz ?: return@update state
-            val isCorrect = currentQuiz.isAnswerCorrect(state.userAnswer)
+            val isCorrect = currentQuiz.isAnswerCorrect(UserAnswer.Text(state.userAnswer))
             val quizResult = QuizResult(
                 isCorrect = isCorrect,
                 correctAnswer = if (isCorrect) "" else currentQuiz.answer,

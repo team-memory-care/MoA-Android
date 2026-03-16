@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.LinguisticQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.model.QuizScore
+import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.linguistic.model.LinguisticQuizUiState
@@ -80,7 +81,7 @@ class LinguisticQuizViewModel @Inject constructor(
         _uiState.update { state ->
             val selectedAnswerIndex = state.selectedAnswerIndex ?: return@update state
             val quiz = state.currentQuiz ?: return@update state
-            val isCorrect = quiz.isAnswerCorrect(selectedAnswerIndex)
+            val isCorrect = quiz.isAnswerCorrect(UserAnswer.Selection(selectedAnswerIndex))
             val correctAnswer = if (isCorrect) "" else quiz.answer
 
             state.copy(

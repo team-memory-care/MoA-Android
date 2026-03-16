@@ -14,6 +14,7 @@ import com.moa.app.domain.quiz.model.Quiz
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.model.QuizScore
 import com.moa.app.domain.quiz.model.SpaceTimeQuiz
+import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchDailyQuizzesUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.memory.InputMode
@@ -77,7 +78,6 @@ class DailyQuizViewModel @Inject constructor(
                     InputMode.VOICE -> "방금 나온 단어를 순서대로 말씀해주세요!"
                     InputMode.TEXT -> "들었던 단어를 밑에 써주세요!"
                 }
-
             }
         }
 
@@ -179,22 +179,16 @@ class DailyQuizViewModel @Inject constructor(
 
         _uiState.update { state ->
             val currentQuiz = state.currentQuiz ?: return@update state
-            val isCorrect = when (currentQuiz) {
-                is PersistenceQuiz -> state.selectedAnswerIndex?.let { currentQuiz.isAnswerCorrect(it) } ?: false
-                is LinguisticQuiz -> state.selectedAnswerIndex?.let { currentQuiz.isAnswerCorrect(it) } ?: false
-                is SpaceTimeQuiz -> state.selectedAnswerIndex?.let { currentQuiz.isAnswerCorrect(it) } ?: false
-                is AttentionQuiz -> currentQuiz.isAnswerCorrect(state.attentionQuizAnswer)
-                is MemoryQuiz -> {
-                    if (sttResult != null) currentQuiz.isAnswerCorrect(sttResult)
-                    else currentQuiz.isAnswerCorrect(state.memoryQuizTextAnswers)
-                }
-            }
-            val correctAnswer = if (isCorrect) "" else "다른 값"
+            val userAnswer = state.toUserAnswer(sttResult)
+            val isCorrect = currentQuiz.isAnswerCorrect(userAnswer)
 
             state.copy(
                 isChecking = true,
                 showResultDialog = true,
-                quizResult = QuizResult(isCorrect = isCorrect, correctAnswer = correctAnswer),
+                quizResult = QuizResult(
+                    isCorrect = isCorrect,
+                    correctAnswer = if (isCorrect) "" else "다른 값",
+                ),
                 correctCount = if (isCorrect) state.correctCount + 1 else state.correctCount,
             )
         }
@@ -235,7 +229,7 @@ class DailyQuizViewModel @Inject constructor(
                 totalNumber = totalCount,
                 correctNumber = correctCount,
                 type = QuizCategory.ALL,
-                category = "TODAY"
+                category = "TODAY",
             )
 
             uploadQuizScoreUseCase(result)
@@ -245,6 +239,22 @@ class DailyQuizViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false, errorMessage = "결과 전송 실패") }
                     exitQuiz()
                 }
+        }
+    }
+
+    private fun DailyQuizUiState.toUserAnswer(sttResult: String?): UserAnswer {
+        return when (currentQuiz) {
+            is AttentionQuiz -> UserAnswer.Text(attentionQuizAnswer)
+            is PersistenceQuiz, is LinguisticQuiz, is SpaceTimeQuiz -> {
+                UserAnswer.Selection(selectedAnswerIndex ?: -1)
+            }
+
+            is MemoryQuiz -> {
+                if (sttResult != null) UserAnswer.Text(sttResult)
+                else UserAnswer.MultipleText(memoryQuizTextAnswers)
+            }
+
+            else -> UserAnswer.Text("")
         }
     }
 

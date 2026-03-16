@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.PersistenceQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.model.QuizScore
+import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.model.QuizResult
@@ -83,7 +84,7 @@ class PersistenceQuizViewModel @Inject constructor(
             if (it.showResultDialog || it.isLoading) return@update it
             val selectedAnswerIndex = it.selectedAnswerIndex ?: return@update it
             val currentQuiz = it.quizzes.getOrNull(it.currentQuestionIndex) ?: return@update it
-            val isCorrect = currentQuiz.isAnswerCorrect(selectedAnswerIndex)
+            val isCorrect = currentQuiz.isAnswerCorrect(UserAnswer.Selection(selectedAnswerIndex))
             val correctAnswer = if (isCorrect) "" else currentQuiz.answer
 
             it.copy(
