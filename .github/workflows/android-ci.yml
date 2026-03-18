@@ -7,8 +7,8 @@ on:
         branches: [ "develop" ]
 
 jobs:
-    lint:
-        name: Run ktlint
+    check:
+        name: Run Lint and Unit Tests
         runs-on: ubuntu-latest
         steps:
             -   name: Check out repository
@@ -19,33 +19,15 @@ jobs:
                 with:
                     java-version: '17'
                     distribution: 'temurin'
-                    cache: gradle
+
+            -   name: Setup Gradle
+                uses: gradle/actions/setup-gradle@v4
 
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
-            -   name: Run ktlint
-                run: ./gradlew ktlintCheck
-
-    test:
-        name: Run Unit Tests
-        runs-on: ubuntu-latest
-        steps:
-            -   name: Check out repository
-                uses: actions/checkout@v4
-
-            -   name: Set up JDK 17
-                uses: actions/setup-java@v4
-                with:
-                    java-version: '17'
-                    distribution: 'temurin'
-                    cache: gradle
-
-            -   name: Grant execute permission for gradlew
-                run: chmod +x gradlew
-
-            -   name: Run unit tests
-                run: ./gradlew testDebugUnitTest
+            -   name: Run Lint and Tests
+                run: ./gradlew ktlintCheck testDebugUnitTest --parallel --build-cache
 
             -   name: Upload test results
                 if: failure()
@@ -54,9 +36,15 @@ jobs:
                     name: test-results
                     path: '**/build/test-results/**/*.xml'
 
+            -   name: Publish Test Report
+                uses: mikepenz/action-junit-report@v4
+                if: always() # 테스트가 성공하든 실패하든 항상 리포트를 게시합니다.
+                with:
+                    report_paths: '**/build/test-results/**/*.xml'
+
     build:
         name: Build Debug APK
-        needs: [ lint, test ]
+        needs: [ check ]
         runs-on: ubuntu-latest
         steps:
             -   name: Check out repository
@@ -67,13 +55,15 @@ jobs:
                 with:
                     java-version: '17'
                     distribution: 'temurin'
-                    cache: gradle
+
+            -   name: Setup Gradle
+                uses: gradle/actions/setup-gradle@v4
 
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
             -   name: Build Debug APK
-                run: ./gradlew assembleDebug
+                run: ./gradlew assembleDebug --parallel --build-cache
 
             -   name: Upload Debug APK
                 uses: actions/upload-artifact@v4
