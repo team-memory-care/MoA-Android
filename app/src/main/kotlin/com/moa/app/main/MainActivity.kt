@@ -6,42 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.moa.app.designsystem.theme.MoATheme
 import com.moa.app.designsystem.theme.MoaTheme
-import com.moa.app.feature.guardian.alert.GuardianAlertScreen
-import com.moa.app.feature.guardian.home.GuardianHomeScreen
-import com.moa.app.feature.guardian.setting.GuardianSettingScreen
-import com.moa.app.feature.onboarding.connection.ConnectionCheckScreen
-import com.moa.app.feature.onboarding.connection.UserConnectionScreen
-import com.moa.app.feature.onboarding.landing.AuthLandingScreen
-import com.moa.app.feature.onboarding.role.SelectUserRoleScreen
-import com.moa.app.feature.onboarding.signin.SignInScreen
-import com.moa.app.feature.onboarding.signup.SignUpCompleteScreen
-import com.moa.app.feature.onboarding.signup.SignUpPhoneAuthScreen
-import com.moa.app.feature.onboarding.signup.SignUpProfileScreen
-import com.moa.app.feature.onboarding.signup.SignUpSharedViewModel
-import com.moa.app.feature.onboarding.splash.SplashScreen
-import com.moa.app.feature.report.ReportScreen
-import com.moa.app.feature.senior.home.SeniorHomeScreen
-import com.moa.app.feature.senior.quiz.attention.AttentionQuizScreen
-import com.moa.app.feature.senior.quiz.category.QuizCategoryScreen
-import com.moa.app.feature.senior.quiz.daily.DailyQuizScreen
-import com.moa.app.feature.senior.quiz.linguistic.LinguisticQuizScreen
-import com.moa.app.feature.senior.quiz.memory.MemoryQuizScreen
-import com.moa.app.feature.senior.quiz.persistence.PersistenceQuizScreen
-import com.moa.app.feature.senior.quiz.spacetime.SpaceTimeQuizScreen
-import com.moa.app.feature.senior.setting.SeniorSettingScreen
+import com.moa.app.feature.guardian.guardianGraph
+import com.moa.app.feature.onboarding.onboardingGraph
+import com.moa.app.feature.report.reportGraph
+import com.moa.app.feature.senior.seniorGraph
 import com.moa.app.navigation.AppRoute
 import com.moa.app.navigation.ObserveNavigationEvents
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,48 +40,13 @@ class MainActivity : ComponentActivity() {
                         startDestination = AppRoute.Splash,
                         modifier = Modifier.padding(innerPadding),
                     ) {
-                        composable<AppRoute.Splash> { SplashScreen() }
-                        composable<AppRoute.AuthLanding> { AuthLandingScreen() }
-                        composable<AppRoute.SignIn> { SignInScreen() }
-                        navigation<AppRoute.SignUp>(
-                            startDestination = AppRoute.SignUpProfile
-                        ) {
-                            composable<AppRoute.SignUpProfile> { backStackEntry ->
-                                val viewModel = backStackEntry.sharedViewModel<SignUpSharedViewModel>(navController)
-                                SignUpProfileScreen(viewModel)
-                            }
-                            composable<AppRoute.SignUpPhoneAuth> { backStackEntry ->
-                                val viewModel = backStackEntry.sharedViewModel<SignUpSharedViewModel>(navController)
-                                SignUpPhoneAuthScreen(viewModel)
-                            }
-                            composable<AppRoute.SignUpComplete> { SignUpCompleteScreen() }
-                        }
-                        composable<AppRoute.SelectUserRole> { SelectUserRoleScreen() }
-                        composable<AppRoute.UserConnection> { UserConnectionScreen() }
-                        composable<AppRoute.ConnectionCheck> { ConnectionCheckScreen() }
-                        composable<AppRoute.SeniorHome> { SeniorHomeScreen() }
-                        composable<AppRoute.QuizCategory> { QuizCategoryScreen() }
-                        composable<AppRoute.PersistenceQuiz> { PersistenceQuizScreen() }
-                        composable<AppRoute.LinguisticQuiz> { LinguisticQuizScreen() }
-                        composable<AppRoute.AttentionQuiz> { AttentionQuizScreen() }
-                        composable<AppRoute.SpaceTimeQuiz> { SpaceTimeQuizScreen() }
-                        composable<AppRoute.MemoryQuiz> { MemoryQuizScreen() }
-                        composable<AppRoute.DailyQuiz> { DailyQuizScreen() }
-                        composable<AppRoute.SeniorSetting> { SeniorSettingScreen() }
-                        composable<AppRoute.Report> { ReportScreen() }
-                        composable<AppRoute.GuardianHome> { GuardianHomeScreen() }
-                        composable<AppRoute.GuardianSetting> { GuardianSettingScreen() }
-                        composable<AppRoute.GuardianAlert> { GuardianAlertScreen() }
+                        onboardingGraph(navController)
+                        seniorGraph()
+                        guardianGraph()
+                        reportGraph()
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-internal inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController): T {
-    val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
-    val parentEntry = remember(this) { navController.getBackStackEntry(navGraphRoute) }
-    return hiltViewModel(parentEntry)
 }
