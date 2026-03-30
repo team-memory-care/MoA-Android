@@ -11,4 +11,6 @@ interface TtsManager {
     fun speak(text: String, isFlush: Boolean = true)
 
     fun stop()
+
+    fun resetSession()
 }

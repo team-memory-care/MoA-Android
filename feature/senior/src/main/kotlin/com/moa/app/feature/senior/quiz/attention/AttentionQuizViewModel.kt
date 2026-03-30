@@ -1,6 +1,5 @@
 package com.moa.app.feature.senior.quiz.attention
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.AttentionQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
@@ -11,6 +10,7 @@ import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.attention.model.AttentionQuizUiState
 import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.tts.QuizTextNormalizer
+import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,10 +30,10 @@ import javax.inject.Inject
 @HiltViewModel
 class AttentionQuizViewModel @Inject constructor(
     private val navigator: Navigator,
-    private val ttsManager: TtsManager,
+    ttsManager: TtsManager,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
-) : ViewModel() {
+) : TtsAwareViewModel(ttsManager) {
 
     private val _uiState = MutableStateFlow(AttentionQuizUiState.INIT)
     val uiState: StateFlow<AttentionQuizUiState> = _uiState.asStateFlow()

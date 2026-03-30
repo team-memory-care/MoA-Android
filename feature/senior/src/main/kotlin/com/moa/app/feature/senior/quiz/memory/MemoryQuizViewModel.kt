@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.compose.runtime.Immutable
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.MemoryQuiz
 import com.moa.app.domain.quiz.model.QuizCategory
@@ -16,6 +15,7 @@ import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.stt.SttManager
 import com.moa.app.feature.senior.quiz.stt.SttState
+import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,9 +41,9 @@ class MemoryQuizViewModel @Inject constructor(
     private val navigator: Navigator,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
-    private val ttsManager: TtsManager,
+    ttsManager: TtsManager,
     private val sttManager: SttManager,
-) : ViewModel() {
+) : TtsAwareViewModel(ttsManager) {
 
     private val _uiState = MutableStateFlow(MemoryQuizUiState.INIT)
     val uiState: StateFlow<MemoryQuizUiState> = _uiState.asStateFlow()

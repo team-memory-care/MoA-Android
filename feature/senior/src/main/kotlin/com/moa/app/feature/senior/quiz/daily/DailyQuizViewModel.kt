@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.AttentionQuiz
 import com.moa.app.domain.quiz.model.LinguisticQuiz
@@ -23,6 +22,7 @@ import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.stt.SttManager
 import com.moa.app.feature.senior.quiz.stt.SttState
 import com.moa.app.feature.senior.quiz.tts.QuizTextNormalizer
+import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,11 +44,11 @@ import javax.inject.Inject
 class DailyQuizViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val navigator: Navigator,
-    private val ttsManager: TtsManager,
+    ttsManager: TtsManager,
     private val sttManager: SttManager,
     private val fetchDailyQuizzesUseCase: FetchDailyQuizzesUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
-) : ViewModel() {
+) : TtsAwareViewModel(ttsManager) {
 
     private val _uiState = MutableStateFlow(DailyQuizUiState.INIT)
     val uiState: StateFlow<DailyQuizUiState> = _uiState.asStateFlow()
