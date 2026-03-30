@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
 import java.util.UUID
 
@@ -43,7 +44,12 @@ class AndroidTtsManager @Inject constructor(
         scope.launch {
             checkAndInitializeEngine()
 
-            val currentState = engineState.first { it == EngineState.READY || it == EngineState.ERROR }
+            val currentState = withTimeoutOrNull(10_000L) {
+                engineState.first { it == EngineState.READY || it == EngineState.ERROR }
+            } ?: run {
+                _playbackState.value = PlaybackState.ERROR
+                return@launch
+            }
 
             if (currentState == EngineState.ERROR) {
                 _playbackState.value = PlaybackState.ERROR
@@ -74,6 +80,8 @@ class AndroidTtsManager @Inject constructor(
     }
 
     private fun initEngine() {
+        tts?.shutdown()
+        tts = null
         tts = TextToSpeech(context) { status ->
             if (status != TextToSpeech.SUCCESS) {
                 engineState.update { EngineState.ERROR }
@@ -100,20 +108,20 @@ class AndroidTtsManager @Inject constructor(
         tts?.setOnUtteranceProgressListener(
             object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {
-                    _playbackState.value = PlaybackState.SPEAKING
+                    scope.launch { _playbackState.value = PlaybackState.SPEAKING }
                 }
 
                 override fun onDone(utteranceId: String?) {
-                    _playbackState.value = PlaybackState.IDLE
+                    scope.launch { _playbackState.value = PlaybackState.IDLE }
                 }
 
                 override fun onError(utteranceId: String?, errorCode: Int) {
-                    _playbackState.value = PlaybackState.ERROR
+                    scope.launch { _playbackState.value = PlaybackState.ERROR }
                 }
 
                 @Deprecated("Deprecated in Java")
                 override fun onError(utteranceId: String?) {
-                    _playbackState.value = PlaybackState.ERROR
+                    scope.launch { _playbackState.value = PlaybackState.ERROR }
                 }
             },
         )
@@ -121,12 +129,26 @@ class AndroidTtsManager @Inject constructor(
 
     override fun stop() {
         tts?.stop()
+        if (_playbackState.value == PlaybackState.SPEAKING) {
+            _playbackState.value = PlaybackState.IDLE
+        }
+    }
+
+    override fun resetSession() {
+        tts?.stop()
         _playbackState.value = PlaybackState.IDLE
     }
 
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)
         stop()
+    }
+
+    override fun onDestroy(owner: LifecycleOwner) {
+        super.onDestroy(owner)
+        tts?.shutdown()
+        tts = null
+        engineState.value = EngineState.UNINITIALIZED
     }
 
 }
