@@ -1,6 +1,5 @@
 package com.moa.app.feature.senior.quiz.spacetime
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.domain.quiz.model.QuizScore
@@ -10,6 +9,7 @@ import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.spacetime.model.SpaceTimeQuizUiState
+import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,10 +28,10 @@ import javax.inject.Inject
 @HiltViewModel
 class SpaceTimeQuizViewModel @Inject constructor(
     private val navigator: Navigator,
-    private val ttsManager: TtsManager,
+    ttsManager: TtsManager,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
-) : ViewModel() {
+) : TtsAwareViewModel(ttsManager) {
 
     private val _uiState = MutableStateFlow(SpaceTimeQuizUiState.INIT)
     val uiState: StateFlow<SpaceTimeQuizUiState> = _uiState.asStateFlow()
