@@ -1,7 +1,6 @@
 package com.moa.app.data.quiz.model.response
 
 import com.moa.app.domain.quiz.model.PersistenceQuiz
-import com.moa.app.domain.quiz.model.QuizCategory
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -19,7 +18,6 @@ data class PersistenceQuizResponse(
 fun PersistenceQuizResponse.toDomain(): PersistenceQuiz {
     return PersistenceQuiz(
         id = this.questionId,
-        type = QuizCategory.PERSISTENCE,
         questionFormat = this.questionFormat,
         questionContent = this.questionContent,
         answer = this.answer,

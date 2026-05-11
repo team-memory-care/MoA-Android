@@ -243,7 +243,8 @@ class DailyQuizViewModel @Inject constructor(
     }
 
     private fun DailyQuizUiState.toUserAnswer(sttResult: String?): UserAnswer {
-        return when (currentQuiz) {
+        val quiz = currentQuiz ?: return UserAnswer.Text("")
+        return when (quiz) {
             is AttentionQuiz -> UserAnswer.Text(attentionQuizAnswer)
             is PersistenceQuiz, is LinguisticQuiz, is SpaceTimeQuiz -> {
                 UserAnswer.Selection(selectedAnswerIndex ?: -1)
@@ -253,8 +254,6 @@ class DailyQuizViewModel @Inject constructor(
                 if (sttResult != null) UserAnswer.Text(sttResult)
                 else UserAnswer.MultipleText(memoryQuizTextAnswers)
             }
-
-            else -> UserAnswer.Text("")
         }
     }
 

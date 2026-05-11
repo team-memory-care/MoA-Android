@@ -175,7 +175,6 @@ private fun MemoryQuizContentPreview() {
             quizzes = persistentListOf(
                 MemoryQuiz(
                     id = 0,
-                    type = QuizCategory.MEMORY,
                     questionFormat = "",
                     questionContent = "",
                     answer = listOf("사과", "당근", "의자"),

@@ -1,7 +1,6 @@
 package com.moa.app.data.quiz.model.response
 
 import com.moa.app.domain.quiz.model.AttentionQuiz
-import com.moa.app.domain.quiz.model.QuizCategory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -19,7 +18,6 @@ data class AttentionQuizResponse(
 fun AttentionQuizResponse.toDomain(): AttentionQuiz {
     return AttentionQuiz(
         id = this.questionId,
-        type = QuizCategory.ATTENTION,
         questionFormat = this.questionFormat,
         questionContent = this.questionContent,
         answer = this.answer,

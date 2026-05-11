@@ -147,7 +147,6 @@ private fun Preview() {
             quizzes = persistentListOf(
                 PersistenceQuiz(
                     id = 1,
-                    type = QuizCategory.PERSISTENCE,
                     questionFormat = "",
                     questionContent = "오늘은 몇 년도인가요?",
                     answer = "2025년",

@@ -1,7 +1,6 @@
 package com.moa.app.data.quiz.model.response
 
 import com.moa.app.domain.quiz.model.LinguisticQuiz
-import com.moa.app.domain.quiz.model.QuizCategory
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,7 +19,6 @@ data class LinguisticQuizResponse(
 fun LinguisticQuizResponse.toDomain(): LinguisticQuiz {
     return LinguisticQuiz(
         id = this.questionId,
-        type = QuizCategory.LINGUISTIC,
         questionFormat = this.questionFormat,
         questionContent = this.questionContent,
         questionImage = this.imageUrl,

@@ -151,7 +151,6 @@ private fun Preview() {
             quizzes = persistentListOf(
                 AttentionQuiz(
                     id = 1,
-                    type = QuizCategory.ATTENTION,
                     questionFormat = "",
                     questionContent = "",
                     answer = "",

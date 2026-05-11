@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.ImmutableList
 
 data class LinguisticQuiz(
     override val id: Long,
-    override val type: QuizCategory,
     override val questionFormat: String,
     override val questionContent: String,
     val answer: String,

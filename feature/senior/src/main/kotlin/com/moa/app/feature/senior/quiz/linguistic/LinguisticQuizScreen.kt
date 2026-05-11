@@ -165,7 +165,6 @@ private fun Preview() {
                         questionImage = "",
                         answerOptions = persistentListOf("A", "B", "C", "D"),
                         id = 1,
-                        type = QuizCategory.LINGUISTIC,
                         questionFormat = "",
                         questionContent = "",
                         answer = "",

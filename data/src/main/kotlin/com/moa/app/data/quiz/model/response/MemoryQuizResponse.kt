@@ -1,7 +1,6 @@
 package com.moa.app.data.quiz.model.response
 
 import com.moa.app.domain.quiz.model.MemoryQuiz
-import com.moa.app.domain.quiz.model.QuizCategory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -20,7 +19,6 @@ data class MemoryQuizResponse(
 fun MemoryQuizResponse.toDomain(): MemoryQuiz {
     return MemoryQuiz(
         id = this.questionId,
-        type = QuizCategory.MEMORY,
         questionFormat = this.questionFormat,
         questionContent = this.questionContent,
         answer = this.answer,
