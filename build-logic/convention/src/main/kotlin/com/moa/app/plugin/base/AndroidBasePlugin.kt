@@ -1,39 +1,31 @@
 package com.moa.app.plugin.base
 
-import com.android.build.gradle.BaseExtension
+import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.getByType
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+import org.gradle.kotlin.dsl.configure
 
 abstract class AndroidBasePlugin : BasePlugin() {
     protected fun Project.configureAndroidBase() {
-        extensions.getByType<BaseExtension>().apply {
-            setCompileSdkVersion(libs.findVersion("compileSdk").get().requiredVersion.toInt())
+        extensions.configure<CommonExtension> {
+            compileSdk = libs.findVersion("compileSdk").get().requiredVersion.toInt()
 
-            defaultConfig {
+            defaultConfig.apply {
                 minSdk = libs.findVersion("minSdk").get().requiredVersion.toInt()
-                targetSdk = libs.findVersion("targetSdk").get().requiredVersion.toInt()
-                versionCode = libs.findVersion("versionCode").get().requiredVersion.toInt()
-                versionName = libs.findVersion("versionName").get().requiredVersion
             }
 
-            compileOptions {
+            compileOptions.apply {
                 sourceCompatibility = JavaVersion.VERSION_17
                 targetCompatibility = JavaVersion.VERSION_17
             }
 
-            packagingOptions {
-                resources {
+            packaging.apply {
+                resources.apply {
                     excludes.add("META-INF/AL2.0")
                     excludes.add("META-INF/LGPL2.1")
                     excludes.add("kotlin/reflect/*")
                 }
             }
-        }
-
-        extensions.getByType<KotlinAndroidProjectExtension>().apply {
-            jvmToolchain(17)
         }
     }
 }

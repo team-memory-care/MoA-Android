@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/macos,android,androidstudio,kotlin
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,android,androidstudio,kotlin
 
+### claude code ###
+CLAUDE.md
+.claude/
+
 ### Android ###
 # Gradle files
 .gradle/
@@ -216,5 +220,10 @@ fabric.properties
 ### AndroidStudio Patch ###
 
 !/gradle/wrapper/gradle-wrapper.jar
+
+### mock ###
+**/mock/
+
+**/moa_anr_bugreport/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,android,androidstudio,kotlin
