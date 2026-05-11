@@ -1,6 +1,5 @@
 package com.moa.app.data.auth.service
 
-import com.moa.app.data.auth.model.request.AuthTokenRequest
 import com.moa.app.data.auth.model.request.PhoneAuthCodeRequest
 import com.moa.app.data.auth.model.request.SignUpUserRequest
 import com.moa.app.data.auth.model.response.AuthTokenResponse
@@ -8,10 +7,8 @@ import com.moa.app.data.auth.model.response.ParentRoleResponse
 import com.moa.app.network.auth.NoAuth
 import com.moa.app.network.auth.TokenResponse
 import com.moa.app.network.model.NetworkResult
-import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.POST
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface AuthService {

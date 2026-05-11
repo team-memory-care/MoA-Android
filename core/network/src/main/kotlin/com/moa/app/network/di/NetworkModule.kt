@@ -1,15 +1,19 @@
 package com.moa.app.network.di
 
+import android.content.Context
 import com.moa.app.network.BuildConfig
 import com.moa.app.network.adapter.NetworkResultCallAdapterFactory
 import com.moa.app.network.auth.AuthInterceptor
 import com.moa.app.network.auth.TokenManager
+import com.moa.app.network.mock.auth.AuthMockInterceptor
+import com.moa.app.network.mock.quiz.QuizMockInterceptor
+import com.moa.app.network.mock.user.UserMockInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
-import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -54,17 +58,45 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthInterceptor(tokenManager: TokenManager): Interceptor =
+    fun provideAuthInterceptor(tokenManager: TokenManager): AuthInterceptor =
         AuthInterceptor(tokenManager)
+
+    @Provides
+    @Singleton
+    fun provideAuthMockInterceptor(
+        @ApplicationContext context: Context,
+    ): AuthMockInterceptor = AuthMockInterceptor(context)
+
+    @Provides
+    @Singleton
+    fun provideUserMockInterceptor(
+        @ApplicationContext context: Context,
+    ): UserMockInterceptor = UserMockInterceptor(context)
+
+    @Provides
+    @Singleton
+    fun provideQuizMockInterceptor(
+        @ApplicationContext context: Context,
+    ): QuizMockInterceptor = QuizMockInterceptor(context)
 
     @Provides
     @Singleton
     fun provideOkHttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor,
-        authInterceptor: AuthInterceptor
+        authInterceptor: AuthInterceptor,
+        authMockInterceptor: AuthMockInterceptor,
+        userMockInterceptor: UserMockInterceptor,
+        quizMockInterceptor: QuizMockInterceptor,
     ): OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(authInterceptor)
-        .addInterceptor(httpLoggingInterceptor)
+        .apply {
+            addInterceptor(httpLoggingInterceptor)
+            addInterceptor(authInterceptor)
+            if (BuildConfig.DEBUG) {
+                addInterceptor(authMockInterceptor)
+                addInterceptor(userMockInterceptor)
+                addInterceptor(quizMockInterceptor)
+            }
+        }
         .connectTimeout(10L, TimeUnit.SECONDS)
         .writeTimeout(30L, TimeUnit.SECONDS)
         .readTimeout(30L, TimeUnit.SECONDS)
@@ -78,7 +110,7 @@ object NetworkModule {
         okHttpClient: OkHttpClient,
     ): Retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
-        .addCallAdapterFactory(NetworkResultCallAdapterFactory.create())
+        .addCallAdapterFactory(NetworkResultCallAdapterFactory())
         .addConverterFactory(converterFactory)
         .client(okHttpClient)
         .build()
