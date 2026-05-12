@@ -16,6 +16,7 @@ import com.moa.app.domain.quiz.model.SpaceTimeQuiz
 import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchDailyQuizzesUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
+import com.moa.app.feature.senior.quiz.internal.QUIZ_RESULT_DISPLAY_MS
 import com.moa.app.feature.senior.quiz.internal.fetchWithMinDelay
 import com.moa.app.feature.senior.quiz.memory.InputMode
 import com.moa.app.feature.senior.quiz.memory.MemoryQuizSetState
@@ -189,7 +190,7 @@ class DailyQuizViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            delay(2000L)
+            delay(QUIZ_RESULT_DISPLAY_MS)
             goToNextQuestion()
             _uiState.update { it.copy(isChecking = false) }
         }

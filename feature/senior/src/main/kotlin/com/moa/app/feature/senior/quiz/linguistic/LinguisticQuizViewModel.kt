@@ -7,6 +7,7 @@ import com.moa.app.domain.quiz.model.QuizScore
 import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
+import com.moa.app.feature.senior.quiz.internal.QUIZ_RESULT_DISPLAY_MS
 import com.moa.app.feature.senior.quiz.internal.loadQuizzesWithMinDelay
 import com.moa.app.feature.senior.quiz.linguistic.model.LinguisticQuizUiState
 import com.moa.app.feature.senior.quiz.model.QuizResult
@@ -82,7 +83,7 @@ class LinguisticQuizViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            delay(2000L)
+            delay(QUIZ_RESULT_DISPLAY_MS)
             goToNextQuestion()
         }
     }

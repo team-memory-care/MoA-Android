@@ -10,6 +10,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 
 internal const val MIN_LOADING_DELAY_MS = 2000L
+internal const val QUIZ_RESULT_DISPLAY_MS = 2000L
 
 internal suspend fun <T> fetchWithMinDelay(
     minDelayMs: Long = MIN_LOADING_DELAY_MS,
