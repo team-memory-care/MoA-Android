@@ -21,7 +21,7 @@ import com.moa.app.feature.senior.quiz.category.model.backgroundColor
 import com.moa.app.feature.senior.quiz.category.model.description
 import com.moa.app.feature.senior.quiz.category.model.iconRes
 import com.moa.app.feature.senior.quiz.category.model.title
-import com.moa.app.feature.senior.quiz.component.QuizCategoryCard
+import com.moa.app.feature.senior.quiz.category.component.QuizCategoryCard
 
 @Composable
 fun QuizCategoryScreen(

@@ -1,4 +1,4 @@
-package com.moa.app.feature.senior.quiz.component
+package com.moa.app.feature.senior.quiz.category.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
