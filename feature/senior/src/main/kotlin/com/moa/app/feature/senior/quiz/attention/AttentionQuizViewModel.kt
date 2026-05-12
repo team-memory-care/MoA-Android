@@ -8,16 +8,13 @@ import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.attention.model.AttentionQuizUiState
+import com.moa.app.feature.senior.quiz.internal.loadQuizzesWithMinDelay
 import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.tts.QuizTextNormalizer
 import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,35 +39,26 @@ class AttentionQuizViewModel @Inject constructor(
         loadAttentionQuizzes()
     }
 
+    private fun loadAttentionQuizzes() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            loadQuizzesWithMinDelay<AttentionQuiz>(QuizCategory.ATTENTION, fetchQuizUseCase)
+                .fold(
+                    onSuccess = { quizzes ->
+                        _uiState.update { it.copy(isLoading = false, quizzes = quizzes) }
+                    },
+                    onFailure = { t ->
+                        Timber.e(t, "loadAttentionQuizzes failed")
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
+                )
+        }
+    }
+
     fun speakCurrentQuestion() {
         val quiz = _uiState.value.currentQuiz ?: return
         val normalizedText = QuizTextNormalizer.normalizeExpression(quiz.expression + "=")
         ttsManager.speak(normalizedText)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun loadAttentionQuizzes() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val minLoadingTime = async { delay(2000L) }
-            val quizzesDeferred = async { fetchQuizUseCase(QuizCategory.ATTENTION) }
-            awaitAll(minLoadingTime, quizzesDeferred)
-            quizzesDeferred.getCompleted().fold(
-                onSuccess = { quizzes ->
-                    val attentionQuizzes = quizzes.filterIsInstance<AttentionQuiz>()
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            quizzes = attentionQuizzes.toImmutableList()
-                        )
-                    }
-                },
-                onFailure = { t ->
-                    Timber.e(t, "loadAttentionQuizzes failed")
-                    _uiState.update { it.copy(isLoading = false) }
-                }
-            )
-        }
     }
 
     fun updateUserInput(input: String) {

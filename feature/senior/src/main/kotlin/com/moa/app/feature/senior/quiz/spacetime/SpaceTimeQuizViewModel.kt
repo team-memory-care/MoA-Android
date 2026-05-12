@@ -7,15 +7,13 @@ import com.moa.app.domain.quiz.model.SpaceTimeQuiz
 import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
+import com.moa.app.feature.senior.quiz.internal.loadQuizzesWithMinDelay
 import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.spacetime.model.SpaceTimeQuizUiState
 import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,33 +38,25 @@ class SpaceTimeQuizViewModel @Inject constructor(
         loadSpaceTimeQuizzes()
     }
 
-    fun speakCurrentQuestion() {
-        if (_uiState.value.currentQuiz == null) return
-        ttsManager.speak("겹치는 모양을 찾아주세요!")
-    }
-
     private fun loadSpaceTimeQuizzes() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val minLoadingTime = async { delay(2000L) }
-            val quizzesDeferred = async { fetchQuizUseCase(QuizCategory.SPACETIME) }
-            awaitAll(minLoadingTime, quizzesDeferred)
-            quizzesDeferred.await().fold(
-                onSuccess = { quizzes ->
-                    val spaceTimeQuizzes = quizzes.filterIsInstance<SpaceTimeQuiz>()
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            quizzes = spaceTimeQuizzes.toImmutableList()
-                        )
+            loadQuizzesWithMinDelay<SpaceTimeQuiz>(QuizCategory.SPACETIME, fetchQuizUseCase)
+                .fold(
+                    onSuccess = { quizzes ->
+                        _uiState.update { it.copy(isLoading = false, quizzes = quizzes) }
+                    },
+                    onFailure = { t ->
+                        Timber.e(t, "loadSpaceTimeQuizzes failed")
+                        _uiState.update { it.copy(isLoading = false) }
                     }
-                },
-                onFailure = { t ->
-                    Timber.e(t, "loadSpaceTimeQuizzes failed")
-                    _uiState.update { it.copy(isLoading = false) }
-                }
-            )
+                )
         }
+    }
+
+    fun speakCurrentQuestion() {
+        if (_uiState.value.currentQuiz == null) return
+        ttsManager.speak("겹치는 모양을 찾아주세요!")
     }
 
     fun selectAnswer(index: Int) {

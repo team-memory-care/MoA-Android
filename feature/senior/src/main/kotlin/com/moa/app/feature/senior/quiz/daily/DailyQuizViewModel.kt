@@ -16,6 +16,7 @@ import com.moa.app.domain.quiz.model.SpaceTimeQuiz
 import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchDailyQuizzesUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
+import com.moa.app.feature.senior.quiz.internal.fetchWithMinDelay
 import com.moa.app.feature.senior.quiz.memory.InputMode
 import com.moa.app.feature.senior.quiz.memory.MemoryQuizSetState
 import com.moa.app.feature.senior.quiz.model.QuizResult
@@ -29,8 +30,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -63,6 +62,22 @@ class DailyQuizViewModel @Inject constructor(
         }
     }
 
+    private fun loadDailyQuizzes() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            fetchWithMinDelay { fetchDailyQuizzesUseCase() }
+                .fold(
+                    onSuccess = { quizzes ->
+                        _uiState.update { it.copy(isLoading = false, quizzes = quizzes) }
+                    },
+                    onFailure = { t ->
+                        Timber.e(t, "loadDailyQuizzes failed")
+                        _uiState.update { it.copy(isLoading = false) }
+                    },
+                )
+        }
+    }
+
     fun speakCurrentQuestion() {
         val state = _uiState.value
         val quiz = state.currentQuiz ?: return
@@ -82,26 +97,6 @@ class DailyQuizViewModel @Inject constructor(
         }
 
         ttsManager.speak(text)
-    }
-
-    private fun loadDailyQuizzes() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val minLoadingTime = async { delay(2000L) }
-            val quizzesDeferred = async { fetchDailyQuizzesUseCase() }
-            awaitAll(minLoadingTime, quizzesDeferred)
-            quizzesDeferred.await().fold(
-                onSuccess = { quizzes ->
-                    _uiState.update {
-                        it.copy(isLoading = false, quizzes = quizzes)
-                    }
-                },
-                onFailure = { t ->
-                    Timber.e(t, "loadDailyQuizzes failed")
-                    _uiState.update { it.copy(isLoading = false) }
-                },
-            )
-        }
     }
 
     fun displayQuizImages() {

@@ -7,15 +7,13 @@ import com.moa.app.domain.quiz.model.QuizScore
 import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
+import com.moa.app.feature.senior.quiz.internal.loadQuizzesWithMinDelay
 import com.moa.app.feature.senior.quiz.linguistic.model.LinguisticQuizUiState
 import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,33 +38,25 @@ class LinguisticQuizViewModel @Inject constructor(
         loadLinguisticQuizzes()
     }
 
+    private fun loadLinguisticQuizzes() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            loadQuizzesWithMinDelay<LinguisticQuiz>(QuizCategory.LINGUISTIC, fetchQuizUseCase)
+                .fold(
+                    onSuccess = { quizzes ->
+                        _uiState.update { it.copy(isLoading = false, quizzes = quizzes) }
+                    },
+                    onFailure = { t ->
+                        Timber.e(t, "loadLinguisticQuizzes failed")
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
+                )
+        }
+    }
+
     fun speakCurrentQuestion() {
         if (_uiState.value.currentQuiz == null) return
         ttsManager.speak("아래의 그림은 무엇일까요?")
-    }
-
-    private fun loadLinguisticQuizzes() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            val minLoadingTime = async { delay(2000L) }
-            val quizzesDeferred = async { fetchQuizUseCase(QuizCategory.LINGUISTIC) }
-            awaitAll(minLoadingTime, quizzesDeferred)
-            quizzesDeferred.await().fold(
-                onSuccess = { quizzes ->
-                    val linguisticQuizzes = quizzes.filterIsInstance<LinguisticQuiz>()
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            quizzes = linguisticQuizzes.toImmutableList(),
-                        )
-                    }
-                },
-                onFailure = { t ->
-                    Timber.e(t, "fetchLinguisticQuizzes failed")
-                    _uiState.update { it.copy(isLoading = false) }
-                },
-            )
-        }
     }
 
     fun selectAnswer(index: Int) {
@@ -102,7 +92,7 @@ class LinguisticQuizViewModel @Inject constructor(
         val nextIndex = currentState.currentQuestionIndex + 1
 
         if (nextIndex >= currentState.quizzes.size) {
-            submitQuizResult(currentState.correctCount, currentState.quizzes.size)
+            uploadQuizResult(currentState.correctCount, currentState.quizzes.size)
         } else {
             _uiState.update { state ->
                 state.copy(
@@ -115,7 +105,7 @@ class LinguisticQuizViewModel @Inject constructor(
         }
     }
 
-    private fun submitQuizResult(correctCount: Int, totalCount: Int) {
+    private fun uploadQuizResult(correctCount: Int, totalCount: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 

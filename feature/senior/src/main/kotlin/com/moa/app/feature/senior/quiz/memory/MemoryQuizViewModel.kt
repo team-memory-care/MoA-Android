@@ -12,6 +12,7 @@ import com.moa.app.domain.quiz.model.QuizScore
 import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
+import com.moa.app.feature.senior.quiz.internal.loadQuizzesWithMinDelay
 import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.stt.SttManager
 import com.moa.app.feature.senior.quiz.stt.SttState
@@ -23,9 +24,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,6 +53,22 @@ class MemoryQuizViewModel @Inject constructor(
         when (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)) {
             PackageManager.PERMISSION_GRANTED -> {}
             else -> switchToTextMode()
+        }
+    }
+
+    private fun loadMemoryQuizzes() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            loadQuizzesWithMinDelay<MemoryQuiz>(QuizCategory.MEMORY, fetchQuizUseCase)
+                .fold(
+                    onSuccess = { quizzes ->
+                        _uiState.update { it.copy(isLoading = false, quizzes = quizzes) }
+                    },
+                    onFailure = { t ->
+                        Timber.e(t, "loadMemoryQuizzes failed")
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
+                )
         }
     }
 
@@ -195,30 +209,6 @@ class MemoryQuizViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false, errorMessage = "결과 전송 실패") }
                     exitQuiz()
                 }
-        }
-    }
-
-    private fun loadMemoryQuizzes() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            val minLoadingTime = async { delay(2000L) }
-            val quizzesDeferred = async { fetchQuizUseCase(QuizCategory.MEMORY) }
-            awaitAll(minLoadingTime, quizzesDeferred)
-            quizzesDeferred.await().fold(
-                onSuccess = { quizzes ->
-                    val memoryQuizzes = quizzes.filterIsInstance<MemoryQuiz>()
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            quizzes = memoryQuizzes.toImmutableList(),
-                        )
-                    }
-                },
-                onFailure = { t ->
-                    Timber.e(t, "loadMemoryQuizzes failed")
-                    _uiState.update { it.copy(isLoading = false) }
-                },
-            )
         }
     }
 

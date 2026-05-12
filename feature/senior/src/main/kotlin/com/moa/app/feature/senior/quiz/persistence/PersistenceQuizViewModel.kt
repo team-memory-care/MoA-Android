@@ -8,6 +8,7 @@ import com.moa.app.domain.quiz.model.QuizScore
 import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
+import com.moa.app.feature.senior.quiz.internal.loadQuizzesWithMinDelay
 import com.moa.app.feature.senior.quiz.model.QuizResult
 import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
@@ -15,9 +16,6 @@ import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,33 +40,25 @@ class PersistenceQuizViewModel @Inject constructor(
         loadPersistenceQuizzes()
     }
 
-    fun speakCurrentQuestion() {
-        val currentQuiz = _uiState.value.currentQuiz ?: return
-        ttsManager.speak(currentQuiz.questionContent)
-    }
-
     private fun loadPersistenceQuizzes() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val minLoadingTime = async { delay(2000L) }
-            val quizzesDeferred = async { fetchQuizUseCase(QuizCategory.PERSISTENCE) }
-            awaitAll(minLoadingTime, quizzesDeferred)
-            quizzesDeferred.await().fold(
-                onSuccess = { quizzes ->
-                    val persistenceQuizzes = quizzes.filterIsInstance<PersistenceQuiz>()
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            quizzes = persistenceQuizzes.toImmutableList(),
-                        )
+            loadQuizzesWithMinDelay<PersistenceQuiz>(QuizCategory.PERSISTENCE, fetchQuizUseCase)
+                .fold(
+                    onSuccess = { quizzes ->
+                        _uiState.update { it.copy(isLoading = false, quizzes = quizzes) }
+                    },
+                    onFailure = { t ->
+                        Timber.e(t, "loadPersistenceQuizzes failed")
+                        _uiState.update { it.copy(isLoading = false) }
                     }
-                },
-                onFailure = { t ->
-                    Timber.e("loadQuizzes failed: $t")
-                    _uiState.update { it.copy(isLoading = false) }
-                },
-            )
+                )
         }
+    }
+
+    fun speakCurrentQuestion() {
+        val currentQuiz = _uiState.value.currentQuiz ?: return
+        ttsManager.speak(currentQuiz.questionContent)
     }
 
     fun selectAnswer(selectedAnswerIndex: Int) {
@@ -105,7 +95,7 @@ class PersistenceQuizViewModel @Inject constructor(
         val nextIndex = currentState.currentQuestionIndex + 1
 
         if (nextIndex >= currentState.quizzes.size) {
-            submitQuizResult(currentState.correctCount, currentState.quizzes.size)
+            uploadQuizResult(currentState.correctCount, currentState.quizzes.size)
         } else {
             _uiState.update { state ->
                 state.copy(
@@ -118,7 +108,7 @@ class PersistenceQuizViewModel @Inject constructor(
         }
     }
 
-    private fun submitQuizResult(correctCount: Int, totalCount: Int) {
+    private fun uploadQuizResult(correctCount: Int, totalCount: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
