@@ -2,7 +2,7 @@ package com.moa.app.feature.senior.quiz.linguistic.model
 
 import androidx.compose.runtime.Immutable
 import com.moa.app.domain.quiz.model.LinguisticQuiz
-import com.moa.app.feature.senior.quiz.model.QuizResult
+import com.moa.app.feature.senior.quiz.internal.QuizResult
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

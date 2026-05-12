@@ -20,7 +20,7 @@ import com.moa.app.feature.senior.quiz.internal.QUIZ_RESULT_DISPLAY_MS
 import com.moa.app.feature.senior.quiz.internal.fetchWithMinDelay
 import com.moa.app.feature.senior.quiz.memory.InputMode
 import com.moa.app.feature.senior.quiz.memory.MemoryQuizSetState
-import com.moa.app.feature.senior.quiz.model.QuizResult
+import com.moa.app.feature.senior.quiz.internal.QuizResult
 import com.moa.app.feature.senior.quiz.stt.SttManager
 import com.moa.app.feature.senior.quiz.stt.SttState
 import com.moa.app.feature.senior.quiz.tts.QuizTextNormalizer

@@ -9,7 +9,7 @@ import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.internal.QUIZ_RESULT_DISPLAY_MS
 import com.moa.app.feature.senior.quiz.internal.loadQuizzesWithMinDelay
-import com.moa.app.feature.senior.quiz.model.QuizResult
+import com.moa.app.feature.senior.quiz.internal.QuizResult
 import com.moa.app.feature.senior.quiz.spacetime.model.SpaceTimeQuizUiState
 import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
