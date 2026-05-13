@@ -1,7 +1,7 @@
 package com.moa.app.data.quiz.model.response
 
 import com.moa.app.domain.quiz.model.SpaceTimeQuiz
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -23,6 +23,6 @@ fun SpaceTimeQuizResponse.toDomain(): SpaceTimeQuiz {
         questionContent = this.questionContent,
         answerIndex = this.answer.toInt() - 1,
         questionImageUrl = this.questionImageUrl,
-        imageOptionsUrl = this.imageOptionsUrl.toPersistentList()
+        imageOptionsUrl = this.imageOptionsUrl.toImmutableList()
     )
 }
