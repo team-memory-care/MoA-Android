@@ -5,6 +5,9 @@
 CLAUDE.md
 .claude/
 
+### codex ###
+.agents
+
 ### Android ###
 # Gradle files
 .gradle/
