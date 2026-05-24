@@ -23,7 +23,9 @@ import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaQuizButton
 import com.moa.app.designsystem.component.core.button.QuizButtonState
 import com.moa.app.designsystem.theme.MoaTheme
+import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.feature.senior.quiz.component.CenterQuizDescription
+import com.moa.app.feature.senior.quiz.internal.rememberQuizImageRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -43,7 +45,7 @@ fun LinguisticQuizForm(
         )
 
         AsyncImage(
-            model = questionImage,
+            model = rememberQuizImageRequest(questionImage, QuizCategory.LINGUISTIC),
             placeholder = painterResource(R.drawable.img_default_card),
             contentDescription = null,
             modifier = Modifier.fillMaxWidth()

@@ -22,7 +22,9 @@ import coil3.compose.LocalAsyncImagePreviewHandler
 import com.moa.app.designsystem.R
 import com.moa.app.designsystem.component.core.button.MaQuizButton
 import com.moa.app.designsystem.component.core.button.QuizButtonState
+import com.moa.app.domain.quiz.model.QuizCategory
 import com.moa.app.feature.senior.quiz.component.CenterQuizDescription
+import com.moa.app.feature.senior.quiz.internal.rememberQuizImageRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -43,7 +45,7 @@ fun SpaceTimeQuizForm(
         )
 
         AsyncImage(
-            model = questionImageUrl,
+            model = rememberQuizImageRequest(questionImageUrl, QuizCategory.SPACETIME),
             placeholder = painterResource(R.drawable.img_default_card_2),
             contentDescription = null,
             modifier = Modifier.fillMaxWidth()
@@ -68,7 +70,7 @@ fun SpaceTimeQuizForm(
                     modifier = Modifier.weight(1f),
                 ) {
                     AsyncImage(
-                        model = option,
+                        model = rememberQuizImageRequest(option, QuizCategory.SPACETIME),
                         contentDescription = null,
                         modifier = Modifier.padding(vertical = 16.dp)
                     )

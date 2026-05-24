@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.browser)
 
     implementation(libs.timber)
+    implementation(libs.bundles.coil)
 
     testImplementation(libs.junit)
 
