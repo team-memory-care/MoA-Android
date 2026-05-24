@@ -57,7 +57,6 @@ fun MemoryQuizScreen(
         MemoryQuizContent(
             uiState = uiState,
             onStartQuizClick = viewModel::displayQuizImages,
-            onImagesFinished = viewModel::onImagesFinished,
             onStartSpeakingClick = viewModel::startListening,
             onChangeModeClick = viewModel::switchToTextMode,
             onUnableToSpeakClick = viewModel::displayChangeModeButton,
@@ -92,7 +91,6 @@ private fun MemoryQuizContent(
     uiState: MemoryQuizUiState,
     modifier: Modifier = Modifier,
     onStartQuizClick: () -> Unit,
-    onImagesFinished: () -> Unit,
     onStartSpeakingClick: () -> Unit,
     onChangeModeClick: () -> Unit,
     onUnableToSpeakClick: () -> Unit,
@@ -131,7 +129,7 @@ private fun MemoryQuizContent(
                         MemoryQuizSetState.QUESTION_DISPLAY -> {
                             MemoryQuizPlayContent(
                                 imageUrls = targetQuiz.imageUrls,
-                                onImagesFinished = onImagesFinished,
+                                currentImageIndex = uiState.displayImageIndex,
                             )
                         }
 
@@ -189,7 +187,6 @@ private fun MemoryQuizContentPreview() {
         onContinueTextClick = {},
         onTextAnswerChange = { _, _ -> },
         onBackClick = {},
-        onImagesFinished = {},
         onImageClick = {},
     )
 }

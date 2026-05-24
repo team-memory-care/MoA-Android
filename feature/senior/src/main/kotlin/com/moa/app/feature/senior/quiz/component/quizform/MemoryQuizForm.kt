@@ -16,10 +16,10 @@ fun MemoryQuizForm(
     isSpeaking: Boolean,
     isChangeModeButtonEnabled: Boolean,
     imageUrls: List<String>,
+    currentImageIndex: Int,
     userTextAnswers: List<String>,
     isTextContinueButtonEnabled: Boolean,
     onStartQuizClick: () -> Unit,
-    onImagesFinished: () -> Unit,
     onImageClick: () -> Unit,
     onStartSpeakingClick: () -> Unit,
     onUnableToSpeakClick: () -> Unit,
@@ -35,7 +35,7 @@ fun MemoryQuizForm(
         MemoryQuizSetState.QUESTION_DISPLAY -> {
             MemoryQuizPlayContent(
                 imageUrls = imageUrls,
-                onImagesFinished = onImagesFinished
+                currentImageIndex = currentImageIndex,
             )
         }
 
@@ -75,10 +75,10 @@ private fun PreviewMemoryQuizForm() {
         isSpeaking = false,
         isChangeModeButtonEnabled = false,
         imageUrls = listOf("", "", ""),
+        currentImageIndex = 0,
         userTextAnswers = listOf("", "", ""),
         isTextContinueButtonEnabled = false,
         onStartQuizClick = {},
-        onImagesFinished = {},
         onImageClick = {},
         onStartSpeakingClick = {},
         onUnableToSpeakClick = {},

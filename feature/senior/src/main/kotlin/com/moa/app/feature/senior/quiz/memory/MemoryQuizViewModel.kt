@@ -13,6 +13,7 @@ import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.internal.QUIZ_RESULT_DISPLAY_MS
+import com.moa.app.feature.senior.quiz.internal.QuizImagePreloader
 import com.moa.app.feature.senior.quiz.internal.loadQuizzesWithMinDelay
 import com.moa.app.feature.senior.quiz.internal.QuizResult
 import com.moa.app.feature.senior.quiz.stt.SttManager
@@ -25,6 +26,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,12 +44,15 @@ class MemoryQuizViewModel @Inject constructor(
     private val navigator: Navigator,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
+    private val imagePreloader: QuizImagePreloader,
     ttsManager: TtsManager,
     private val sttManager: SttManager,
 ) : TtsAwareViewModel(ttsManager) {
 
     private val _uiState = MutableStateFlow(MemoryQuizUiState.INIT)
     val uiState: StateFlow<MemoryQuizUiState> = _uiState.asStateFlow()
+    private val preloadJobs = mutableMapOf<Int, Deferred<Boolean>>()
+    private var imageDisplayJob: Job? = null
 
     init {
         observeSttState()
@@ -60,7 +67,9 @@ class MemoryQuizViewModel @Inject constructor(
     private fun loadMemoryQuizzes() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            loadQuizzesWithMinDelay<MemoryQuiz>(QuizCategory.MEMORY, fetchQuizUseCase)
+            loadQuizzesWithMinDelay<MemoryQuiz>(QuizCategory.MEMORY, fetchQuizUseCase) { quizzes ->
+                startPreloadForQuestion(index = 0, quizzes = quizzes)?.await()
+            }
                 .fold(
                     onSuccess = { quizzes ->
                         _uiState.update { it.copy(isLoading = false, quizzes = quizzes) }
@@ -84,11 +93,48 @@ class MemoryQuizViewModel @Inject constructor(
     }
 
     fun displayQuizImages() {
-        _uiState.update { it.copy(quizState = MemoryQuizSetState.QUESTION_DISPLAY) }
+        viewModelScope.launch {
+            val currentState = _uiState.value
+            waitForPreload(currentState.currentQuestionIndex, currentState.quizzes)
+            _uiState.update {
+                it.copy(
+                    quizState = MemoryQuizSetState.QUESTION_DISPLAY,
+                    displayImageIndex = 0,
+                )
+            }
+            startImageDisplayTimer()
+        }
     }
 
-    fun onImagesFinished() {
-        _uiState.update { it.copy(quizState = MemoryQuizSetState.ANSWERING) }
+    private fun onImagesFinished() {
+        _uiState.update {
+            it.copy(
+                quizState = MemoryQuizSetState.ANSWERING,
+                displayImageIndex = 0,
+            )
+        }
+        val currentState = _uiState.value
+        startPreloadForQuestion(currentState.currentQuestionIndex + 1, currentState.quizzes)
+    }
+
+    private fun startImageDisplayTimer() {
+        imageDisplayJob?.cancel()
+        imageDisplayJob = viewModelScope.launch {
+            while (true) {
+                delay(MEMORY_IMAGE_DISPLAY_MS)
+                val currentState = _uiState.value
+                val currentQuiz = currentState.currentQuiz ?: return@launch
+                val nextImageIndex = currentState.displayImageIndex + 1
+
+                if (nextImageIndex < currentQuiz.imageUrls.size) {
+                    _uiState.update { it.copy(displayImageIndex = nextImageIndex) }
+                } else {
+                    delay(MEMORY_IMAGE_FINISH_DELAY_MS)
+                    onImagesFinished()
+                    return@launch
+                }
+            }
+        }
     }
 
     private fun observeSttState() {
@@ -174,23 +220,48 @@ class MemoryQuizViewModel @Inject constructor(
         }
     }
 
-    private fun goToNextQuestion() {
+    private suspend fun goToNextQuestion() {
+        imageDisplayJob?.cancel()
         val currentState = _uiState.value
         val nextIndex = currentState.currentQuestionIndex + 1
 
         if (nextIndex >= currentState.quizzes.size) {
             uploadQuizResult(currentState.correctCount, currentState.quizzes.size)
         } else {
+            waitForPreload(nextIndex, currentState.quizzes)
             _uiState.update { state ->
                 state.copy(
                     currentQuestionIndex = nextIndex,
                     showResultDialog = false,
                     quizResult = null,
                     quizState = MemoryQuizSetState.WAITING_TO_START,
+                    displayImageIndex = 0,
                     userTextAnswers = persistentListOf("", "", ""),
                 )
             }
         }
+    }
+
+    private suspend fun waitForPreload(index: Int, quizzes: ImmutableList<MemoryQuiz>) {
+        val job = preloadJobs[index] ?: startPreloadForQuestion(index, quizzes) ?: return
+        job.await()
+    }
+
+    private fun startPreloadForQuestion(
+        index: Int,
+        quizzes: ImmutableList<MemoryQuiz> = _uiState.value.quizzes,
+    ): Deferred<Boolean>? {
+        if (index !in quizzes.indices) return null
+        preloadJobs[index]?.let { return it }
+
+        return viewModelScope.async {
+            preloadQuestion(quizzes[index])
+        }.also { preloadJobs[index] = it }
+    }
+
+    private suspend fun preloadQuestion(quiz: MemoryQuiz?): Boolean {
+        quiz ?: return true
+        return imagePreloader.preload(quiz.imageUrls, QuizCategory.MEMORY)
     }
 
     private fun uploadQuizResult(correctCount: Int, totalCount: Int) {
@@ -225,6 +296,7 @@ class MemoryQuizViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        imageDisplayJob?.cancel()
         sttManager.destroy()
     }
 }
@@ -243,6 +315,7 @@ data class MemoryQuizUiState(
     val inputMode: InputMode,
     val isSpeaking: Boolean,
     val isChangeModeButtonEnabled: Boolean,
+    val displayImageIndex: Int,
     val userTextAnswers: PersistentList<String>,
 ) {
     val currentQuiz: MemoryQuiz?
@@ -271,6 +344,7 @@ data class MemoryQuizUiState(
             inputMode = InputMode.VOICE,
             isSpeaking = false,
             isChangeModeButtonEnabled = false,
+            displayImageIndex = 0,
             userTextAnswers = persistentListOf("", "", ""),
         )
     }
@@ -278,3 +352,6 @@ data class MemoryQuizUiState(
 
 enum class MemoryQuizSetState { WAITING_TO_START, QUESTION_DISPLAY, ANSWERING }
 enum class InputMode { TEXT, VOICE }
+
+private const val MEMORY_IMAGE_DISPLAY_MS = 1200L
+private const val MEMORY_IMAGE_FINISH_DELAY_MS = 500L

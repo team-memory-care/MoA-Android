@@ -31,6 +31,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,6 +53,7 @@ class DailyQuizViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(DailyQuizUiState.INIT)
     val uiState: StateFlow<DailyQuizUiState> = _uiState.asStateFlow()
+    private var memoryImageDisplayJob: Job? = null
 
     init {
         observeSttState()
@@ -101,11 +103,42 @@ class DailyQuizViewModel @Inject constructor(
     }
 
     fun displayQuizImages() {
-        _uiState.update { it.copy(memoryQuizState = MemoryQuizSetState.QUESTION_DISPLAY) }
+        _uiState.update {
+            it.copy(
+                memoryQuizState = MemoryQuizSetState.QUESTION_DISPLAY,
+                memoryDisplayImageIndex = 0,
+            )
+        }
+        startMemoryImageDisplayTimer()
     }
 
-    fun onImagesFinished() {
-        _uiState.update { it.copy(memoryQuizState = MemoryQuizSetState.ANSWERING) }
+    private fun onImagesFinished() {
+        _uiState.update {
+            it.copy(
+                memoryQuizState = MemoryQuizSetState.ANSWERING,
+                memoryDisplayImageIndex = 0,
+            )
+        }
+    }
+
+    private fun startMemoryImageDisplayTimer() {
+        memoryImageDisplayJob?.cancel()
+        memoryImageDisplayJob = viewModelScope.launch {
+            while (true) {
+                delay(MEMORY_IMAGE_DISPLAY_MS)
+                val currentState = _uiState.value
+                val currentQuiz = currentState.currentQuiz as? MemoryQuiz ?: return@launch
+                val nextImageIndex = currentState.memoryDisplayImageIndex + 1
+
+                if (nextImageIndex < currentQuiz.imageUrls.size) {
+                    _uiState.update { it.copy(memoryDisplayImageIndex = nextImageIndex) }
+                } else {
+                    delay(MEMORY_IMAGE_FINISH_DELAY_MS)
+                    onImagesFinished()
+                    return@launch
+                }
+            }
+        }
     }
 
     private fun observeSttState() {
@@ -197,6 +230,7 @@ class DailyQuizViewModel @Inject constructor(
     }
 
     private fun goToNextQuestion() {
+        memoryImageDisplayJob?.cancel()
         val currentState = _uiState.value
         val nextIndex = currentState.currentQuestionIndex + 1
 
@@ -211,6 +245,7 @@ class DailyQuizViewModel @Inject constructor(
                     selectedAnswerIndex = null,
                     attentionQuizAnswer = "",
                     memoryQuizState = MemoryQuizSetState.WAITING_TO_START,
+                    memoryDisplayImageIndex = 0,
                     memoryQuizTextAnswers = persistentListOf("", "", ""),
                 )
             }
@@ -265,6 +300,7 @@ class DailyQuizViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        memoryImageDisplayJob?.cancel()
         sttManager.destroy()
     }
 }
@@ -285,6 +321,7 @@ data class DailyQuizUiState(
     val memoryQuizInputMode: InputMode = InputMode.VOICE,
     val isSpeaking: Boolean = false,
     val isChangeModeButtonEnabled: Boolean = false,
+    val memoryDisplayImageIndex: Int = 0,
     val memoryQuizTextAnswers: PersistentList<String> = persistentListOf("", "", ""),
 
     val showExitDialog: Boolean,
@@ -329,3 +366,6 @@ data class DailyQuizUiState(
         )
     }
 }
+
+private const val MEMORY_IMAGE_DISPLAY_MS = 1200L
+private const val MEMORY_IMAGE_FINISH_DELAY_MS = 500L
