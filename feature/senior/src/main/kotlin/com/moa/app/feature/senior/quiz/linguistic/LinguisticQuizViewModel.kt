@@ -8,6 +8,7 @@ import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.internal.QUIZ_RESULT_DISPLAY_MS
+import com.moa.app.feature.senior.quiz.internal.QuizImagePreloader
 import com.moa.app.feature.senior.quiz.internal.loadQuizzesWithMinDelay
 import com.moa.app.feature.senior.quiz.linguistic.model.LinguisticQuizUiState
 import com.moa.app.feature.senior.quiz.internal.QuizResult
@@ -15,6 +16,9 @@ import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,10 +34,12 @@ class LinguisticQuizViewModel @Inject constructor(
     ttsManager: TtsManager,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
+    private val imagePreloader: QuizImagePreloader,
 ) : TtsAwareViewModel(ttsManager) {
 
     private val _uiState = MutableStateFlow(LinguisticQuizUiState.INIT)
     val uiState: StateFlow<LinguisticQuizUiState> = _uiState.asStateFlow()
+    private val preloadJobs = mutableMapOf<Int, Deferred<Boolean>>()
 
     init {
         loadLinguisticQuizzes()
@@ -42,10 +48,13 @@ class LinguisticQuizViewModel @Inject constructor(
     private fun loadLinguisticQuizzes() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            loadQuizzesWithMinDelay<LinguisticQuiz>(QuizCategory.LINGUISTIC, fetchQuizUseCase)
+            loadQuizzesWithMinDelay<LinguisticQuiz>(QuizCategory.LINGUISTIC, fetchQuizUseCase) { quizzes ->
+                preloadQuestion(quizzes.firstOrNull())
+            }
                 .fold(
                     onSuccess = { quizzes ->
                         _uiState.update { it.copy(isLoading = false, quizzes = quizzes) }
+                        startPreloadForQuestion(1, quizzes)
                     },
                     onFailure = { t ->
                         Timber.e(t, "loadLinguisticQuizzes failed")
@@ -88,13 +97,14 @@ class LinguisticQuizViewModel @Inject constructor(
         }
     }
 
-    private fun goToNextQuestion() {
+    private suspend fun goToNextQuestion() {
         val currentState = _uiState.value
         val nextIndex = currentState.currentQuestionIndex + 1
 
         if (nextIndex >= currentState.quizzes.size) {
             uploadQuizResult(currentState.correctCount, currentState.quizzes.size)
         } else {
+            waitForPreload(nextIndex, currentState.quizzes)
             _uiState.update { state ->
                 state.copy(
                     currentQuestionIndex = nextIndex,
@@ -103,7 +113,30 @@ class LinguisticQuizViewModel @Inject constructor(
                     quizResult = null,
                 )
             }
+            startPreloadForQuestion(nextIndex + 1, currentState.quizzes)
         }
+    }
+
+    private suspend fun waitForPreload(index: Int, quizzes: ImmutableList<LinguisticQuiz>) {
+        val job = preloadJobs[index] ?: startPreloadForQuestion(index, quizzes) ?: return
+        job.await()
+    }
+
+    private fun startPreloadForQuestion(
+        index: Int,
+        quizzes: ImmutableList<LinguisticQuiz> = _uiState.value.quizzes,
+    ): Deferred<Boolean>? {
+        if (index !in quizzes.indices) return null
+        preloadJobs[index]?.let { return it }
+
+        return viewModelScope.async {
+            preloadQuestion(quizzes[index])
+        }.also { preloadJobs[index] = it }
+    }
+
+    private suspend fun preloadQuestion(quiz: LinguisticQuiz?): Boolean {
+        quiz ?: return true
+        return imagePreloader.preload(listOf(quiz.questionImage), QuizCategory.LINGUISTIC)
     }
 
     private fun uploadQuizResult(correctCount: Int, totalCount: Int) {

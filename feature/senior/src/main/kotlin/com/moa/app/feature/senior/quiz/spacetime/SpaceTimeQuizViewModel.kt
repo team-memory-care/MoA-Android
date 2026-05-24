@@ -8,6 +8,7 @@ import com.moa.app.domain.quiz.model.UserAnswer
 import com.moa.app.domain.quiz.usecase.FetchQuizUseCase
 import com.moa.app.domain.quiz.usecase.UploadQuizScoreUseCase
 import com.moa.app.feature.senior.quiz.internal.QUIZ_RESULT_DISPLAY_MS
+import com.moa.app.feature.senior.quiz.internal.QuizImagePreloader
 import com.moa.app.feature.senior.quiz.internal.loadQuizzesWithMinDelay
 import com.moa.app.feature.senior.quiz.internal.QuizResult
 import com.moa.app.feature.senior.quiz.spacetime.model.SpaceTimeQuizUiState
@@ -15,6 +16,9 @@ import com.moa.app.feature.senior.quiz.tts.TtsAwareViewModel
 import com.moa.app.feature.senior.quiz.tts.TtsManager
 import com.moa.app.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,10 +34,12 @@ class SpaceTimeQuizViewModel @Inject constructor(
     ttsManager: TtsManager,
     private val fetchQuizUseCase: FetchQuizUseCase,
     private val uploadQuizScoreUseCase: UploadQuizScoreUseCase,
+    private val imagePreloader: QuizImagePreloader,
 ) : TtsAwareViewModel(ttsManager) {
 
     private val _uiState = MutableStateFlow(SpaceTimeQuizUiState.INIT)
     val uiState: StateFlow<SpaceTimeQuizUiState> = _uiState.asStateFlow()
+    private val preloadJobs = mutableMapOf<Int, Deferred<Boolean>>()
 
     init {
         loadSpaceTimeQuizzes()
@@ -42,10 +48,13 @@ class SpaceTimeQuizViewModel @Inject constructor(
     private fun loadSpaceTimeQuizzes() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            loadQuizzesWithMinDelay<SpaceTimeQuiz>(QuizCategory.SPACETIME, fetchQuizUseCase)
+            loadQuizzesWithMinDelay<SpaceTimeQuiz>(QuizCategory.SPACETIME, fetchQuizUseCase) { quizzes ->
+                preloadQuestion(quizzes.firstOrNull())
+            }
                 .fold(
                     onSuccess = { quizzes ->
                         _uiState.update { it.copy(isLoading = false, quizzes = quizzes) }
+                        startPreloadForQuestion(1, quizzes)
                     },
                     onFailure = { t ->
                         Timber.e(t, "loadSpaceTimeQuizzes failed")
@@ -88,13 +97,14 @@ class SpaceTimeQuizViewModel @Inject constructor(
         }
     }
 
-    private fun goToNextQuestion() {
+    private suspend fun goToNextQuestion() {
         val currentState = _uiState.value
         val nextIndex = currentState.currentQuestionIndex + 1
 
         if (nextIndex >= currentState.quizzes.size) {
             uploadQuizResult(currentState.correctCount, currentState.quizzes.size)
         } else {
+            waitForPreload(nextIndex, currentState.quizzes)
             _uiState.update { state ->
                 state.copy(
                     currentQuestionIndex = nextIndex,
@@ -103,7 +113,31 @@ class SpaceTimeQuizViewModel @Inject constructor(
                     quizResult = null,
                 )
             }
+            startPreloadForQuestion(nextIndex + 1, currentState.quizzes)
         }
+    }
+
+    private suspend fun waitForPreload(index: Int, quizzes: ImmutableList<SpaceTimeQuiz>) {
+        val job = preloadJobs[index] ?: startPreloadForQuestion(index, quizzes) ?: return
+        job.await()
+    }
+
+    private fun startPreloadForQuestion(
+        index: Int,
+        quizzes: ImmutableList<SpaceTimeQuiz> = _uiState.value.quizzes,
+    ): Deferred<Boolean>? {
+        if (index !in quizzes.indices) return null
+        preloadJobs[index]?.let { return it }
+
+        return viewModelScope.async {
+            preloadQuestion(quizzes[index])
+        }.also { preloadJobs[index] = it }
+    }
+
+    private suspend fun preloadQuestion(quiz: SpaceTimeQuiz?): Boolean {
+        quiz ?: return true
+        val urls = listOf(quiz.questionImageUrl) + quiz.imageOptionsUrl
+        return imagePreloader.preload(urls, QuizCategory.SPACETIME)
     }
 
     private fun uploadQuizResult(correctCount: Int, totalCount: Int) {
